@@ -21,7 +21,7 @@ export default function SavingsPanel({
 }: SavingsPanelProps) {
   if (!airco || !savings) {
     return (
-      <section id="overzicht" className="mx-auto max-w-6xl scroll-mt-4 px-4 py-12 sm:px-6">
+      <section id="overzicht" className="mx-auto max-w-6xl scroll-mt-4 px-4 py-12 sm:px-6 min-h-[60vh]">
         <div className="rounded-3xl border border-dashed border-teal/30 bg-white p-8 text-center text-ink/60">
           Kies een airco om je overzicht en indicatieve offerte te zien.
         </div>

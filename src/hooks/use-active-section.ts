@@ -14,19 +14,15 @@ export function useActiveSection() {
 
     const update = () => {
       const rootRect = root.getBoundingClientRect()
+      const activationLine = rootRect.top + Math.min(rootRect.height * 0.32, 220)
       let current = SECTION_IDS[0] ?? 'home'
-      let bestVisible = 0
 
       for (const id of SECTION_IDS) {
         const element = document.getElementById(id)
         if (!element) continue
 
         const rect = element.getBoundingClientRect()
-        const visibleHeight =
-          Math.min(rect.bottom, rootRect.bottom) - Math.max(rect.top, rootRect.top)
-
-        if (visibleHeight > bestVisible) {
-          bestVisible = visibleHeight
+        if (rect.top <= activationLine) {
           current = id
         }
       }
