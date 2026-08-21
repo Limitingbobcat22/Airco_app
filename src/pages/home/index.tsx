@@ -74,7 +74,7 @@ export default function HomePage() {
 
   return (
     <div id="top" className="flex h-full min-h-0 flex-col bg-foam">
-      <div id="page-scroll" className="min-h-0 flex-1 overflow-y-auto">
+      <div id="page-scroll" className="min-h-0 flex-1 overflow-y-auto pb-[45vh]">
         <Hero>
           <PowerForm
             areaM2={areaM2}

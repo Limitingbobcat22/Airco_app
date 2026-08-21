@@ -1,3 +1,5 @@
+import PopupModal from '@/components/shared/popup-modal'
+import { CreateKlantForm } from '@/pages/klant'
 import type { Airco } from '../data/aircos'
 import { type InsulationFactor, insulationLabel } from '../lib/power'
 import {
@@ -34,17 +36,17 @@ export default function SavingsPanel({
 }: SavingsPanelProps) {
   if (!airco || !savings) {
     return (
-      <section id="overzicht" className="mx-auto max-w-6xl scroll-mt-4 px-4 py-12 sm:px-6 min-h-[60vh]">
+      <section id="overzicht" className="mx-auto max-w-7xl scroll-mt-4 px-4 py-12 sm:px-6 min-h-[60vh] 2xl:max-w-[110rem] 2xl:px-10">
         <div className="rounded-3xl border border-dashed border-teal/30 bg-white p-8 text-center text-ink/60">
-          Kies een airco om je overzicht en geschatte netto voordeel te zien.
+          Kies een airco om uw overzicht en geschatte netto voordeel te zien.
         </div>
       </section>
     )
   }
 
   return (
-    <section id="overzicht" className="scroll-mt-4 px-4 py-12 sm:px-6 sm:py-16">
-      <div className="mx-auto max-w-6xl">
+    <section id="overzicht" className="mx-auto max-w-7xl scroll-mt-4 px-4 py-12 sm:px-6 sm:py-16 2xl:max-w-[110rem] 2xl:px-10">
+      <div>
         <p className="text-xs font-medium tracking-[0.2em] text-teal uppercase">
           Stap 4
         </p>
@@ -52,14 +54,14 @@ export default function SavingsPanel({
           Overzicht {airco.brand} {airco.series} {airco.sizeCode}
         </h2>
         <p className="mt-3 max-w-2xl text-ink/70">
-          Je geschatte netto voordeel en het passende vermogen op basis van de
+          Uw geschatte netto voordeel en het passende vermogen op basis van de
           gekozen airco. De exacte prijs bespreken we samen op afspraak.
         </p>
 
         <div className="mt-8 grid gap-4 lg:grid-cols-3">
           <div className="rounded-3xl border border-mist bg-white p-5 sm:p-6">
             <p className="text-xs font-medium tracking-wide text-teal uppercase">
-              Jouw ruimte
+              Uw ruimte
             </p>
             <dl className="mt-4 space-y-3 text-sm text-ink/75">
               <div className="flex justify-between gap-3">
@@ -142,7 +144,7 @@ export default function SavingsPanel({
             </p>
             <p className="mt-2 text-sm text-white/70">
               Na dit overzicht plannen we een afspraak. Dan bespreken we de
-              exacte prijs en installatie voor jouw situatie.
+              exacte prijs en installatie voor uw situatie.
             </p>
             <dl className="mt-5 space-y-3 text-sm text-white/75">
               <div className="flex justify-between gap-3">
@@ -164,12 +166,42 @@ export default function SavingsPanel({
                 </dd>
               </div>
             </dl>
-            <button
-              type="button"
-              className="mt-6 w-full rounded-xl bg-mint py-3 text-sm font-semibold text-ink hover:bg-white"
-            >
-              Afspraak aanvragen
-            </button>
+            <PopupModal
+              maxWidth="md:max-w-[720px]"
+              maxHeight="max-h-[85dvh]"
+              renderButton={(onClick) => (
+                <button
+                  type="button"
+                  onClick={onClick}
+                  className="mt-6 w-full rounded-xl bg-mint py-3 text-sm font-semibold text-ink hover:bg-white"
+                >
+                  Offerte aanvragen
+                </button>
+              )}
+              renderModal={(onClose) => (
+                <CreateKlantForm
+                  onClose={onClose}
+                  offerte={{
+                    aircoLabel: `${airco.brand} ${airco.series} ${airco.sizeCode}`,
+                    coolingKw: airco.coolingKw,
+                    heatingKw: airco.heatingKw,
+                    netEuroSavedYearly: savings.yearly.netEuroSaved,
+                  }}
+                  onSubmit={async (data) => {
+                    // TODO: API — e-mail versturen met NAW + offertecontext
+                    console.info('Offerteaanvraag (nog zonder backend)', {
+                      klant: data,
+                      offerte: {
+                        aircoLabel: `${airco.brand} ${airco.series} ${airco.sizeCode}`,
+                        coolingKw: airco.coolingKw,
+                        heatingKw: airco.heatingKw,
+                        netEuroSavedYearly: savings.yearly.netEuroSaved,
+                      },
+                    })
+                  }}
+                />
+              )}
+            />
             <p className="mt-3 text-xs text-white/45">
               Geen vaste catalogusprijs — alles op maat.
             </p>
@@ -180,7 +212,7 @@ export default function SavingsPanel({
           <h3 className="font-display text-xl">Uitgangspunten</h3>
           <ul className="mt-4 grid gap-3 text-sm text-ink/75 lg:grid-cols-2">
             <li>
-              {heatingSharePct}% van je jaarlijkse gasverbruik wordt
+              {heatingSharePct}% van uw jaarlijkse gasverbruik wordt
               vervangen door verwarming via de airco.
             </li>
             <li>

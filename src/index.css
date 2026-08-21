@@ -44,6 +44,7 @@
   --animate-sheet-fade-in: sheet-fade-in 500ms ease-out both;
   --animate-sheet-fade-out: sheet-fade-out 400ms ease-in both;
   --animate-kw-pulse: kw-pulse 2.8s ease-in-out infinite;
+  --animate-card-glow-pulse: card-glow-pulse 2.8s ease-in-out infinite;
 
   @keyframes sheet-in-left {
     from {
@@ -88,6 +89,62 @@
     }
     50% {
       color: #3ee0c0;
+    }
+  }
+
+  @keyframes card-glow-pulse {
+    0%,
+    100% {
+      background: var(--glow-dark);
+    }
+    50% {
+      background: var(--glow-light);
+    }
+  }
+}
+
+@layer components {
+  .airco-card-glow {
+    pointer-events: none;
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    border-radius: inherit;
+    padding: 4px;
+    background: var(--glow-dark);
+    -webkit-mask:
+      linear-gradient(#fff 0 0) content-box,
+      linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+  }
+
+  .airco-card-glow--fit {
+    --glow-dark: #0f766e;
+    --glow-light: #3ee0c0;
+    animation: var(--animate-card-glow-pulse);
+  }
+
+  .airco-card-glow--miss {
+    --glow-dark: #9aa6ad;
+    background: #9aa6ad;
+  }
+
+  .airco-card-shadow--fit {
+    box-shadow:
+      0 0 0 1px rgba(15, 118, 110, 0.28),
+      0 0 18px rgba(62, 224, 192, 0.22),
+      0 10px 28px rgba(15, 118, 110, 0.12);
+  }
+
+  .airco-card-shadow--miss {
+    box-shadow: 0 8px 22px rgba(7, 20, 28, 0.06);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .airco-card-glow--fit {
+      animation: none;
+      background: var(--glow-light);
     }
   }
 }

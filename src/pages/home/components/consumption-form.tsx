@@ -63,17 +63,17 @@ export default function ConsumptionForm({
   onHeatingShareChange,
 }: ConsumptionFormProps) {
   return (
-    <section id="verbruik" className="mx-auto max-w-6xl scroll-mt-4 px-4 py-12 sm:px-6 sm:py-16">
+    <section id="verbruik" className="mx-auto max-w-7xl scroll-mt-4 px-4 py-12 sm:px-6 sm:py-16 2xl:max-w-[110rem] 2xl:px-10">
       <div className="max-w-2xl">
         <p className="text-xs font-medium tracking-[0.2em] text-teal uppercase">
           Stap 3
         </p>
         <h2 className="mt-2 font-display text-3xl text-ink sm:text-4xl">
-          Bereken je besparing
+          Bereken uw besparing
         </h2>
         <p className="mt-3 text-ink/70">
-          Vul je jaarlijks gasverbruik en energietarieven in. We rekenen direct
-          uit wat je per jaar bespaart met de gekozen airco.
+          Vul uw jaarlijks gasverbruik en energietarieven in. We rekenen direct
+          uit wat u per jaar bespaart met de gekozen airco.
         </p>
       </div>
 

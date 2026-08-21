@@ -39,7 +39,7 @@ export const AIRCOS: Airco[] = [
     model: 'Wandmodel',
     tag: 'Instapmodel & Populair',
     description:
-      'Compact, strak mat wit design en voorzien van slimme Wi-Fi bediening en Coanda Plus luchtstroom.',
+      'Compact, strak mat wit design en voorzien van slimme Wi-Fi bediening en Coanda Plus luchtstroom. Een betrouwbare instapper die uw woning zuinig koelt en in het voor- en najaar verwarmt.',
     features: [
       'Energielabel A++ / A++',
       'Slechts 18 dB(A) fluisterstil',
@@ -74,12 +74,12 @@ export const AIRCOS: Airco[] = [
     model: 'Wandmodel',
     tag: 'Meest Verkocht',
     description:
-      'Luxe uitvoering verkrijgbaar in mat wit en mat zwart. Voorzien van Eco-sensor voor maximaal comfort.',
+      'Luxe uitvoering verkrijgbaar in mat wit en mat zwart. Voorzien van Eco-sensor voor maximaal comfort, UV-C luchtreiniging en een stil, energiezuinig klimaat het hele jaar door.',
     features: [
-      'Verkrijgbaar in Wit & Zwart',
-      'Eco-Sensor (aanwezigheidsdetectie)',
-      'UV-C Sterilisatie (luchtreiniging)',
-      'Energielabel A+++ / A++',
+      'Luxe designafwerking in wit & zwart',
+      'UV-C Luchtzuivering',
+      'Eco-Sensor energiebesparing',
+      'Ingebouwde Wi-Fi module',
     ],
     coolingKw: 3.5,
     heatingKw: 4.2,
@@ -110,7 +110,7 @@ export const AIRCOS: Airco[] = [
     model: 'Wandmodel',
     tag: 'Voordelig & Efficient',
     description:
-      'Het perfecte basismodel voor snelle koeling en verwarming met een uitstekende prijs-kwaliteitverhouding.',
+      'Het perfecte basismodel voor snelle koeling en verwarming met een uitstekende prijs-kwaliteitverhouding. Degelijk, zuinig en eenvoudig te bedienen via de app.',
     features: [
       'Energielabel A++ / A+',
       'Snelle koeling & verwarming',
@@ -145,7 +145,7 @@ export const AIRCOS: Airco[] = [
     model: 'Wandmodel',
     tag: 'Premium Luchtreiniger',
     description:
-      'Combineert een hoogwaardige A+++ airconditioning met een professionele IFD-luchtreiniger.',
+      'Combineert een hoogwaardige A+++ airconditioning met een professionele IFD-luchtreiniger. Ideaal als u naast comfort ook schonere lucht in huis wilt.',
     features: [
       'Energielabel A+++ / A+++',
       'Geïntegreerd IFD-luchtfilter',
@@ -179,7 +179,7 @@ export const AIRCOS: Airco[] = [
     model: 'Wandmodel',
     tag: 'Topklasse & Hygiëne',
     description:
-      'Ontworpen voor maximale hygiëne en eenvoudig onderhoud met ingebouwde UV-C Pro technologie.',
+      'Ontworpen voor maximale hygiëne en eenvoudig onderhoud met ingebouwde UV-C Pro technologie. Topklasse comfort met Coanda Airflow en een hoog energielabel.',
     features: [
       'UV-C Pro luchtreiniging',
       'Extreem makkelijk te reinigen',
@@ -214,7 +214,7 @@ export const AIRCOS: Airco[] = [
     model: 'MSZ-LN',
     tag: 'Stil en betrouwbaar',
     description:
-      'Wandmodel MSZ-LN. Energielabel A+++ voor koelen en verwarmen, fluisterstil tot 19 dB(A).',
+      'Wandmodel MSZ-LN. Energielabel A+++ voor koelen en verwarmen, fluisterstil tot 19 dB(A). Een stijlvol Mitsubishi-design voor wie stilte en betrouwbaarheid belangrijk vindt.',
     features: [
       'Energielabel A+++ / A+++',
       'Slechts 19 dB(A) fluisterstil',
