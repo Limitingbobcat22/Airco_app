@@ -26,8 +26,8 @@ export default function Hero({ children }: HeroProps) {
           </h1>
           <p className="mt-5 max-w-lg text-base text-white/75 sm:text-lg">
             Bereken het vermogen voor jouw ruimte, kies een Haier- of
-            Mitsubishi-model, en zie wat je bespaart — tot een indicatieve
-            offerte.
+            Mitsubishi-model, en zie je geschatte netto voordeel. De prijs
+            bespreken we daarna op afspraak.
           </p>
         </div>
         {children}

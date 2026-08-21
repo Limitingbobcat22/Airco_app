@@ -52,9 +52,6 @@ function Tile({
 }
 
 export default function SavingsDock({ airco, savings, visible }: SavingsDockProps) {
-  const extraElec = savings?.yearly.extraElecKwh ?? 0
-  const elecLabel = extraElec >= 0 ? 'Extra stroom' : 'Minder stroom'
-
   return (
     <div
       className={cn(
@@ -68,7 +65,7 @@ export default function SavingsDock({ airco, savings, visible }: SavingsDockProp
             <div className="grid grid-cols-2 gap-2 lg:grid-cols-4">
               <Tile
                 accent
-                label="Netto voordeel"
+                label="Geschat netto voordeel"
                 value={eur.format(savings.yearly.netEuroSaved)}
                 hint={`${eur.format(savings.monthly.netEuroSaved)} / maand`}
               />
@@ -78,9 +75,9 @@ export default function SavingsDock({ airco, savings, visible }: SavingsDockProp
                 hint={`${eur.format(savings.yearly.gasEuroSaved)} gaskosten`}
               />
               <Tile
-                label={elecLabel}
-                value={`${num.format(Math.abs(extraElec))} kWh`}
-                hint={`${eur.format(Math.abs(savings.yearly.elecEuroDelta))} stroom`}
+                label="Extra stroom"
+                value={`${num.format(savings.yearly.extraElecKwh)} kWh`}
+                hint={`${eur.format(savings.yearly.elecEuroDelta)} stroom`}
               />
               <Tile
                 label="CO₂-winst"

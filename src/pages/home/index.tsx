@@ -11,15 +11,19 @@ import {
   calculateRequiredPower,
   type InsulationFactor,
 } from './lib/power'
-import { calculateSavings } from './lib/savings'
+import { SAVINGS_DEFAULTS, calculateSavings } from './lib/savings'
 
 export default function HomePage() {
   const [areaM2, setAreaM2] = useState<number | null>(null)
   const [heightM, setHeightM] = useState(2.5)
   const [insulationFactor, setInsulationFactor] =
     useState<InsulationFactor>(40)
-  const [monthlyGas, setMonthlyGas] = useState(0)
-  const [monthlyElec, setMonthlyElec] = useState(0)
+  const [yearlyGas, setYearlyGas] = useState(SAVINGS_DEFAULTS.yearlyGasM3)
+  const [gasPrice, setGasPrice] = useState(SAVINGS_DEFAULTS.gasPriceEur)
+  const [elecPrice, setElecPrice] = useState(SAVINGS_DEFAULTS.elecPriceEur)
+  const [heatingSharePct, setHeatingSharePct] = useState(
+    SAVINGS_DEFAULTS.heatingSharePct,
+  )
   const [hasAdjustedConsumption, setHasAdjustedConsumption] = useState(false)
   const [selectedId, setSelectedId] = useState<string | null>(null)
 
@@ -32,14 +36,26 @@ export default function HomePage() {
     [areaM2, heightM, insulationFactor],
   )
 
-  const handleGasChange = (value: number) => {
-    setMonthlyGas(value)
-    setHasAdjustedConsumption(true)
+  const markAdjusted = () => setHasAdjustedConsumption(true)
+
+  const handleYearlyGasChange = (value: number) => {
+    setYearlyGas(value)
+    markAdjusted()
   }
 
-  const handleElecChange = (value: number) => {
-    setMonthlyElec(value)
-    setHasAdjustedConsumption(true)
+  const handleGasPriceChange = (value: number) => {
+    setGasPrice(value)
+    markAdjusted()
+  }
+
+  const handleElecPriceChange = (value: number) => {
+    setElecPrice(value)
+    markAdjusted()
+  }
+
+  const handleHeatingShareChange = (value: number) => {
+    setHeatingSharePct(value)
+    markAdjusted()
   }
 
   const selected = AIRCOS.find((airco) => airco.id === selectedId) ?? null
@@ -47,7 +63,13 @@ export default function HomePage() {
     ? applyCapacity(selected, power?.requiredKw ?? null)
     : null
   const savings = sized
-    ? calculateSavings(monthlyGas, monthlyElec, sized)
+    ? calculateSavings({
+        yearlyGasM3: yearlyGas,
+        gasPriceEur: gasPrice,
+        elecPriceEur: elecPrice,
+        heatingSharePct,
+        scop: sized.scop,
+      })
     : null
 
   return (
@@ -72,10 +94,15 @@ export default function HomePage() {
           onSelect={setSelectedId}
         />
         <ConsumptionForm
-          monthlyGas={monthlyGas}
-          monthlyElec={monthlyElec}
-          onGasChange={handleGasChange}
-          onElecChange={handleElecChange}
+          yearlyGas={yearlyGas}
+          gasPrice={gasPrice}
+          elecPrice={elecPrice}
+          heatingSharePct={heatingSharePct}
+          airco={sized}
+          onYearlyGasChange={handleYearlyGasChange}
+          onGasPriceChange={handleGasPriceChange}
+          onElecPriceChange={handleElecPriceChange}
+          onHeatingShareChange={handleHeatingShareChange}
         />
         <SavingsPanel
           airco={sized}
@@ -84,12 +111,15 @@ export default function HomePage() {
           areaM2={areaM2}
           heightM={heightM}
           insulationFactor={insulationFactor}
+          heatingSharePct={heatingSharePct}
+          gasPrice={gasPrice}
+          elecPrice={elecPrice}
         />
       </div>
       <SavingsDock
         airco={sized}
         savings={savings}
-        visible={hasAdjustedConsumption}
+        visible={hasAdjustedConsumption || selectedId != null}
       />
     </div>
   )

@@ -22,7 +22,7 @@ export default function AircoGrid({
   )
 
   return (
-    <section id="modellen" className="mx-auto max-w-6xl scroll-mt-4 px-4 py-12 sm:px-6 sm:py-16">
+    <section id="modellen" className="mx-auto max-w-7xl scroll-mt-4 px-4 py-12 sm:px-6 sm:py-16 2xl:max-w-[110rem] 2xl:px-10">
       <div className="max-w-2xl">
         <p className="text-xs font-medium tracking-[0.2em] text-teal uppercase">
           Stap 2
@@ -36,7 +36,7 @@ export default function AircoGrid({
             : 'Bereken eerst het vermogen in stap 1. Kies daarna zelf een airco die bij dat vermogen past.'}
         </p>
       </div>
-      <div className="mt-8 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+      <div className="mt-8 grid gap-6 2xl:grid-cols-2 2xl:gap-8">
         {byPrice.map((airco) => (
           <AircoCard
             key={airco.id}

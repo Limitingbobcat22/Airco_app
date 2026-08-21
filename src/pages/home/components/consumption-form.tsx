@@ -1,11 +1,19 @@
+import type { Airco } from '../data/aircos'
+import { dec } from '../lib/savings'
+
 type ConsumptionFormProps = {
-  monthlyGas: number
-  monthlyElec: number
-  onGasChange: (value: number) => void
-  onElecChange: (value: number) => void
+  yearlyGas: number
+  gasPrice: number
+  elecPrice: number
+  heatingSharePct: number
+  airco: Airco | null
+  onYearlyGasChange: (value: number) => void
+  onGasPriceChange: (value: number) => void
+  onElecPriceChange: (value: number) => void
+  onHeatingShareChange: (value: number) => void
 }
 
-function Field({
+function NumberField({
   label,
   unit,
   value,
@@ -24,39 +32,35 @@ function Field({
 }) {
   return (
     <label className="block">
-      <span className="mb-2 flex items-baseline justify-between text-sm text-ink/70">
-        <span>{label}</span>
-        <span className="font-medium text-teal">
-          {value} {unit}
+      <span className="mb-2 block text-sm font-medium text-ink/70">{label}</span>
+      <div className="relative">
+        <input
+          type="number"
+          min={min}
+          max={max}
+          step={step}
+          value={value}
+          onChange={(event) => onChange(Number(event.target.value))}
+          className="w-full rounded-xl border border-mist bg-foam px-3 py-2.5 pr-16 text-ink outline-none focus:border-teal"
+        />
+        <span className="pointer-events-none absolute top-1/2 right-3 -translate-y-1/2 text-sm text-ink/45">
+          {unit}
         </span>
-      </span>
-      <input
-        type="range"
-        min={min}
-        max={max}
-        step={step}
-        value={value}
-        onChange={(event) => onChange(Number(event.target.value))}
-        className="h-2 w-full cursor-pointer appearance-none rounded-full bg-mist accent-teal"
-      />
-      <input
-        type="number"
-        min={min}
-        max={max}
-        step={step}
-        value={value}
-        onChange={(event) => onChange(Number(event.target.value))}
-        className="mt-3 w-full rounded-xl border border-mist bg-foam px-3 py-2 text-ink outline-none focus:border-teal"
-      />
+      </div>
     </label>
   )
 }
 
 export default function ConsumptionForm({
-  monthlyGas,
-  monthlyElec,
-  onGasChange,
-  onElecChange,
+  yearlyGas,
+  gasPrice,
+  elecPrice,
+  heatingSharePct,
+  airco,
+  onYearlyGasChange,
+  onGasPriceChange,
+  onElecPriceChange,
+  onHeatingShareChange,
 }: ConsumptionFormProps) {
   return (
     <section id="verbruik" className="mx-auto max-w-6xl scroll-mt-4 px-4 py-12 sm:px-6 sm:py-16">
@@ -68,8 +72,8 @@ export default function ConsumptionForm({
           Bereken je besparing
         </h2>
         <p className="mt-3 text-ink/70">
-          Vul je gemiddelde maandverbruik in. We rekenen daarna uit wat dit
-          model je per jaar scheelt.
+          Vul je jaarlijks gasverbruik en energietarieven in. We rekenen direct
+          uit wat je per jaar bespaart met de gekozen airco.
         </p>
       </div>
 
@@ -78,25 +82,65 @@ export default function ConsumptionForm({
         onSubmit={(event) => event.preventDefault()}
       >
         <div className="grid gap-6 sm:grid-cols-2">
-          <Field
-            label="Gas per maand"
+          <NumberField
+            label="Uw jaarlijks gasverbruik (m³)"
             unit="m³"
-            value={monthlyGas}
+            value={yearlyGas}
             min={0}
-            max={400}
-            step={5}
-            onChange={onGasChange}
+            max={10000}
+            step={50}
+            onChange={onYearlyGasChange}
           />
-          <Field
-            label="Stroom per maand"
-            unit="kWh"
-            value={monthlyElec}
+          <NumberField
+            label="Huidige gasprijs (€ per m³)"
+            unit="€ / m³"
+            value={gasPrice}
             min={0}
-            max={800}
-            step={10}
-            onChange={onElecChange}
+            max={5}
+            step={0.01}
+            onChange={onGasPriceChange}
           />
+          <NumberField
+            label="Huidige stroomprijs (€ per kWh)"
+            unit="€ / kWh"
+            value={elecPrice}
+            min={0}
+            max={2}
+            step={0.01}
+            onChange={onElecPriceChange}
+          />
+
+          <label className="block sm:col-span-2">
+            <span className="mb-2 flex items-baseline justify-between text-sm font-medium text-ink/70">
+              <span>Deel van de woning verwarmd via airco</span>
+              <span className="font-semibold text-teal">{heatingSharePct}%</span>
+            </span>
+            <input
+              type="range"
+              min={10}
+              max={100}
+              step={5}
+              value={heatingSharePct}
+              onChange={(event) => onHeatingShareChange(Number(event.target.value))}
+              className="h-2 w-full cursor-pointer appearance-none rounded-full bg-mist accent-teal"
+            />
+          </label>
         </div>
+
+        {airco ? (
+          <p className="mt-6 rounded-2xl border border-mist bg-foam px-4 py-3 text-sm text-ink/70">
+            Gekozen model:{' '}
+            <span className="font-medium text-ink">
+              {airco.brand} {airco.series}
+            </span>
+            {' · '}
+            SCOP {dec.format(airco.scop)} ({airco.energyClassHeating})
+          </p>
+        ) : (
+          <p className="mt-6 rounded-2xl border border-dashed border-mist bg-foam px-4 py-3 text-sm text-ink/55">
+            Kies eerst een airco in stap 2 om de besparing te berekenen.
+          </p>
+        )}
       </form>
     </section>
   )

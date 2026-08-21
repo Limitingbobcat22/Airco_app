@@ -1,21 +1,23 @@
-import type { Airco } from '../data/aircos'
+export const SAVINGS_DEFAULTS: {
+  yearlyGasM3: number
+  gasPriceEur: number
+  elecPriceEur: number
+  heatingSharePct: number
+} = {
+  yearlyGasM3: 1200,
+  gasPriceEur: 1.35,
+  elecPriceEur: 0.3,
+  heatingSharePct: 70,
+}
 
-export const ENERGY = {
-  gasKwhPerM3: 9.77,
-  boilerEfficiency: 0.9,
-  gasPriceEur: 1.4,
-  elecPriceEur: 0.28,
-  co2GasKgPerM3: 1.78,
-  co2ElecKgPerKwh: 0.244,
-  spaceHeatingShare: 0.7,
-  oldCoolingSeer: 3.2,
-  coolingShareOfElec: 0.08,
+export const SAVINGS_CONSTANTS = {
+  gasKwhPerM3: 8.8,
+  co2GasKgPerM3: 1.8,
 } as const
 
 export type PeriodSavings = {
   gasM3Saved: number
   heatingElecKwh: number
-  coolingElecSavedKwh: number
   extraElecKwh: number
   gasEuroSaved: number
   elecEuroDelta: number
@@ -24,16 +26,22 @@ export type PeriodSavings = {
 }
 
 export type SavingsResult = {
-  monthly: PeriodSavings
   yearly: PeriodSavings
-  paybackYears: number | null
+  monthly: PeriodSavings
+}
+
+export type SavingsInput = {
+  yearlyGasM3: number
+  gasPriceEur: number
+  elecPriceEur: number
+  heatingSharePct: number
+  scop: number
 }
 
 function scale(period: PeriodSavings, factor: number): PeriodSavings {
   return {
     gasM3Saved: period.gasM3Saved * factor,
     heatingElecKwh: period.heatingElecKwh * factor,
-    coolingElecSavedKwh: period.coolingElecSavedKwh * factor,
     extraElecKwh: period.extraElecKwh * factor,
     gasEuroSaved: period.gasEuroSaved * factor,
     elecEuroDelta: period.elecEuroDelta * factor,
@@ -42,46 +50,41 @@ function scale(period: PeriodSavings, factor: number): PeriodSavings {
   }
 }
 
-export function calculateSavings(
-  monthlyGasM3: number,
-  monthlyElecKwh: number,
-  airco: Airco,
-): SavingsResult {
-  const gas = Math.max(0, monthlyGasM3)
-  const elec = Math.max(0, monthlyElecKwh)
+export function calculateSavings({
+  yearlyGasM3,
+  gasPriceEur,
+  elecPriceEur,
+  heatingSharePct,
+  scop,
+}: SavingsInput): SavingsResult {
+  const gas = Math.max(0, yearlyGasM3)
+  const gasPrice = Math.max(0, gasPriceEur)
+  const elecPrice = Math.max(0, elecPriceEur)
+  const share = Math.min(100, Math.max(0, heatingSharePct))
+  const safeScop = scop > 0 ? scop : 1
 
-  const replaceableGas = gas * ENERGY.spaceHeatingShare * airco.heatingCoverage
-  const usefulHeatKwh = replaceableGas * ENERGY.gasKwhPerM3 * ENERGY.boilerEfficiency
-  const heatingElecKwh = airco.scop > 0 ? usefulHeatKwh / airco.scop : 0
+  const gasM3Saved = Math.round(gas * (share / 100))
+  const gasEuroSaved = Math.round(gasM3Saved * gasPrice)
+  const heatingElecKwh = Math.round(
+    (gasM3Saved * SAVINGS_CONSTANTS.gasKwhPerM3) / safeScop,
+  )
+  const elecEuroDelta = Math.round(heatingElecKwh * elecPrice)
+  const netEuroSaved = Math.max(0, gasEuroSaved - elecEuroDelta)
+  const co2SavedKg = Math.round(gasM3Saved * SAVINGS_CONSTANTS.co2GasKgPerM3)
 
-  const oldCoolingKwh = elec * ENERGY.coolingShareOfElec
-  const newCoolingKwh =
-    airco.seer > 0 ? oldCoolingKwh * (ENERGY.oldCoolingSeer / airco.seer) : oldCoolingKwh
-  const coolingElecSavedKwh = Math.max(0, oldCoolingKwh - newCoolingKwh)
-  const extraElecKwh = heatingElecKwh - coolingElecSavedKwh
-
-  const gasEuroSaved = replaceableGas * ENERGY.gasPriceEur
-  const elecEuroDelta = extraElecKwh * ENERGY.elecPriceEur
-  const netEuroSaved = gasEuroSaved - elecEuroDelta
-  const co2SavedKg =
-    replaceableGas * ENERGY.co2GasKgPerM3 - extraElecKwh * ENERGY.co2ElecKgPerKwh
-
-  const monthly: PeriodSavings = {
-    gasM3Saved: replaceableGas,
+  const yearly: PeriodSavings = {
+    gasM3Saved,
     heatingElecKwh,
-    coolingElecSavedKwh,
-    extraElecKwh,
+    extraElecKwh: heatingElecKwh,
     gasEuroSaved,
     elecEuroDelta,
     netEuroSaved,
     co2SavedKg,
   }
 
-  const yearly = scale(monthly, 12)
-  const paybackYears =
-    yearly.netEuroSaved > 0 ? airco.priceEur / yearly.netEuroSaved : null
+  const monthly = scale(yearly, 1 / 12)
 
-  return { monthly, yearly, paybackYears }
+  return { yearly, monthly }
 }
 
 export const eur = new Intl.NumberFormat('nl-NL', {
