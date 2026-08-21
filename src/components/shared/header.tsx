@@ -1,7 +1,9 @@
 import { Menu } from 'lucide-react'
+import { useLocation } from 'react-router'
 import { Button } from '@/components/ui/button'
 import { useActiveSection } from '@/hooks/use-active-section'
 import { getNavTitleBySectionId } from '@/lib/constants/nav-items'
+import { AIRCO_TOPIC, getTopicFromPath } from '@/lib/topics'
 import Heading from './heading'
 
 type HeaderProps = {
@@ -9,8 +11,10 @@ type HeaderProps = {
 }
 
 export default function Header({ onMenuClick }: HeaderProps) {
+  const { pathname } = useLocation()
   const activeSectionId = useActiveSection()
-  const headingText = getNavTitleBySectionId(activeSectionId)
+  const topic = getTopicFromPath(pathname) ?? AIRCO_TOPIC
+  const headingText = getNavTitleBySectionId(activeSectionId, topic)
 
   return (
     <div className="bg-secondary flex flex-1 items-center gap-2 px-3 md:px-4">

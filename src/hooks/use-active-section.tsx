@@ -1,30 +1,42 @@
-import { useEffect, useRef, useState } from 'react'
-import { useLocation } from 'react-router'
-import { getSectionIdFromHref, navItems } from '@/lib/constants/nav-items'
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type ReactNode,
+} from 'react'
+import { useLocation, useNavigate } from 'react-router'
+import {
+  AIRCO_TOPIC,
+  getSectionFromPath,
+  getTopicFromPath,
+  TOPIC_SECTIONS,
+  topicSectionPath,
+} from '@/lib/topics'
+import { markPathUpdatedFromScroll } from '@/lib/section-nav-sync'
 
-const SECTION_IDS = navItems
-  .map((item) => (item.href ? getSectionIdFromHref(item.href) : null))
-  .filter((id): id is string => Boolean(id))
+const ActiveSectionContext = createContext('vermogen')
 
-function sectionIdFromHash(hash: string) {
-  const id = hash.replace(/^#/, '')
-  return SECTION_IDS.includes(id) ? id : null
-}
-
-export function useActiveSection() {
-  const { hash } = useLocation()
+export function ActiveSectionProvider({ children }: { children: ReactNode }) {
+  const navigate = useNavigate()
+  const { pathname } = useLocation()
+  const topic = getTopicFromPath(pathname) ?? AIRCO_TOPIC
+  const sectionIds = TOPIC_SECTIONS[topic]
+  const pathSection = getSectionFromPath(pathname)
   const lockUntilRef = useRef(0)
+  const activeIdRef = useRef(pathSection ?? sectionIds[0] ?? 'vermogen')
   const [activeId, setActiveId] = useState(
-    () => sectionIdFromHash(hash) ?? SECTION_IDS[0] ?? 'vermogen',
+    () => pathSection ?? sectionIds[0] ?? 'vermogen',
   )
 
   useEffect(() => {
-    const fromHash = sectionIdFromHash(hash)
-    if (!fromHash) return
-    setActiveId(fromHash)
-    // Tijdens smooth scroll even vasthouden op de aangeklikte sectie.
+    if (!pathSection) return
+    activeIdRef.current = pathSection
+    setActiveId(pathSection)
     lockUntilRef.current = Date.now() + 700
-  }, [hash])
+  }, [pathSection])
 
   useEffect(() => {
     const root = document.getElementById('page-scroll')
@@ -39,10 +51,10 @@ export function useActiveSection() {
       const nearBottom =
         root.scrollHeight - root.scrollTop - root.clientHeight < 48
 
-      let current = SECTION_IDS[0] ?? 'vermogen'
+      let current = sectionIds[0] ?? 'vermogen'
       let bestDistance = Number.POSITIVE_INFINITY
 
-      for (const id of SECTION_IDS) {
+      for (const id of sectionIds) {
         const element = document.getElementById(id)
         if (!element) continue
 
@@ -59,8 +71,8 @@ export function useActiveSection() {
       }
 
       if (nearBottom) {
-        for (let i = SECTION_IDS.length - 1; i >= 0; i -= 1) {
-          const id = SECTION_IDS[i]
+        for (let i = sectionIds.length - 1; i >= 0; i -= 1) {
+          const id = sectionIds[i]
           const element = document.getElementById(id)
           if (!element) continue
           const rect = element.getBoundingClientRect()
@@ -71,7 +83,11 @@ export function useActiveSection() {
         }
       }
 
+      if (current === activeIdRef.current) return
+      activeIdRef.current = current
       setActiveId(current)
+      markPathUpdatedFromScroll()
+      navigate(topicSectionPath(topic, current), { replace: true })
     }
 
     update()
@@ -82,7 +98,17 @@ export function useActiveSection() {
       root.removeEventListener('scroll', update)
       window.removeEventListener('resize', update)
     }
-  }, [])
+  }, [navigate, sectionIds, topic])
 
-  return activeId
+  const value = useMemo(() => activeId, [activeId])
+
+  return (
+    <ActiveSectionContext.Provider value={value}>
+      {children}
+    </ActiveSectionContext.Provider>
+  )
+}
+
+export function useActiveSection() {
+  return useContext(ActiveSectionContext)
 }

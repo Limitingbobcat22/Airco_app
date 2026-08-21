@@ -1,4 +1,5 @@
-import { useMemo, useLayoutEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
+import { Navigate, useParams } from 'react-router'
 import AircoGrid from './components/airco-grid'
 import ConsumptionForm from './components/consumption-form'
 import Hero from './components/hero'
@@ -12,8 +13,17 @@ import {
   type InsulationFactor,
 } from './lib/power'
 import { SAVINGS_DEFAULTS, calculateSavings } from './lib/savings'
+import {
+  AIRCO_SECTIONS,
+  AIRCO_TOPIC,
+  defaultSectionForTopic,
+  topicSectionPath,
+} from '@/lib/topics'
+import { useUnsavedChanges } from '@/providers/unsaved-changes'
 
-export default function HomePage() {
+export default function AircoPage() {
+  const { section } = useParams()
+  const { setDirty } = useUnsavedChanges()
   const [areaM2, setAreaM2] = useState<number | null>(null)
   const [heightM, setHeightM] = useState(2.5)
   const [insulationFactor, setInsulationFactor] =
@@ -27,9 +37,23 @@ export default function HomePage() {
   const [hasAdjustedConsumption, setHasAdjustedConsumption] = useState(false)
   const [selectedId, setSelectedId] = useState<string | null>(null)
 
-  useLayoutEffect(() => {
-    document.getElementById('page-scroll')?.scrollTo({ top: 0 })
-  }, [])
+  useEffect(() => {
+    const dirty =
+      areaM2 != null ||
+      selectedId != null ||
+      hasAdjustedConsumption ||
+      heightM !== 2.5 ||
+      insulationFactor !== 40
+    setDirty(dirty)
+    return () => setDirty(false)
+  }, [
+    areaM2,
+    selectedId,
+    hasAdjustedConsumption,
+    heightM,
+    insulationFactor,
+    setDirty,
+  ])
 
   const power = useMemo(
     () => calculateRequiredPower({ areaM2, heightM, insulationFactor }),
@@ -71,6 +95,18 @@ export default function HomePage() {
         scop: sized.scop,
       })
     : null
+
+  if (
+    !section ||
+    !AIRCO_SECTIONS.includes(section as (typeof AIRCO_SECTIONS)[number])
+  ) {
+    return (
+      <Navigate
+        to={topicSectionPath(AIRCO_TOPIC, defaultSectionForTopic(AIRCO_TOPIC))}
+        replace
+      />
+    )
+  }
 
   return (
     <div id="top" className="flex h-full min-h-0 flex-col bg-foam">

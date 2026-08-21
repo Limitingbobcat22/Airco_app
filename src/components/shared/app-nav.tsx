@@ -1,5 +1,5 @@
-import type { Dispatch, SetStateAction } from 'react'
-import { Link, useLocation } from 'react-router'
+import type { Dispatch, MouseEvent, SetStateAction } from 'react'
+import { Link, useLocation, useNavigate } from 'react-router'
 import {
   Tooltip,
   TooltipContent,
@@ -8,7 +8,12 @@ import {
 } from '@/components/ui/tooltip'
 import { useActiveSection } from '@/hooks/use-active-section'
 import { useSidebar } from '@/hooks/use-sidebar'
-import { getSectionIdFromHref, type NavItem, navItems } from '@/lib/constants/nav-items'
+import {
+  getSectionIdFromHref,
+  getNavItemsForPath,
+  type NavItem,
+} from '@/lib/constants/nav-items'
+import { useUnsavedChanges } from '@/providers/unsaved-changes'
 import { cn } from '@/lib/utils'
 
 type AppNavProps = {
@@ -18,34 +23,42 @@ type AppNavProps = {
   isCollapsed?: boolean
 }
 
-function isItemActive(href: string, pathname: string, activeSectionId: string) {
+function isItemActive(
+  href: string,
+  activeSectionId: string,
+  leavesTopic?: boolean,
+) {
+  if (leavesTopic) return false
   const sectionId = getSectionIdFromHref(href)
   if (sectionId) return sectionId === activeSectionId
-  return pathname === href
+  return false
 }
 
 export default function AppNav({
-  items = navItems,
+  items,
   setOpen,
   isMobileNav = false,
   isCollapsed,
 }: AppNavProps) {
+  const navigate = useNavigate()
   const { pathname } = useLocation()
   const activeSectionId = useActiveSection()
   const { isMinimized } = useSidebar()
+  const { requestNavigation } = useUnsavedChanges()
   const shouldShowIconOnly =
     isCollapsed !== undefined ? isCollapsed : isMinimized
+  const navItems = items ?? getNavItemsForPath(pathname)
 
   return (
     <nav className="grid items-start gap-2">
       <TooltipProvider>
-        {items.map((item, index) => {
+        {navItems.map((item, index) => {
           if (item.sectionHeader) {
             if (shouldShowIconOnly) return null
 
             return (
               <div
-                key={`section-${item.sectionHeader}`}
+                key={`section-${item.sectionHeader}-${index}`}
                 className="text-foreground/50 px-3 pt-1 text-[10px] font-semibold tracking-[0.2em] uppercase first:pt-0"
               >
                 {item.sectionHeader}
@@ -65,7 +78,24 @@ export default function AppNav({
           if (!item.href || !item.icon || !item.title) return null
 
           const Icon = item.icon
-          const active = isItemActive(item.href, pathname, activeSectionId)
+          const active = isItemActive(
+            item.href,
+            activeSectionId,
+            item.leavesTopic,
+          )
+
+          const handleClick = (event: MouseEvent<HTMLAnchorElement>) => {
+            if (!item.leavesTopic) {
+              setOpen?.(false)
+              return
+            }
+
+            event.preventDefault()
+            const label = item.destinationLabel ?? item.title
+            const canNavigate = requestNavigation(item.href!, label)
+            if (canNavigate) navigate(item.href!)
+            setOpen?.(false)
+          }
 
           const link = (
             <Link
@@ -77,7 +107,7 @@ export default function AppNav({
                   ? 'bg-primary text-primary-foreground hover:text-primary-foreground'
                   : 'transparent',
               )}
-              onClick={() => setOpen?.(false)}
+              onClick={handleClick}
             >
               <Icon
                 className={cn('size-5 shrink-0', !shouldShowIconOnly && 'ml-2.5')}

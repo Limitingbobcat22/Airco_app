@@ -1,7 +1,9 @@
 import { useRef, useState } from 'react'
 import { Check, ChevronLeft, ChevronRight, Expand, ImageIcon, Info, Sparkles } from 'lucide-react'
+import { useNavigate } from 'react-router'
 import { cn } from '@/lib/utils'
 import PopupModal from '@/components/shared/popup-modal'
+import { markPathUpdatedFromScroll } from '@/lib/section-nav-sync'
 import type { Airco } from '../data/aircos'
 import { maxCoolingKw } from '../lib/power'
 import { dec, eur } from '../lib/savings'
@@ -331,6 +333,7 @@ export default function AircoCard({
   const fits = requiredKw != null && maxCoolingKw(airco) >= requiredKw
   const [previewOpen, setPreviewOpen] = useState(false)
   const ignoreSelectUntilRef = useRef(0)
+  const navigate = useNavigate()
 
   const handlePreviewOpenChange = (open: boolean) => {
     setPreviewOpen(open)
@@ -458,10 +461,11 @@ export default function AircoCard({
                     onSelect(airco.id)
                     onClose()
                     window.setTimeout(() => {
+                      markPathUpdatedFromScroll()
+                      navigate('/airco/verbruik', { replace: true })
                       document
                         .getElementById('verbruik')
                         ?.scrollIntoView({ behavior: 'smooth' })
-                      window.history.replaceState(null, '', '/#verbruik')
                     }, 150)
                   }}
                 />

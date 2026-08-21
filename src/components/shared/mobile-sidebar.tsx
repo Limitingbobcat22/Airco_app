@@ -26,7 +26,7 @@ export default function MobileSidebar({
         <div className="flex h-full flex-col">
           <div className="flex items-center border-b px-4 py-3">
             <Link
-              to="/"
+              to="/airco/vermogen"
               className="flex items-center gap-2"
               onClick={() => setSidebarOpen(false)}
             >
