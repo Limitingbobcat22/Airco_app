@@ -3,6 +3,7 @@ import {
   ClipboardList,
   Flame,
   Gauge,
+  Home,
   Thermometer,
   Wind,
 } from 'lucide-react'
@@ -14,6 +15,7 @@ export const TOPIC_SLUGS = [AIRCO_TOPIC, KETEL_TOPIC] as const
 export type TopicSlug = (typeof TOPIC_SLUGS)[number]
 
 export const AIRCO_SECTIONS = [
+  'home',
   'vermogen',
   'modellen',
   'verbruik',
@@ -21,6 +23,7 @@ export const AIRCO_SECTIONS = [
 ] as const
 
 export const KETEL_SECTIONS = [
+  'home',
   'vermogen',
   'modellen',
   'verbruik',
@@ -43,6 +46,7 @@ export type TopicNavLink = {
 }
 
 export const AIRCO_NAV_LINKS: TopicNavLink[] = [
+  { title: 'Home', section: 'home', icon: Home, group: 'Ontdekken' },
   { title: 'Vermogen', section: 'vermogen', icon: Gauge, group: 'Ontdekken' },
   { title: 'Modellen', section: 'modellen', icon: Wind, group: 'Ontdekken' },
   { title: 'Verbruik', section: 'verbruik', icon: Thermometer, group: 'Besparen' },
@@ -55,6 +59,7 @@ export const AIRCO_NAV_LINKS: TopicNavLink[] = [
 ]
 
 export const KETEL_NAV_LINKS: TopicNavLink[] = [
+  { title: 'Home', section: 'home', icon: Home, group: 'Ontdekken' },
   { title: 'Vermogen', section: 'vermogen', icon: Gauge, group: 'Ontdekken' },
   { title: 'Modellen', section: 'modellen', icon: Flame, group: 'Ontdekken' },
   { title: 'Verbruik', section: 'verbruik', icon: Thermometer, group: 'Besparen' },
@@ -98,5 +103,5 @@ export function getSectionFromPath(pathname: string): string | null {
 }
 
 export function defaultSectionForTopic(topic: TopicSlug) {
-  return TOPIC_SECTIONS[topic][0] ?? 'vermogen'
+  return TOPIC_SECTIONS[topic][0] ?? 'home'
 }

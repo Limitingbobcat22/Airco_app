@@ -13,6 +13,7 @@ import {
   getNavItemsForPath,
   type NavItem,
 } from '@/lib/constants/nav-items'
+import { scrollToPageSection } from '@/lib/page-scroll'
 import { useUnsavedChanges } from '@/providers/unsaved-changes'
 import { cn } from '@/lib/utils'
 
@@ -77,9 +78,11 @@ export default function AppNav({
 
           if (!item.href || !item.icon || !item.title) return null
 
+          const href = item.href
+          const title = item.title
           const Icon = item.icon
           const active = isItemActive(
-            item.href,
+            href,
             activeSectionId,
             item.leavesTopic,
           )
@@ -87,19 +90,27 @@ export default function AppNav({
           const handleClick = (event: MouseEvent<HTMLAnchorElement>) => {
             if (!item.leavesTopic) {
               setOpen?.(false)
+              const sectionId = getSectionIdFromHref(href)
+              if (sectionId && pathname === href) {
+                event.preventDefault()
+                scrollToPageSection(
+                  sectionId === 'home' ? null : sectionId,
+                  'smooth',
+                )
+              }
               return
             }
 
             event.preventDefault()
-            const label = item.destinationLabel ?? item.title
-            const canNavigate = requestNavigation(item.href!, label)
-            if (canNavigate) navigate(item.href!)
+            const label = item.destinationLabel ?? title
+            const canNavigate = requestNavigation(href, label)
+            if (canNavigate) navigate(href)
             setOpen?.(false)
           }
 
           const link = (
             <Link
-              to={item.href}
+              to={href}
               className={cn(
                 'flex items-center overflow-hidden rounded-md py-2 text-sm font-medium hover:text-muted-foreground',
                 shouldShowIconOnly ? 'justify-center px-2' : 'gap-2',

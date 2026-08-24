@@ -5,12 +5,10 @@ type ConsumptionFormProps = {
   yearlyGas: number
   gasPrice: number
   elecPrice: number
-  heatingSharePct: number
   airco: Airco | null
   onYearlyGasChange: (value: number) => void
   onGasPriceChange: (value: number) => void
   onElecPriceChange: (value: number) => void
-  onHeatingShareChange: (value: number) => void
 }
 
 function NumberField({
@@ -55,15 +53,13 @@ export default function ConsumptionForm({
   yearlyGas,
   gasPrice,
   elecPrice,
-  heatingSharePct,
   airco,
   onYearlyGasChange,
   onGasPriceChange,
   onElecPriceChange,
-  onHeatingShareChange,
 }: ConsumptionFormProps) {
   return (
-    <section id="verbruik" className="mx-auto max-w-7xl scroll-mt-4 px-4 py-12 sm:px-6 sm:py-16 2xl:max-w-[110rem] 2xl:px-10">
+    <section id="verbruik" className="mx-auto max-w-7xl scroll-mt-4 px-4 py-8 sm:px-6 sm:py-10 2xl:max-w-[110rem] 2xl:px-10">
       <div className="max-w-2xl">
         <p className="text-xs font-medium tracking-[0.2em] text-teal uppercase">
           Stap 3
@@ -109,22 +105,6 @@ export default function ConsumptionForm({
             step={0.01}
             onChange={onElecPriceChange}
           />
-
-          <label className="block sm:col-span-2">
-            <span className="mb-2 flex items-baseline justify-between text-sm font-medium text-ink/70">
-              <span>Deel van de woning verwarmd via airco</span>
-              <span className="font-semibold text-teal">{heatingSharePct}%</span>
-            </span>
-            <input
-              type="range"
-              min={10}
-              max={100}
-              step={5}
-              value={heatingSharePct}
-              onChange={(event) => onHeatingShareChange(Number(event.target.value))}
-              className="h-2 w-full cursor-pointer appearance-none rounded-full bg-mist accent-teal"
-            />
-          </label>
         </div>
 
         {airco ? (

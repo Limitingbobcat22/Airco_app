@@ -1,6 +1,11 @@
 import type { Dispatch, SetStateAction } from 'react'
 import { Link } from 'react-router'
 import { Sheet, SheetContent, SheetDescription, SheetTitle } from '@/components/ui/sheet'
+import {
+  AIRCO_TOPIC,
+  defaultSectionForTopic,
+  topicSectionPath,
+} from '@/lib/topics'
 import AppNav from './app-nav'
 
 type MobileSidebarProps = {
@@ -26,7 +31,7 @@ export default function MobileSidebar({
         <div className="flex h-full flex-col">
           <div className="flex items-center border-b px-4 py-3">
             <Link
-              to="/airco/vermogen"
+              to={topicSectionPath(AIRCO_TOPIC, defaultSectionForTopic(AIRCO_TOPIC))}
               className="flex items-center gap-2"
               onClick={() => setSidebarOpen(false)}
             >

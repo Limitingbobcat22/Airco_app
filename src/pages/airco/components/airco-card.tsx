@@ -3,6 +3,7 @@ import { Check, ChevronLeft, ChevronRight, Expand, ImageIcon, Info, Sparkles } f
 import { useNavigate } from 'react-router'
 import { cn } from '@/lib/utils'
 import PopupModal from '@/components/shared/popup-modal'
+import { scrollToPageSection } from '@/lib/page-scroll'
 import { markPathUpdatedFromScroll } from '@/lib/section-nav-sync'
 import type { Airco } from '../data/aircos'
 import { maxCoolingKw } from '../lib/power'
@@ -463,9 +464,7 @@ export default function AircoCard({
                     window.setTimeout(() => {
                       markPathUpdatedFromScroll()
                       navigate('/airco/verbruik', { replace: true })
-                      document
-                        .getElementById('verbruik')
-                        ?.scrollIntoView({ behavior: 'smooth' })
+                      scrollToPageSection('verbruik', 'smooth')
                     }, 150)
                   }}
                 />

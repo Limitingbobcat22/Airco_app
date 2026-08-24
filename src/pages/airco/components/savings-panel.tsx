@@ -36,7 +36,7 @@ export default function SavingsPanel({
 }: SavingsPanelProps) {
   if (!airco || !savings) {
     return (
-      <section id="overzicht" className="mx-auto max-w-7xl scroll-mt-4 px-4 py-12 sm:px-6 min-h-[60vh] 2xl:max-w-[110rem] 2xl:px-10">
+      <section id="overzicht" className="mx-auto max-w-7xl scroll-mt-4 px-4 py-8 sm:px-6 min-h-[60vh] 2xl:max-w-[110rem] 2xl:px-10">
         <div className="rounded-3xl border border-dashed border-teal/30 bg-white p-8 text-center text-ink/60">
           Kies een airco om uw overzicht en geschatte netto voordeel te zien.
         </div>
@@ -45,7 +45,7 @@ export default function SavingsPanel({
   }
 
   return (
-    <section id="overzicht" className="mx-auto max-w-7xl scroll-mt-4 px-4 py-12 sm:px-6 sm:py-16 2xl:max-w-[110rem] 2xl:px-10">
+    <section id="overzicht" className="mx-auto max-w-7xl scroll-mt-4 px-4 py-8 sm:px-6 sm:py-10 2xl:max-w-[110rem] 2xl:px-10">
       <div>
         <p className="text-xs font-medium tracking-[0.2em] text-teal uppercase">
           Stap 4
@@ -79,6 +79,10 @@ export default function SavingsPanel({
                 <dd className="font-medium text-ink">
                   {insulationLabel(insulationFactor, true)}
                 </dd>
+              </div>
+              <div className="flex justify-between gap-3">
+                <dt>Aandeel airco</dt>
+                <dd className="font-medium text-ink">{heatingSharePct}%</dd>
               </div>
               <div className="flex justify-between gap-3">
                 <dt>Berekend vermogen</dt>
@@ -127,10 +131,6 @@ export default function SavingsPanel({
                 <dd className="font-medium text-ink">
                   {num.format(savings.yearly.co2SavedKg)} kg
                 </dd>
-              </div>
-              <div className="flex justify-between gap-3">
-                <dt>Aandeel airco</dt>
-                <dd className="font-medium text-ink">{heatingSharePct}%</dd>
               </div>
             </dl>
           </div>

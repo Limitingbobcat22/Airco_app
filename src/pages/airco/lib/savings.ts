@@ -1,3 +1,5 @@
+import { POWER_DEFAULTS } from './power'
+
 export const SAVINGS_DEFAULTS: {
   yearlyGasM3: number
   gasPriceEur: number
@@ -7,7 +9,7 @@ export const SAVINGS_DEFAULTS: {
   yearlyGasM3: 1200,
   gasPriceEur: 1.35,
   elecPriceEur: 0.3,
-  heatingSharePct: 70,
+  heatingSharePct: POWER_DEFAULTS.heatingSharePct,
 }
 
 export const SAVINGS_CONSTANTS = {

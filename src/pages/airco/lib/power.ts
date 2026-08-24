@@ -20,10 +20,17 @@ export const INSULATION_OPTIONS = [
 
 export type InsulationFactor = (typeof INSULATION_OPTIONS)[number]['factor']
 
+export const POWER_DEFAULTS = {
+  heightM: 2.5,
+  insulationFactor: 40 as InsulationFactor,
+  heatingSharePct: 70,
+}
+
 export type PowerInput = {
   areaM2: number | null
   heightM: number
   insulationFactor: InsulationFactor
+  heatingSharePct: number
 }
 
 export type PowerResult = {
@@ -34,11 +41,14 @@ export function calculateRequiredPower({
   areaM2,
   heightM,
   insulationFactor,
+  heatingSharePct,
 }: PowerInput): PowerResult | null {
   if (!areaM2 || areaM2 <= 0 || heightM <= 0) return null
 
+  const share = Math.min(100, Math.max(0, heatingSharePct)) / 100
+
   return {
-    requiredKw: (areaM2 * heightM * insulationFactor) / 1000,
+    requiredKw: (areaM2 * heightM * insulationFactor * share) / 1000,
   }
 }
 

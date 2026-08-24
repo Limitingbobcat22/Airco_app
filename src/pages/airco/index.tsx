@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Navigate, useParams } from 'react-router'
+import { useGoToSection } from '@/hooks/use-go-to-section'
 import AircoGrid from './components/airco-grid'
 import ConsumptionForm from './components/consumption-form'
 import Hero from './components/hero'
@@ -10,6 +11,7 @@ import { AIRCOS } from './data/aircos'
 import {
   applyCapacity,
   calculateRequiredPower,
+  POWER_DEFAULTS,
   type InsulationFactor,
 } from './lib/power'
 import { SAVINGS_DEFAULTS, calculateSavings } from './lib/savings'
@@ -24,16 +26,18 @@ import { useUnsavedChanges } from '@/providers/unsaved-changes'
 export default function AircoPage() {
   const { section } = useParams()
   const { setDirty } = useUnsavedChanges()
+  const goToSection = useGoToSection()
   const [areaM2, setAreaM2] = useState<number | null>(null)
-  const [heightM, setHeightM] = useState(2.5)
-  const [insulationFactor, setInsulationFactor] =
-    useState<InsulationFactor>(40)
+  const [heightM, setHeightM] = useState(POWER_DEFAULTS.heightM)
+  const [insulationFactor, setInsulationFactor] = useState<InsulationFactor>(
+    POWER_DEFAULTS.insulationFactor,
+  )
+  const [heatingSharePct, setHeatingSharePct] = useState(
+    POWER_DEFAULTS.heatingSharePct,
+  )
   const [yearlyGas, setYearlyGas] = useState(SAVINGS_DEFAULTS.yearlyGasM3)
   const [gasPrice, setGasPrice] = useState(SAVINGS_DEFAULTS.gasPriceEur)
   const [elecPrice, setElecPrice] = useState(SAVINGS_DEFAULTS.elecPriceEur)
-  const [heatingSharePct, setHeatingSharePct] = useState(
-    SAVINGS_DEFAULTS.heatingSharePct,
-  )
   const [hasAdjustedConsumption, setHasAdjustedConsumption] = useState(false)
   const [selectedId, setSelectedId] = useState<string | null>(null)
 
@@ -42,8 +46,9 @@ export default function AircoPage() {
       areaM2 != null ||
       selectedId != null ||
       hasAdjustedConsumption ||
-      heightM !== 2.5 ||
-      insulationFactor !== 40
+      heightM !== POWER_DEFAULTS.heightM ||
+      insulationFactor !== POWER_DEFAULTS.insulationFactor ||
+      heatingSharePct !== POWER_DEFAULTS.heatingSharePct
     setDirty(dirty)
     return () => setDirty(false)
   }, [
@@ -52,12 +57,19 @@ export default function AircoPage() {
     hasAdjustedConsumption,
     heightM,
     insulationFactor,
+    heatingSharePct,
     setDirty,
   ])
 
   const power = useMemo(
-    () => calculateRequiredPower({ areaM2, heightM, insulationFactor }),
-    [areaM2, heightM, insulationFactor],
+    () =>
+      calculateRequiredPower({
+        areaM2,
+        heightM,
+        insulationFactor,
+        heatingSharePct,
+      }),
+    [areaM2, heightM, insulationFactor, heatingSharePct],
   )
 
   const markAdjusted = () => setHasAdjustedConsumption(true)
@@ -74,11 +86,6 @@ export default function AircoPage() {
 
   const handleElecPriceChange = (value: number) => {
     setElecPrice(value)
-    markAdjusted()
-  }
-
-  const handleHeatingShareChange = (value: number) => {
-    setHeatingSharePct(value)
     markAdjusted()
   }
 
@@ -111,18 +118,22 @@ export default function AircoPage() {
   return (
     <div id="top" className="flex h-full min-h-0 flex-col bg-foam">
       <div id="page-scroll" className="min-h-0 flex-1 overflow-y-auto pb-[45vh]">
-        <Hero>
-          <PowerForm
-            areaM2={areaM2}
-            heightM={heightM}
-            insulationFactor={insulationFactor}
-            result={power}
-            onAreaChange={setAreaM2}
-            onHeightChange={setHeightM}
-            onInsulationChange={setInsulationFactor}
-            onViewAircos={() => setSelectedId(null)}
-          />
-        </Hero>
+        <Hero />
+        <PowerForm
+          areaM2={areaM2}
+          heightM={heightM}
+          insulationFactor={insulationFactor}
+          heatingSharePct={heatingSharePct}
+          result={power}
+          onAreaChange={setAreaM2}
+          onHeightChange={setHeightM}
+          onInsulationChange={setInsulationFactor}
+          onHeatingShareChange={setHeatingSharePct}
+          onViewAircos={() => {
+            setSelectedId(null)
+            goToSection('modellen')
+          }}
+        />
         <AircoGrid
           aircos={AIRCOS}
           selectedId={selectedId}
@@ -133,12 +144,10 @@ export default function AircoPage() {
           yearlyGas={yearlyGas}
           gasPrice={gasPrice}
           elecPrice={elecPrice}
-          heatingSharePct={heatingSharePct}
           airco={sized}
           onYearlyGasChange={handleYearlyGasChange}
           onGasPriceChange={handleGasPriceChange}
           onElecPriceChange={handleElecPriceChange}
-          onHeatingShareChange={handleHeatingShareChange}
         />
         <SavingsPanel
           airco={sized}

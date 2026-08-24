@@ -1,50 +1,54 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { useLocation } from 'react-router'
 import { ActiveSectionProvider } from '@/hooks/use-active-section'
+import { scrollToPageSection } from '@/lib/page-scroll'
+import { consumeSuppressSectionScroll } from '@/lib/section-nav-sync'
 import {
+  defaultSectionForTopic,
   getSectionFromPath,
   getTopicFromPath,
 } from '@/lib/topics'
-import { consumeSuppressSectionScroll } from '@/lib/section-nav-sync'
 import { UnsavedChangesProvider } from '@/providers/unsaved-changes'
 import Header from '../shared/header'
 import MobileSidebar from '../shared/mobile-sidebar'
 import Sidebar from '../shared/sidebar'
 
-function scrollToSection(sectionId: string | null, behavior: ScrollBehavior) {
-  const root = document.getElementById('page-scroll')
-  if (!root) return
-
-  if (!sectionId) {
-    root.scrollTo({ top: 0, behavior })
-    return
-  }
-
-  const target = document.getElementById(sectionId)
-  if (!target) return
-  target.scrollIntoView({ behavior })
-}
-
 export default function AppLayout({ children }: { children: ReactNode }) {
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const { pathname } = useLocation()
   const isFirstLoad = useRef(true)
+  const prevPathRef = useRef(pathname)
   const topic = getTopicFromPath(pathname)
   const section = getSectionFromPath(pathname)
 
   useEffect(() => {
+    const prevPath = prevPathRef.current
+    prevPathRef.current = pathname
+
     if (consumeSuppressSectionScroll()) return
+
+    const isDefaultSection =
+      topic != null && section === defaultSectionForTopic(topic)
 
     if (isFirstLoad.current) {
       isFirstLoad.current = false
+      if (isDefaultSection) return
+
       requestAnimationFrame(() => {
-        scrollToSection(section, 'auto')
+        scrollToPageSection(section, 'auto')
       })
       return
     }
 
     if (!topic) return
-    scrollToSection(section, 'smooth')
+
+    const prevTopic = getTopicFromPath(prevPath)
+    if (section === 'home' || (prevTopic != null && prevTopic !== topic && isDefaultSection)) {
+      scrollToPageSection(null, 'smooth')
+      return
+    }
+
+    scrollToPageSection(section, 'smooth')
   }, [pathname, section, topic])
 
   return (

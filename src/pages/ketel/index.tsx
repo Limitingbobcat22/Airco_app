@@ -133,7 +133,7 @@ export default function KetelPage() {
     <div className="flex h-full min-h-0 flex-col bg-foam">
       <div id="page-scroll" className="min-h-0 flex-1 overflow-y-auto pb-[45vh]">
         <section
-          id="vermogen"
+          id="home"
           className="scroll-mt-4 bg-ink px-4 py-12 sm:px-6 sm:py-16"
         >
           <div className="mx-auto max-w-7xl 2xl:max-w-[110rem] 2xl:px-4">
@@ -149,7 +149,10 @@ export default function KetelPage() {
               berekening en productcatalogus.
             </p>
 
-            <div className="mt-8 max-w-xl rounded-3xl border border-white/10 bg-white/8 p-5 backdrop-blur-xl sm:p-6">
+            <div
+              id="vermogen"
+              className="mt-8 max-w-xl scroll-mt-4 rounded-3xl border border-white/10 bg-white/8 p-5 backdrop-blur-xl sm:p-6"
+            >
               <p className="text-xs font-medium tracking-[0.2em] text-mint uppercase">
                 Stap 1
               </p>

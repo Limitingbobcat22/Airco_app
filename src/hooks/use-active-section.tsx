@@ -17,7 +17,7 @@ import {
 } from '@/lib/topics'
 import { markPathUpdatedFromScroll } from '@/lib/section-nav-sync'
 
-const ActiveSectionContext = createContext('vermogen')
+const ActiveSectionContext = createContext('home')
 
 export function ActiveSectionProvider({ children }: { children: ReactNode }) {
   const navigate = useNavigate()
@@ -26,9 +26,9 @@ export function ActiveSectionProvider({ children }: { children: ReactNode }) {
   const sectionIds = TOPIC_SECTIONS[topic]
   const pathSection = getSectionFromPath(pathname)
   const lockUntilRef = useRef(0)
-  const activeIdRef = useRef(pathSection ?? sectionIds[0] ?? 'vermogen')
+  const activeIdRef = useRef(pathSection ?? sectionIds[0] ?? 'home')
   const [activeId, setActiveId] = useState(
-    () => pathSection ?? sectionIds[0] ?? 'vermogen',
+    () => pathSection ?? sectionIds[0] ?? 'home',
   )
 
   useEffect(() => {
@@ -51,28 +51,36 @@ export function ActiveSectionProvider({ children }: { children: ReactNode }) {
       const nearBottom =
         root.scrollHeight - root.scrollTop - root.clientHeight < 48
 
-      let current = sectionIds[0] ?? 'vermogen'
+      let current = sectionIds[0] ?? 'home'
       let bestDistance = Number.POSITIVE_INFINITY
 
-      for (const id of sectionIds) {
-        const element = document.getElementById(id)
-        if (!element) continue
+      // Bovenaan de pagina: Home actief houden, ook als stap 1 al zichtbaar is.
+      if (root.scrollTop < 72) {
+        current = 'home'
+      } else {
+        for (const id of sectionIds) {
+          if (id === 'home') continue
 
-        const rect = element.getBoundingClientRect()
-        const visible =
-          rect.bottom > rootRect.top + 8 && rect.top < rootRect.bottom - 8
-        if (!visible) continue
+          const element = document.getElementById(id)
+          if (!element) continue
 
-        const distance = activationLine - rect.top
-        if (distance >= -24 && distance < bestDistance) {
-          bestDistance = distance
-          current = id
+          const rect = element.getBoundingClientRect()
+          const visible =
+            rect.bottom > rootRect.top + 8 && rect.top < rootRect.bottom - 8
+          if (!visible) continue
+
+          const distance = activationLine - rect.top
+          if (distance >= -24 && distance < bestDistance) {
+            bestDistance = distance
+            current = id
+          }
         }
       }
 
       if (nearBottom) {
         for (let i = sectionIds.length - 1; i >= 0; i -= 1) {
           const id = sectionIds[i]
+          if (id === 'home') continue
           const element = document.getElementById(id)
           if (!element) continue
           const rect = element.getBoundingClientRect()

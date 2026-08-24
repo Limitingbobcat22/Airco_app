@@ -1,6 +1,11 @@
 import { ChevronsLeft } from 'lucide-react'
 import { Link } from 'react-router'
 import { useSidebar } from '@/hooks/use-sidebar'
+import {
+  AIRCO_TOPIC,
+  defaultSectionForTopic,
+  topicSectionPath,
+} from '@/lib/topics'
 import { cn } from '@/lib/utils'
 import AppNav from './app-nav'
 
@@ -26,7 +31,10 @@ export default function Sidebar({ className }: SidebarProps) {
             isMinimized ? 'flex-col gap-3' : 'justify-between',
           )}
         >
-          <Link to="/airco/vermogen" className="flex items-center gap-2">
+          <Link
+            to={topicSectionPath(AIRCO_TOPIC, defaultSectionForTopic(AIRCO_TOPIC))}
+            className="flex items-center gap-2"
+          >
             <span className="bg-primary text-primary-foreground grid size-10 place-items-center rounded-full">
               <svg viewBox="0 0 24 24" className="size-4" fill="none" aria-hidden>
                 <path

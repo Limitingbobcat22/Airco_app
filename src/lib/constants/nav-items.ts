@@ -75,7 +75,7 @@ export function getNavTitleBySectionId(
   topic: TopicSlug = AIRCO_TOPIC,
 ): string {
   const matched = TOPIC_NAV_LINKS[topic].find((link) => link.section === sectionId)
-  return matched?.title ?? 'Vermogen'
+  return matched?.title ?? 'Home'
 }
 
 export const navItems = buildTopicNavItems(AIRCO_TOPIC)

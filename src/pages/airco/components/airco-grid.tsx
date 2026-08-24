@@ -46,7 +46,7 @@ export default function AircoGrid({
   }, [aircos, requiredKw])
 
   return (
-    <section id="modellen" className="mx-auto max-w-7xl scroll-mt-4 px-4 py-12 sm:px-6 sm:py-16 2xl:max-w-[110rem] 2xl:px-10">
+    <section id="modellen" className="mx-auto max-w-7xl scroll-mt-4 px-4 py-8 sm:px-6 sm:py-10 2xl:max-w-[110rem] 2xl:px-10">
       <div className="max-w-2xl">
         <p className="text-xs font-medium tracking-[0.2em] text-teal uppercase">
           Stap 2
