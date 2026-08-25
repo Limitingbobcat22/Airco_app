@@ -55,7 +55,8 @@ function Tile({
 
 export default function SavingsDock({ airco, savings, visible }: SavingsDockProps) {
   const [expanded, setExpanded] = useState(true)
-  const showTiles = visible && expanded
+  const hasSavings = airco != null && savings != null
+  const showTiles = visible && hasSavings && expanded
 
   return (
     <div
@@ -69,31 +70,43 @@ export default function SavingsDock({ airco, savings, visible }: SavingsDockProp
           <div
             className={cn(
               'flex items-center justify-between gap-3 px-3 sm:gap-4 sm:px-4',
-              showTiles ? 'pt-3' : 'py-3.5 sm:py-4',
+              showTiles ? 'pt-3' : 'py-3 sm:py-3.5',
             )}
           >
-            <div className="flex min-w-0 items-center gap-3">
-              <span className="grid size-11 shrink-0 place-items-center rounded-full border border-ink/20 bg-foam text-teal shadow-sm sm:size-12">
-                <Leaf className="size-5 sm:size-6" strokeWidth={2.25} aria-hidden />
+            <div className="flex min-w-0 flex-1 items-center gap-3">
+              <span className="grid size-10 shrink-0 place-items-center rounded-full border border-ink/20 bg-foam text-teal shadow-sm sm:size-11">
+                <Leaf className="size-5 sm:size-[1.35rem]" strokeWidth={2.25} aria-hidden />
               </span>
-              <div className="min-w-0">
-                <p className="truncate text-base font-semibold text-ink sm:text-lg">
-                  {airco && savings
-                    ? `Besparing · ${airco.brand} ${airco.series}`
-                    : 'Uw besparing'}
-                </p>
-                {!showTiles && airco && savings ? (
-                  <p className="truncate text-sm text-ink/55 sm:text-base">
-                    {eur.format(savings.yearly.netEuroSaved)} / jaar
+              <div className="flex min-w-0 flex-1 flex-wrap items-baseline gap-x-3 gap-y-0.5">
+                {hasSavings ? (
+                  <>
+                    <p className="truncate text-base font-semibold text-ink sm:text-lg">
+                      Besparing · {airco.brand} {airco.series}
+                    </p>
+                    {!showTiles ? (
+                      <p className="truncate text-sm text-ink/55 sm:text-base">
+                        {eur.format(savings.yearly.netEuroSaved)} / jaar
+                      </p>
+                    ) : null}
+                  </>
+                ) : (
+                  <p className="truncate text-sm text-ink/50 sm:text-base">
+                    Kies een airco om de besparing te zien.
                   </p>
-                ) : null}
+                )}
               </div>
             </div>
 
             <button
               type="button"
               onClick={() => setExpanded((current) => !current)}
-              className="grid size-11 shrink-0 place-items-center rounded-full border border-ink/20 bg-foam text-ink shadow-sm transition hover:border-teal/40 hover:text-teal focus-visible:ring-2 focus-visible:ring-teal focus-visible:outline-none sm:size-12"
+              disabled={!hasSavings}
+              className={cn(
+                'grid size-10 shrink-0 place-items-center rounded-full border border-ink/20 bg-foam text-ink shadow-sm transition focus-visible:ring-2 focus-visible:ring-teal focus-visible:outline-none sm:size-11',
+                hasSavings
+                  ? 'hover:border-teal/40 hover:text-teal'
+                  : 'cursor-default opacity-40',
+              )}
               aria-expanded={showTiles}
               aria-label={
                 showTiles
@@ -103,7 +116,7 @@ export default function SavingsDock({ airco, savings, visible }: SavingsDockProp
             >
               <ChevronsDown
                 className={cn(
-                  'size-5 transition-transform duration-300 sm:size-6',
+                  'size-5 transition-transform duration-300 sm:size-[1.35rem]',
                   showTiles && 'rotate-180',
                 )}
                 aria-hidden
@@ -118,8 +131,8 @@ export default function SavingsDock({ airco, savings, visible }: SavingsDockProp
             )}
           >
             <div className="min-h-0 overflow-hidden">
-              <div className="px-3 py-3 sm:px-4 sm:py-4">
-                {airco && savings ? (
+              {hasSavings ? (
+                <div className="px-3 py-3 sm:px-4 sm:py-4">
                   <div className="grid grid-cols-2 gap-2 lg:grid-cols-4">
                     <Tile
                       accent
@@ -143,12 +156,8 @@ export default function SavingsDock({ airco, savings, visible }: SavingsDockProp
                       hint={`${num.format(savings.yearly.co2SavedKg)} kg minder`}
                     />
                   </div>
-                ) : (
-                  <p className="rounded-2xl border border-dashed border-mist bg-white px-4 py-6 text-center text-sm text-ink/50">
-                    Kies een airco om de besparing te zien.
-                  </p>
-                )}
-              </div>
+                </div>
+              ) : null}
             </div>
           </div>
         </div>
