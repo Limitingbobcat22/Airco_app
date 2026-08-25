@@ -117,11 +117,11 @@ export default function AircoHome() {
               </button>
             ) : null}
           </div>
-          <ul className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-0 sm:divide-x sm:divide-ink/15">
+          <ul className="mt-6 flex flex-col gap-3">
             {HOME_HIGHLIGHTS.map((label) => (
               <li
                 key={label}
-                className="flex items-center gap-2 text-base font-medium text-ink sm:px-4 first:sm:pl-0 last:sm:pr-0"
+                className="flex items-center gap-2 text-base font-medium text-ink"
               >
                 <CheckCircle2
                   className="size-6 shrink-0 text-ink"
