@@ -7,6 +7,7 @@ import {
   TooltipTrigger,
 } from '@/components/ui/tooltip'
 import { useActiveSection } from '@/hooks/use-active-section'
+import { useAuth } from '@/hooks/use-auth'
 import { useSidebar } from '@/hooks/use-sidebar'
 import {
   getSectionIdFromHref,
@@ -14,6 +15,7 @@ import {
   type NavItem,
 } from '@/lib/constants/nav-items'
 import { scrollToPageSection } from '@/lib/page-scroll'
+import { getTopicFromPath } from '@/lib/topics'
 import { useUnsavedChanges } from '@/providers/unsaved-changes'
 import { cn } from '@/lib/utils'
 
@@ -26,9 +28,13 @@ type AppNavProps = {
 
 function isItemActive(
   href: string,
+  pathname: string,
   activeSectionId: string,
   leavesTopic?: boolean,
 ) {
+  if (pathname === href || pathname.startsWith(`${href}/`)) return true
+  // Buiten topic-pagina's (admin): alleen exacte path-match, geen sectie-spy.
+  if (!getTopicFromPath(pathname)) return false
   if (leavesTopic) return false
   const sectionId = getSectionIdFromHref(href)
   if (sectionId) return sectionId === activeSectionId
@@ -45,10 +51,12 @@ export default function AppNav({
   const { pathname } = useLocation()
   const activeSectionId = useActiveSection()
   const { isMinimized } = useSidebar()
+  const { user, isLoggedIn } = useAuth()
   const { requestNavigation } = useUnsavedChanges()
   const shouldShowIconOnly =
     isCollapsed !== undefined ? isCollapsed : isMinimized
-  const navItems = items ?? getNavItemsForPath(pathname)
+  const isAdmin = isLoggedIn && Boolean(user?.isAdmin)
+  const navItems = items ?? getNavItemsForPath(pathname, { isAdmin })
 
   return (
     <nav className="grid items-start gap-2">
@@ -83,6 +91,7 @@ export default function AppNav({
           const Icon = item.icon
           const active = isItemActive(
             href,
+            pathname,
             activeSectionId,
             item.leavesTopic,
           )

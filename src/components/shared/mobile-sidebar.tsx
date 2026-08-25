@@ -8,6 +8,7 @@ import {
 } from '@/lib/topics'
 import AppNav from './app-nav'
 import BrandMark from './brand-mark'
+import SidebarAuthFooter from './sidebar-auth-footer'
 
 type MobileSidebarProps = {
   sidebarOpen: boolean
@@ -44,6 +45,10 @@ export default function MobileSidebar({
               <AppNav setOpen={setSidebarOpen} isMobileNav />
             </div>
           </div>
+          <SidebarAuthFooter
+            isMobileNav
+            onNavigate={() => setSidebarOpen(false)}
+          />
         </div>
       </SheetContent>
     </Sheet>

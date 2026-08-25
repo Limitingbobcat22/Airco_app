@@ -2,6 +2,7 @@ import { ArrowRight, CheckCircle2, ChevronRight, Gauge } from 'lucide-react'
 import { useLocation, useNavigate } from 'react-router'
 import AircoIcon from '@/components/icons/airco-icon'
 import KetelIcon from '@/components/icons/ketel-icon'
+import { useAuth } from '@/hooks/use-auth'
 import { useGoToSection } from '@/hooks/use-go-to-section'
 import {
   AIRCO_TOPIC,
@@ -31,10 +32,12 @@ export default function AircoHome() {
   const goToSection = useGoToSection()
   const navigate = useNavigate()
   const { pathname } = useLocation()
+  const { user, isLoggedIn } = useAuth()
   const { requestNavigation } = useUnsavedChanges()
   const topic = getTopicFromPath(pathname) ?? AIRCO_TOPIC
   const aircosActive = topic === AIRCO_TOPIC
   const ketelsActive = topic === KETEL_TOPIC
+  const isAdmin = isLoggedIn && Boolean(user?.isAdmin)
 
   const goToKetels = () => {
     const href = topicSectionPath(KETEL_TOPIC, 'modellen')
@@ -68,7 +71,12 @@ export default function AircoHome() {
             Bereken het vermogen voor uw ruimte, of bekijk meteen alle Haier-
             en Mitsubishi-modellen. De prijs bespreken we daarna op afspraak.
           </p>
-          <div className="mt-8 grid grid-cols-3 gap-2 sm:gap-2.5">
+          <div
+            className={cn(
+              'mt-8 grid gap-2 sm:gap-2.5',
+              isAdmin ? 'grid-cols-3' : 'grid-cols-2',
+            )}
+          >
             <button
               type="button"
               onClick={() => goToSection('vermogen')}
@@ -92,20 +100,22 @@ export default function AircoHome() {
                 aria-hidden
               />
             </button>
-            <button
-              type="button"
-              onClick={goToKetels}
-              aria-current={ketelsActive ? 'page' : undefined}
-              className={topicButtonClass(ketelsActive)}
-            >
-              <KetelIcon className="size-5 shrink-0 sm:size-6" strokeWidth={1.75} />
-              <span className="min-w-0 flex-1 text-left">Alle ketels</span>
-              <ChevronRight
-                className="size-4 shrink-0 text-orange-500 sm:size-5"
-                strokeWidth={2.5}
-                aria-hidden
-              />
-            </button>
+            {isAdmin ? (
+              <button
+                type="button"
+                onClick={goToKetels}
+                aria-current={ketelsActive ? 'page' : undefined}
+                className={topicButtonClass(ketelsActive)}
+              >
+                <KetelIcon className="size-5 shrink-0 sm:size-6" strokeWidth={1.75} />
+                <span className="min-w-0 flex-1 text-left">Alle ketels</span>
+                <ChevronRight
+                  className="size-4 shrink-0 text-orange-500 sm:size-5"
+                  strokeWidth={2.5}
+                  aria-hidden
+                />
+              </button>
+            ) : null}
           </div>
           <ul className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-0 sm:divide-x sm:divide-ink/15">
             {HOME_HIGHLIGHTS.map((label) => (

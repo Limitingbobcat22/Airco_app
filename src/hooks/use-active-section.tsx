@@ -9,7 +9,6 @@ import {
 } from 'react'
 import { useLocation, useNavigate } from 'react-router'
 import {
-  AIRCO_TOPIC,
   getSectionFromPath,
   getTopicFromPath,
   TOPIC_SECTIONS,
@@ -17,28 +16,35 @@ import {
 } from '@/lib/topics'
 import { markPathUpdatedFromScroll } from '@/lib/section-nav-sync'
 
-const ActiveSectionContext = createContext('home')
+const ActiveSectionContext = createContext('')
 
 export function ActiveSectionProvider({ children }: { children: ReactNode }) {
   const navigate = useNavigate()
   const { pathname } = useLocation()
-  const topic = getTopicFromPath(pathname) ?? AIRCO_TOPIC
-  const sectionIds = TOPIC_SECTIONS[topic]
+  const topic = getTopicFromPath(pathname)
+  const sectionIds = topic ? TOPIC_SECTIONS[topic] : []
   const pathSection = getSectionFromPath(pathname)
   const lockUntilRef = useRef(0)
-  const activeIdRef = useRef(pathSection ?? sectionIds[0] ?? 'home')
-  const [activeId, setActiveId] = useState(
-    () => pathSection ?? sectionIds[0] ?? 'home',
-  )
+  const activeIdRef = useRef(pathSection ?? '')
+  const [activeId, setActiveId] = useState(() => pathSection ?? '')
 
   useEffect(() => {
+    if (!topic) {
+      activeIdRef.current = ''
+      setActiveId('')
+      return
+    }
+
     if (!pathSection) return
     activeIdRef.current = pathSection
     setActiveId(pathSection)
     lockUntilRef.current = Date.now() + 700
-  }, [pathSection])
+  }, [pathSection, topic])
 
   useEffect(() => {
+    // Geen sectie-scroll-spy buiten topic-pagina's (bijv. /admin/aircos).
+    if (!topic) return
+
     const root = document.getElementById('page-scroll')
     if (!root) return
 

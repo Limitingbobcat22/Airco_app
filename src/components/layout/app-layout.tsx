@@ -27,8 +27,10 @@ export default function AppLayout({ children }: { children: ReactNode }) {
 
     if (consumeSuppressSectionScroll()) return
 
-    const isDefaultSection =
-      topic != null && section === defaultSectionForTopic(topic)
+    // Admin / andere niet-topic pagina's: geen sectie-scroll.
+    if (!topic) return
+
+    const isDefaultSection = section === defaultSectionForTopic(topic)
 
     if (isFirstLoad.current) {
       isFirstLoad.current = false
@@ -39,8 +41,6 @@ export default function AppLayout({ children }: { children: ReactNode }) {
       })
       return
     }
-
-    if (!topic) return
 
     const prevTopic = getTopicFromPath(prevPath)
     if (section === 'home' || (prevTopic != null && prevTopic !== topic && isDefaultSection)) {

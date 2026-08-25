@@ -1,5 +1,5 @@
 import type { LucideIcon } from 'lucide-react'
-import { Flame } from 'lucide-react'
+import { Flame, Table2 } from 'lucide-react'
 import AircoIcon from '@/components/icons/airco-icon'
 import {
   AIRCO_TOPIC,
@@ -12,6 +12,8 @@ import {
   topicSectionPath,
   type TopicSlug,
 } from '@/lib/topics'
+
+export const ADMIN_AIRCOS_PATH = '/admin/aircos'
 
 export type NavItem = {
   title?: string
@@ -32,8 +34,17 @@ function topicSwitchIcon(topic: TopicSlug): LucideIcon {
   return topic === KETEL_TOPIC ? Flame : (AircoIcon as LucideIcon)
 }
 
+type BuildTopicNavOptions = {
+  /** Ketels en admin-pagina's alleen tonen voor admins. */
+  isAdmin?: boolean
+}
+
 /** Sectie-items van het actieve topic + switch naar het andere product. */
-export function buildTopicNavItems(topic: TopicSlug): NavItem[] {
+export function buildTopicNavItems(
+  topic: TopicSlug,
+  options: BuildTopicNavOptions = {},
+): NavItem[] {
+  const { isAdmin = false } = options
   const links = TOPIC_NAV_LINKS[topic]
   const items: NavItem[] = []
   let lastGroup: string | null = null
@@ -52,17 +63,32 @@ export function buildTopicNavItems(topic: TopicSlug): NavItem[] {
   }
 
   const target = otherTopic(topic)
-  const label = TOPIC_LABELS[target]
+  const canSwitchToTarget = target !== KETEL_TOPIC || isAdmin
 
-  items.push({ separator: true })
-  items.push({ sectionHeader: 'Producten' })
-  items.push({
-    title: label,
-    href: topicSectionPath(target, defaultSectionForTopic(target)),
-    icon: topicSwitchIcon(target),
-    leavesTopic: true,
-    destinationLabel: label,
-  })
+  if (canSwitchToTarget) {
+    const label = TOPIC_LABELS[target]
+    items.push({ separator: true })
+    items.push({ sectionHeader: 'Producten' })
+    items.push({
+      title: label,
+      href: topicSectionPath(target, defaultSectionForTopic(target)),
+      icon: topicSwitchIcon(target),
+      leavesTopic: true,
+      destinationLabel: label,
+    })
+  }
+
+  if (isAdmin) {
+    items.push({ separator: true })
+    items.push({ sectionHeader: 'Beheer' })
+    items.push({
+      title: 'Aircos beheer',
+      href: ADMIN_AIRCOS_PATH,
+      icon: Table2,
+      leavesTopic: true,
+      destinationLabel: 'Aircos beheer',
+    })
+  }
 
   return items
 }
@@ -81,7 +107,10 @@ export function getNavTitleBySectionId(
 
 export const navItems = buildTopicNavItems(AIRCO_TOPIC)
 
-export function getNavItemsForPath(pathname: string): NavItem[] {
+export function getNavItemsForPath(
+  pathname: string,
+  options: BuildTopicNavOptions = {},
+): NavItem[] {
   const topic = getTopicFromPath(pathname) ?? AIRCO_TOPIC
-  return buildTopicNavItems(topic)
+  return buildTopicNavItems(topic, options)
 }

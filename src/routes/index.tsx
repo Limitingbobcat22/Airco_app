@@ -1,4 +1,6 @@
+import RequireAdmin from '@/auth/require-admin'
 import AppLayout from '@/components/layout/app-layout'
+import AdminAircosPage from '@/pages/admin/aircos'
 import AircoPage from '@/pages/airco'
 import KetelPage from '@/pages/ketel'
 import {
@@ -42,11 +44,27 @@ export default function AppRouter() {
         },
         {
           path: 'ketel',
-          element: <Navigate to={ketelStart} replace />,
+          element: (
+            <RequireAdmin>
+              <Navigate to={ketelStart} replace />
+            </RequireAdmin>
+          ),
         },
         {
           path: 'ketel/:section',
-          element: <KetelPage />,
+          element: (
+            <RequireAdmin>
+              <KetelPage />
+            </RequireAdmin>
+          ),
+        },
+        {
+          path: 'admin/aircos',
+          element: (
+            <RequireAdmin>
+              <AdminAircosPage />
+            </RequireAdmin>
+          ),
         },
       ],
     },
