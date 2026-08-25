@@ -1,5 +1,6 @@
 import type { LucideIcon } from 'lucide-react'
-import { Flame, Wind } from 'lucide-react'
+import { Flame } from 'lucide-react'
+import AircoIcon from '@/components/icons/airco-icon'
 import {
   AIRCO_TOPIC,
   defaultSectionForTopic,
@@ -28,7 +29,7 @@ function otherTopic(topic: TopicSlug): TopicSlug {
 }
 
 function topicSwitchIcon(topic: TopicSlug): LucideIcon {
-  return topic === KETEL_TOPIC ? Flame : Wind
+  return topic === KETEL_TOPIC ? Flame : (AircoIcon as LucideIcon)
 }
 
 /** Sectie-items van het actieve topic + switch naar het andere product. */

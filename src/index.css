@@ -104,6 +104,10 @@
 }
 
 @layer components {
+  .hero-bg {
+    background: linear-gradient(to right, #ebf3ff, #74b8f8);
+  }
+
   .airco-card-glow {
     pointer-events: none;
     position: absolute;

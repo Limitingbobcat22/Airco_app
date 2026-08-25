@@ -22,15 +22,15 @@ export default function MobileSidebar({
     <Sheet open={sidebarOpen} onOpenChange={setSidebarOpen}>
       <SheetContent
         side="left"
-        className="w-[min(20rem,85vw)] p-0 pt-2 text-ink"
-        style={{ backgroundColor: '#ffffff' }}
+        className="bg-secondary w-[min(20rem,85vw)] border-0 p-0 pt-2 text-ink shadow-2xl"
+        style={{ backgroundColor: 'hsl(var(--secondary))' }}
       >
         <SheetTitle className="sr-only">Navigatie</SheetTitle>
         <SheetDescription className="sr-only">
           Ga naar een onderdeel van de site
         </SheetDescription>
         <div className="flex h-full flex-col">
-          <div className="flex items-center border-b px-2 py-1">
+          <div className="flex items-center px-2 py-1">
             <Link
               to={topicSectionPath(AIRCO_TOPIC, defaultSectionForTopic(AIRCO_TOPIC))}
               className="flex w-full min-w-0 items-center"

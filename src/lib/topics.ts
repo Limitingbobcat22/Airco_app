@@ -5,8 +5,8 @@ import {
   Gauge,
   Home,
   Thermometer,
-  Wind,
 } from 'lucide-react'
+import AircoIcon from '@/components/icons/airco-icon'
 
 export const AIRCO_TOPIC = 'airco'
 export const KETEL_TOPIC = 'ketel'
@@ -48,7 +48,7 @@ export type TopicNavLink = {
 export const AIRCO_NAV_LINKS: TopicNavLink[] = [
   { title: 'Home', section: 'home', icon: Home, group: 'Ontdekken' },
   { title: 'Vermogen', section: 'vermogen', icon: Gauge, group: 'Ontdekken' },
-  { title: 'Modellen', section: 'modellen', icon: Wind, group: 'Ontdekken' },
+  { title: 'Modellen', section: 'modellen', icon: AircoIcon as LucideIcon, group: 'Ontdekken' },
   { title: 'Verbruik', section: 'verbruik', icon: Thermometer, group: 'Besparen' },
   {
     title: 'Overzicht',
