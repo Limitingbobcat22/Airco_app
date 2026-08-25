@@ -50,13 +50,13 @@ export default function Hero() {
             </button>
           </div>
         </div>
-        <figure className="relative overflow-hidden rounded-3xl border border-white/10 shadow-[0_20px_80px_rgba(0,0,0,0.25)]">
+        <figure className="relative mx-auto w-full max-w-md lg:max-w-none">
           <img
-            src="/images/bedrijf.jpg"
+            src="/images/bedrijf.png"
             alt="Onze installateurs bij een airco-installatie"
-            width={1600}
-            height={1200}
-            className="aspect-[4/3] h-full w-full object-cover"
+            width={567}
+            height={566}
+            className="h-auto w-full rounded-full object-cover shadow-[0_20px_80px_rgba(0,0,0,0.25)]"
           />
         </figure>
       </div>

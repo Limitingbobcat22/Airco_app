@@ -8,6 +8,7 @@ import {
 } from '@/lib/topics'
 import { cn } from '@/lib/utils'
 import AppNav from './app-nav'
+import BrandMark from './brand-mark'
 
 type SidebarProps = {
   className?: string
@@ -20,34 +21,25 @@ export default function Sidebar({ className }: SidebarProps) {
     <nav
       className={cn(
         'relative z-10 hidden h-svh flex-none duration-300 md:block',
-        isMinimized ? 'w-24 px-2' : 'w-72 px-3',
+        isMinimized ? 'w-24 px-2' : 'w-96 px-3',
         className,
       )}
     >
       <div className="flex h-full flex-col overflow-y-auto">
         <div
           className={cn(
-            'flex items-center px-0 py-5 md:px-2',
-            isMinimized ? 'flex-col gap-3' : 'justify-between',
+            'flex items-center',
+            isMinimized ? 'flex-col gap-2 px-0 py-2' : 'gap-2 px-0 pt-2 pb-0',
           )}
         >
           <Link
             to={topicSectionPath(AIRCO_TOPIC, defaultSectionForTopic(AIRCO_TOPIC))}
-            className="flex items-center gap-2"
+            className={cn(
+              'flex items-center',
+              isMinimized ? 'justify-center' : 'min-w-0 flex-1',
+            )}
           >
-            <span className="bg-primary text-primary-foreground grid size-10 place-items-center rounded-full">
-              <svg viewBox="0 0 24 24" className="size-4" fill="none" aria-hidden>
-                <path
-                  d="M4 14c4-8 12-8 16 0M7 17c3-5 7-5 10 0"
-                  stroke="currentColor"
-                  strokeWidth="1.8"
-                  strokeLinecap="round"
-                />
-              </svg>
-            </span>
-            {!isMinimized ? (
-              <span className="font-display text-lg tracking-tight">Aera</span>
-            ) : null}
+            <BrandMark withText={!isMinimized} />
           </Link>
           <ChevronsLeft
             className={cn(
@@ -57,7 +49,7 @@ export default function Sidebar({ className }: SidebarProps) {
             onClick={toggle}
           />
         </div>
-        <div className="space-y-4 py-4">
+        <div className={cn('space-y-4', isMinimized ? 'py-3' : 'pt-1 pb-3')}>
           <div className={cn('py-2', isMinimized ? 'px-1' : 'px-2')}>
             <AppNav isCollapsed={isMinimized} />
           </div>

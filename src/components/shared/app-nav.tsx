@@ -60,7 +60,7 @@ export default function AppNav({
             return (
               <div
                 key={`section-${item.sectionHeader}-${index}`}
-                className="text-foreground/50 px-3 pt-1 text-[10px] font-semibold tracking-[0.2em] uppercase first:pt-0"
+                className="text-foreground/50 px-3 pt-1 text-xs font-semibold tracking-[0.2em] uppercase first:pt-0"
               >
                 {item.sectionHeader}
               </div>
@@ -112,8 +112,8 @@ export default function AppNav({
             <Link
               to={href}
               className={cn(
-                'flex items-center overflow-hidden rounded-md py-2 text-sm font-medium hover:text-muted-foreground',
-                shouldShowIconOnly ? 'justify-center px-2' : 'gap-2',
+                'flex items-center overflow-hidden rounded-md py-2.5 text-base font-medium hover:text-muted-foreground',
+                shouldShowIconOnly ? 'justify-center px-2' : 'gap-2.5',
                 active
                   ? 'bg-primary text-primary-foreground hover:text-primary-foreground'
                   : 'transparent',
@@ -121,7 +121,7 @@ export default function AppNav({
               onClick={handleClick}
             >
               <Icon
-                className={cn('size-5 shrink-0', !shouldShowIconOnly && 'ml-2.5')}
+                className={cn('size-6 shrink-0', !shouldShowIconOnly && 'ml-2.5')}
               />
               {isMobileNav || (!shouldShowIconOnly && !isMobileNav) ? (
                 <span className="mr-2 truncate">{item.title}</span>

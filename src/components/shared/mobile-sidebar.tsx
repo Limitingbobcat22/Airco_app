@@ -7,6 +7,7 @@ import {
   topicSectionPath,
 } from '@/lib/topics'
 import AppNav from './app-nav'
+import BrandMark from './brand-mark'
 
 type MobileSidebarProps = {
   sidebarOpen: boolean
@@ -29,31 +30,16 @@ export default function MobileSidebar({
           Ga naar een onderdeel van de site
         </SheetDescription>
         <div className="flex h-full flex-col">
-          <div className="flex items-center border-b px-4 py-3">
+          <div className="flex items-center border-b px-2 py-1">
             <Link
               to={topicSectionPath(AIRCO_TOPIC, defaultSectionForTopic(AIRCO_TOPIC))}
-              className="flex items-center gap-2"
+              className="flex w-full min-w-0 items-center"
               onClick={() => setSidebarOpen(false)}
             >
-              <span className="bg-primary text-primary-foreground grid size-10 place-items-center rounded-full">
-                <svg
-                  viewBox="0 0 24 24"
-                  className="size-4"
-                  fill="none"
-                  aria-hidden
-                >
-                  <path
-                    d="M4 14c4-8 12-8 16 0M7 17c3-5 7-5 10 0"
-                    stroke="currentColor"
-                    strokeWidth="1.8"
-                    strokeLinecap="round"
-                  />
-                </svg>
-              </span>
-              <span className="font-display text-lg tracking-tight">Aera</span>
+              <BrandMark withText />
             </Link>
           </div>
-          <div className="flex-1 overflow-y-auto py-4">
+          <div className="flex-1 overflow-y-auto pt-2 pb-4">
             <div className="px-4">
               <AppNav setOpen={setSidebarOpen} isMobileNav />
             </div>
