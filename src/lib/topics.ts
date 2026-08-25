@@ -77,7 +77,7 @@ export const TOPIC_NAV_LINKS: Record<TopicSlug, TopicNavLink[]> = {
 }
 
 export const TOPIC_LABELS: Record<TopicSlug, string> = {
-  airco: 'Airco',
+  airco: 'Aircos',
   ketel: 'Ketels',
 }
 

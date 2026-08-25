@@ -3,7 +3,7 @@ import { Navigate, useParams } from 'react-router'
 import { useGoToSection } from '@/hooks/use-go-to-section'
 import AircoGrid from './components/airco-grid'
 import ConsumptionForm from './components/consumption-form'
-import Hero from './components/hero'
+import AircoHome from './components/airco-home'
 import PowerForm from './components/power-form'
 import SavingsDock from './components/savings-dock'
 import SavingsPanel from './components/savings-panel'
@@ -118,7 +118,7 @@ export default function AircoPage() {
   return (
     <div id="top" className="flex h-full min-h-0 flex-col bg-foam">
       <div id="page-scroll" className="min-h-0 flex-1 overflow-y-auto pb-[45vh]">
-        <Hero />
+        <AircoHome />
         <PowerForm
           areaM2={areaM2}
           heightM={heightM}

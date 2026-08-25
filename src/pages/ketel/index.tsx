@@ -9,6 +9,7 @@ import {
   topicSectionPath,
 } from '@/lib/topics'
 import { useUnsavedChanges } from '@/providers/unsaved-changes'
+import KetelHome from './components/ketel-home'
 import { KETELS, type Ketel } from './data/ketels'
 
 const eur = new Intl.NumberFormat('nl-NL', {
@@ -132,72 +133,50 @@ export default function KetelPage() {
   return (
     <div className="flex h-full min-h-0 flex-col bg-foam">
       <div id="page-scroll" className="min-h-0 flex-1 overflow-y-auto pb-[45vh]">
-        <section
-          id="home"
-          className="scroll-mt-4 bg-ink px-4 py-12 sm:px-6 sm:py-16"
-        >
-          <div className="mx-auto max-w-7xl 2xl:max-w-[110rem] 2xl:px-4">
-            <p className="text-sm font-medium tracking-[0.22em] text-mint uppercase">
-              Testomgeving · Ketels
-            </p>
-            <h1 className="mt-4 max-w-xl font-display text-4xl text-white sm:text-5xl">
-              Vind de juiste ketel.
-              <span className="mt-2 block text-mint">Stap voor stap.</span>
-            </h1>
-            <p className="mt-4 max-w-lg text-white/70">
-              Dit is een testversie met nepdata. Later komt hier de echte
-              berekening en productcatalogus.
-            </p>
+        <KetelHome />
 
-            <div
-              id="vermogen"
-              className="mt-8 max-w-xl scroll-mt-4 rounded-3xl border border-white/10 bg-white/8 p-5 backdrop-blur-xl sm:p-6"
-            >
-              <p className="text-xs font-medium tracking-[0.2em] text-mint uppercase">
-                Stap 1
-              </p>
-              <h2 className="mt-2 font-display text-2xl text-white">
-                Schat het vermogen
-              </h2>
-              <p className="mt-2 text-sm text-white/70">
-                Vul een paar basisgegevens in. We tonen een geschat ketelvermogen
-                (mock).
-              </p>
-              <div className="mt-6 grid gap-4 sm:grid-cols-2">
-                <label className="block">
-                  <span className="mb-2 block text-sm text-white/70">
-                    Aantal personen
-                  </span>
-                  <input
-                    type="number"
-                    min={1}
-                    max={10}
-                    value={persons}
-                    onChange={(event) => setPersons(Number(event.target.value))}
-                    className="w-full rounded-xl border border-white/15 bg-ink/40 px-3 py-2.5 text-white outline-none focus:border-mint"
-                  />
-                </label>
-                <label className="block">
-                  <span className="mb-2 block text-sm text-white/70">
-                    Badkamers
-                  </span>
-                  <input
-                    type="number"
-                    min={1}
-                    max={5}
-                    value={bathrooms}
-                    onChange={(event) =>
-                      setBathrooms(Number(event.target.value))
-                    }
-                    className="w-full rounded-xl border border-white/15 bg-ink/40 px-3 py-2.5 text-white outline-none focus:border-mint"
-                  />
-                </label>
-              </div>
-              <p className="mt-5 rounded-2xl bg-mint/15 px-4 py-3 text-sm text-mint">
-                Geschat vermogen:{' '}
-                <span className="font-semibold text-white">{estimatedKw} kW</span>
-              </p>
+        <section
+          id="vermogen"
+          className="mx-auto max-w-7xl scroll-mt-4 px-4 py-12 sm:px-6 sm:py-16 2xl:max-w-[110rem] 2xl:px-10"
+        >
+          <StepHeader
+            step="Stap 1"
+            title="Schat het vermogen"
+            description="Vul een paar basisgegevens in. We tonen een geschat ketelvermogen (mock)."
+          />
+          <div className="mt-8 max-w-xl rounded-3xl border border-mist bg-white p-5 shadow-sm sm:p-6">
+            <div className="grid gap-4 sm:grid-cols-2">
+              <label className="block">
+                <span className="mb-2 block text-sm font-medium text-ink/70">
+                  Aantal personen
+                </span>
+                <input
+                  type="number"
+                  min={1}
+                  max={10}
+                  value={persons}
+                  onChange={(event) => setPersons(Number(event.target.value))}
+                  className="w-full rounded-xl border border-mist bg-foam px-3 py-2.5 text-ink outline-none focus:border-teal"
+                />
+              </label>
+              <label className="block">
+                <span className="mb-2 block text-sm font-medium text-ink/70">
+                  Badkamers
+                </span>
+                <input
+                  type="number"
+                  min={1}
+                  max={5}
+                  value={bathrooms}
+                  onChange={(event) => setBathrooms(Number(event.target.value))}
+                  className="w-full rounded-xl border border-mist bg-foam px-3 py-2.5 text-ink outline-none focus:border-teal"
+                />
+              </label>
             </div>
+            <p className="mt-5 rounded-2xl border border-mist bg-foam px-4 py-3 text-sm text-ink/70">
+              Geschat vermogen:{' '}
+              <span className="font-semibold text-ink">{estimatedKw} kW</span>
+            </p>
           </div>
         </section>
 
