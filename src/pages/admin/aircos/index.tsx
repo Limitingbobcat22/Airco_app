@@ -41,9 +41,9 @@ function createEmptyAirco(values: AircoFormValues): Airco {
     tag: values.tag,
     description: values.description || 'Nog geen beschrijving.',
     features: [],
-    coolingKw: values.coolingKw,
+    coolingKwMin: values.coolingKwMin,
+    coolingKwMax: values.coolingKwMax,
     heatingKw: values.heatingKw,
-    sizeCode: '35',
     seer: 8,
     scop: 4.5,
     energyClassCooling: 'A++',
@@ -55,13 +55,6 @@ function createEmptyAirco(values: AircoFormValues): Airco {
     heatingCoverage: 0.55,
     priceEur: values.priceEur,
     accent: '#005A9C',
-    availableCapacities: [
-      {
-        code: '35',
-        coolingKw: values.coolingKw,
-        heatingKw: values.heatingKw,
-      },
-    ],
   }
 }
 
@@ -72,7 +65,8 @@ function toFormValues(airco: Airco): AircoFormValues {
     model: airco.model,
     tag: airco.tag,
     description: airco.description,
-    coolingKw: airco.coolingKw,
+    coolingKwMin: airco.coolingKwMin,
+    coolingKwMax: airco.coolingKwMax,
     heatingKw: airco.heatingKw,
     roomM2: airco.roomM2,
     priceEur: airco.priceEur,
@@ -142,9 +136,10 @@ export default function AdminAircosPage() {
         header: 'Model',
       },
       {
-        accessorKey: 'coolingKw',
+        id: 'coolingRange',
         header: 'Koelen (kW)',
-        cell: ({ getValue }) => Number(getValue<number>()).toFixed(1),
+        cell: ({ row }) =>
+          `${row.original.coolingKwMin.toFixed(1)} – ${row.original.coolingKwMax.toFixed(1)}`,
       },
       {
         accessorKey: 'heatingKw',
@@ -272,7 +267,8 @@ export default function AdminAircosPage() {
                   model: '',
                   tag: '',
                   description: '',
-                  coolingKw: 3.5,
+                  coolingKwMin: 2.7,
+                  coolingKwMax: 6.2,
                   heatingKw: 4,
                   roomM2: 'tot 40 m²',
                   priceEur: 2000,

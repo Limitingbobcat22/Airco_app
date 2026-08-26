@@ -1,4 +1,4 @@
-import type { Airco, AircoCapacity } from '../data/aircos'
+import type { Airco } from '../data/aircos'
 
 export const INSULATION_OPTIONS = [
   {
@@ -58,44 +58,11 @@ export function insulationLabel(factor: InsulationFactor, short = false): string
   return short ? option.shortLabel : option.label
 }
 
-export function pickCapacity(
-  airco: Airco,
-  requiredKw: number | null,
-): AircoCapacity {
-  const capacities = airco.availableCapacities
-  const fallback = capacities.find((item) => item.code === '35') ?? capacities[0]
-
-  if (requiredKw == null) return fallback
-
-  const covering = capacities.filter((item) => item.coolingKw >= requiredKw)
-  if (covering.length > 0) {
-    return covering.reduce((best, item) =>
-      item.coolingKw < best.coolingKw ? item : best,
-    )
-  }
-
-  return capacities.reduce((best, item) =>
-    item.coolingKw > best.coolingKw ? item : best,
-  )
-}
-
 export function maxCoolingKw(airco: Airco): number {
-  return airco.availableCapacities.reduce(
-    (max, item) => (item.coolingKw > max ? item.coolingKw : max),
-    0,
-  )
+  return airco.coolingKwMax
 }
 
-export function applyCapacity(airco: Airco, requiredKw: number | null): Airco {
-  const capacity = pickCapacity(airco, requiredKw)
-  const scale = capacity.coolingKw / 3.5
-
-  return {
-    ...airco,
-    coolingKw: capacity.coolingKw,
-    heatingKw: capacity.heatingKw,
-    sizeCode: capacity.code,
-    heatingCoverage: Math.min(0.9, Math.round(airco.heatingCoverage * scale * 100) / 100),
-    roomM2: `tot ${Math.round(capacity.coolingKw * 11)} m²`,
-  }
+/** Besparing en overzicht rekenen altijd met het maximale koelvermogen. */
+export function applyCapacity(airco: Airco, _requiredKw: number | null): Airco {
+  return airco
 }

@@ -51,7 +51,7 @@ export default function SavingsPanel({
           Stap 4
         </p>
         <h2 className="mt-2 font-display text-3xl text-ink sm:text-4xl">
-          Overzicht {airco.brand} {airco.series} {airco.sizeCode}
+          Overzicht {airco.brand} {airco.series}
         </h2>
         <p className="mt-3 max-w-2xl text-ink/70">
           Uw geschatte netto voordeel en het passende vermogen op basis van de
@@ -93,7 +93,7 @@ export default function SavingsPanel({
               <div className="flex justify-between gap-3">
                 <dt>Gekozen model</dt>
                 <dd className="font-medium text-ink">
-                  {airco.sizeCode} · {dec.format(airco.coolingKw)} kW
+                  Tot {dec.format(airco.coolingKwMax)} kW
                 </dd>
               </div>
             </dl>
@@ -150,13 +150,13 @@ export default function SavingsPanel({
               <div className="flex justify-between gap-3">
                 <dt>Model</dt>
                 <dd className="font-medium text-white">
-                  {airco.series} {airco.sizeCode}
+                  {airco.series}
                 </dd>
               </div>
               <div className="flex justify-between gap-3">
                 <dt>Vermogen</dt>
                 <dd className="font-medium text-white">
-                  {dec.format(airco.coolingKw)} / {dec.format(airco.heatingKw)} kW
+                  {dec.format(airco.coolingKwMax)} / {dec.format(airco.heatingKw)} kW
                 </dd>
               </div>
               <div className="flex justify-between gap-3">
@@ -182,8 +182,8 @@ export default function SavingsPanel({
                 <CreateKlantForm
                   onClose={onClose}
                   offerte={{
-                    aircoLabel: `${airco.brand} ${airco.series} ${airco.sizeCode}`,
-                    coolingKw: airco.coolingKw,
+                    aircoLabel: `${airco.brand} ${airco.series}`,
+                    coolingKw: airco.coolingKwMax,
                     heatingKw: airco.heatingKw,
                     netEuroSavedYearly: savings.yearly.netEuroSaved,
                   }}
@@ -192,8 +192,8 @@ export default function SavingsPanel({
                     console.info('Offerteaanvraag (nog zonder backend)', {
                       klant: data,
                       offerte: {
-                        aircoLabel: `${airco.brand} ${airco.series} ${airco.sizeCode}`,
-                        coolingKw: airco.coolingKw,
+                        aircoLabel: `${airco.brand} ${airco.series}`,
+                        coolingKw: airco.coolingKwMax,
                         heatingKw: airco.heatingKw,
                         netEuroSavedYearly: savings.yearly.netEuroSaved,
                       },

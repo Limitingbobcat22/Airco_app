@@ -18,9 +18,8 @@ type AircoCardProps = {
 }
 
 function coolingRangeLabel(airco: Airco) {
-  const values = airco.availableCapacities.map((c) => c.coolingKw)
-  const min = Math.min(...values)
-  const max = Math.max(...values)
+  const min = airco.coolingKwMin
+  const max = airco.coolingKwMax
   if (min === max) return `${dec.format(min)} kW`
   return `${dec.format(min)} tot ${dec.format(max)} kW`
 }
@@ -145,9 +144,8 @@ function AircoPhotoPreview({
   const photo = MOCK_PHOTOS[index]
   const total = MOCK_PHOTOS.length
 
-  const coolingValues = airco.availableCapacities.map((c) => c.coolingKw)
-  const coolingMin = Math.min(...coolingValues)
-  const coolingMax = Math.max(...coolingValues)
+  const coolingMin = airco.coolingKwMin
+  const coolingMax = airco.coolingKwMax
   const coolingRange =
     coolingMin === coolingMax
       ? `${dec.format(coolingMin)} kW`

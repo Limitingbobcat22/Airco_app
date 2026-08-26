@@ -1,11 +1,5 @@
 export type EnergyClass = 'A+++' | 'A++' | 'A+'
 
-export type AircoCapacity = {
-  code: string
-  coolingKw: number
-  heatingKw: number
-}
-
 export type Airco = {
   id: string
   brand: string
@@ -14,9 +8,9 @@ export type Airco = {
   tag: string
   description: string
   features: string[]
-  coolingKw: number
+  coolingKwMin: number
+  coolingKwMax: number
   heatingKw: number
-  sizeCode: string
   seer: number
   scop: number
   energyClassCooling: EnergyClass
@@ -28,7 +22,6 @@ export type Airco = {
   heatingCoverage: number
   priceEur: number
   accent: string
-  availableCapacities: AircoCapacity[]
 }
 
 export const AIRCOS: Airco[] = [
@@ -46,9 +39,9 @@ export const AIRCOS: Airco[] = [
       'Steri-Clean 56°C technologie',
       'Standaard ingebouwde Wi-Fi',
     ],
-    coolingKw: 3.6,
-    heatingKw: 3.9,
-    sizeCode: '35',
+    coolingKwMin: 2.7,
+    coolingKwMax: 7.1,
+    heatingKw: 7.4,
     seer: 8.5,
     scop: 4.6,
     energyClassCooling: 'A+++',
@@ -60,12 +53,6 @@ export const AIRCOS: Airco[] = [
     heatingCoverage: 0.55,
     priceEur: 2190,
     accent: '#005A9C',
-    availableCapacities: [
-      { code: '25', coolingKw: 2.7, heatingKw: 3.1 },
-      { code: '35', coolingKw: 3.6, heatingKw: 3.9 },
-      { code: '50', coolingKw: 5.3, heatingKw: 5.8 },
-      { code: '70', coolingKw: 7.1, heatingKw: 7.4 },
-    ],
   },
   {
     id: 'haier-flexis-plus',
@@ -81,9 +68,9 @@ export const AIRCOS: Airco[] = [
       'Eco-Sensor energiebesparing',
       'Ingebouwde Wi-Fi module',
     ],
-    coolingKw: 3.5,
-    heatingKw: 4.2,
-    sizeCode: '35',
+    coolingKwMin: 2.6,
+    coolingKwMax: 7.0,
+    heatingKw: 8.0,
     seer: 8.5,
     scop: 4.6,
     energyClassCooling: 'A+++',
@@ -95,13 +82,6 @@ export const AIRCOS: Airco[] = [
     heatingCoverage: 0.58,
     priceEur: 2690,
     accent: '#005A9C',
-    availableCapacities: [
-      { code: '25', coolingKw: 2.6, heatingKw: 3.2 },
-      { code: '35', coolingKw: 3.5, heatingKw: 4.2 },
-      { code: '42', coolingKw: 4.2, heatingKw: 4.4 },
-      { code: '50', coolingKw: 5.2, heatingKw: 6.0 },
-      { code: '70', coolingKw: 7.0, heatingKw: 8.0 },
-    ],
   },
   {
     id: 'haier-revive',
@@ -117,9 +97,9 @@ export const AIRCOS: Airco[] = [
       'hOn Smart App bediening',
       'Eenvoudig onderhoud',
     ],
-    coolingKw: 3.5,
-    heatingKw: 3.9,
-    sizeCode: '35',
+    coolingKwMin: 2.7,
+    coolingKwMax: 6.2,
+    heatingKw: 6.3,
     seer: 6.1,
     scop: 4.0,
     energyClassCooling: 'A++',
@@ -131,12 +111,6 @@ export const AIRCOS: Airco[] = [
     heatingCoverage: 0.5,
     priceEur: 1890,
     accent: '#005A9C',
-    availableCapacities: [
-      { code: '25', coolingKw: 2.7, heatingKw: 2.9 },
-      { code: '35', coolingKw: 3.5, heatingKw: 3.9 },
-      { code: '50', coolingKw: 4.8, heatingKw: 4.8 },
-      { code: '68', coolingKw: 6.2, heatingKw: 6.3 },
-    ],
   },
   {
     id: 'haier-jade',
@@ -152,9 +126,9 @@ export const AIRCOS: Airco[] = [
       'Superstil (slechts 15 dB(A))',
       'Zuivert de lucht van allergenen',
     ],
-    coolingKw: 3.5,
-    heatingKw: 4.2,
-    sizeCode: '35',
+    coolingKwMin: 2.6,
+    coolingKwMax: 5.2,
+    heatingKw: 6.0,
     seer: 8.75,
     scop: 5.1,
     energyClassCooling: 'A+++',
@@ -166,11 +140,6 @@ export const AIRCOS: Airco[] = [
     heatingCoverage: 0.62,
     priceEur: 3290,
     accent: '#005A9C',
-    availableCapacities: [
-      { code: '25', coolingKw: 2.6, heatingKw: 3.2 },
-      { code: '35', coolingKw: 3.5, heatingKw: 4.2 },
-      { code: '50', coolingKw: 5.2, heatingKw: 6.0 },
-    ],
   },
   {
     id: 'haier-expert',
@@ -186,9 +155,9 @@ export const AIRCOS: Airco[] = [
       'Coanda Airflow technologie',
       'Energielabel A+++ / A++',
     ],
-    coolingKw: 3.5,
-    heatingKw: 4.2,
-    sizeCode: '35',
+    coolingKwMin: 2.8,
+    coolingKwMax: 6.2,
+    heatingKw: 6.8,
     seer: 8.5,
     scop: 4.6,
     energyClassCooling: 'A+++',
@@ -200,12 +169,6 @@ export const AIRCOS: Airco[] = [
     heatingCoverage: 0.58,
     priceEur: 2890,
     accent: '#005A9C',
-    availableCapacities: [
-      { code: '25', coolingKw: 2.8, heatingKw: 3.2 },
-      { code: '35', coolingKw: 3.5, heatingKw: 4.2 },
-      { code: '50', coolingKw: 5.0, heatingKw: 6.0 },
-      { code: '70', coolingKw: 6.2, heatingKw: 6.8 },
-    ],
   },
   {
     id: 'mitsubishi-ln',
@@ -221,9 +184,9 @@ export const AIRCOS: Airco[] = [
       'Koelen en verwarmen',
       'Design wandmodel',
     ],
-    coolingKw: 3.5,
-    heatingKw: 4.0,
-    sizeCode: '35',
+    coolingKwMin: 2.5,
+    coolingKwMax: 6.1,
+    heatingKw: 6.8,
     seer: 9.5,
     scop: 5.1,
     energyClassCooling: 'A+++',
@@ -235,11 +198,5 @@ export const AIRCOS: Airco[] = [
     heatingCoverage: 0.58,
     priceEur: 3190,
     accent: '#1d4ed8',
-    availableCapacities: [
-      { code: '25', coolingKw: 2.5, heatingKw: 3.2 },
-      { code: '35', coolingKw: 3.5, heatingKw: 4.0 },
-      { code: '50', coolingKw: 5.0, heatingKw: 6.0 },
-      { code: '60', coolingKw: 6.1, heatingKw: 6.8 },
-    ],
   },
 ]
