@@ -117,7 +117,7 @@ export default function SavingsDock({ airco, savings, visible }: SavingsDockProp
               <ChevronsDown
                 className={cn(
                   'size-5 transition-transform duration-300 sm:size-[1.35rem]',
-                  showTiles && 'rotate-180',
+                  !showTiles && 'rotate-180',
                 )}
                 aria-hidden
               />

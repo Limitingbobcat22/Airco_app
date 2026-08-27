@@ -66,7 +66,7 @@ export default function KetelHome() {
           </h1>
           <p className="mt-5 max-w-lg text-base text-ink/70 sm:text-lg">
             Bereken het vermogen voor uw woning, of bekijk meteen alle
-            ketelmodellen. De prijs bespreken we daarna op afspraak.
+            ketelmodellen.
           </p>
           <div className="mt-8 grid grid-cols-3 gap-2 sm:gap-2.5">
             <button

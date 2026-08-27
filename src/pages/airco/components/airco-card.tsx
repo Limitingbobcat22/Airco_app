@@ -548,16 +548,26 @@ export default function AircoCard({
               </div>
             </dl>
 
-            <span
-              className={cn(
-                'inline-flex shrink-0 items-center justify-center rounded-full px-5 py-2.5 text-sm font-semibold transition md:text-base',
-                selected
-                  ? 'bg-teal text-white'
-                  : 'bg-ink text-white group-hover:bg-deep',
-              )}
-            >
-              {selected ? 'Geselecteerd' : 'Kies dit model'}
-            </span>
+            {selected ? (
+              <button
+                type="button"
+                onPointerDown={(event) => event.stopPropagation()}
+                onClick={(event) => {
+                  event.stopPropagation()
+                  event.preventDefault()
+                  markPathUpdatedFromScroll()
+                  navigate('/airco/verbruik', { replace: true })
+                  scrollToPageSection('verbruik', 'smooth')
+                }}
+                className="inline-flex cursor-pointer shrink-0 items-center justify-center rounded-full bg-teal px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-deep focus-visible:ring-2 focus-visible:ring-teal focus-visible:outline-none md:text-base"
+              >
+                Bereken besparing
+              </button>
+            ) : (
+              <span className="inline-flex shrink-0 items-center justify-center rounded-full bg-ink px-5 py-2.5 text-sm font-semibold text-white transition group-hover:bg-deep md:text-base">
+                Kies dit model
+              </span>
+            )}
           </div>
         </div>
       </div>

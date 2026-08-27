@@ -1,13 +1,14 @@
 import { useEffect, useMemo, useState } from 'react'
+import { useQuery } from '@tanstack/react-query'
 import { Navigate, useParams } from 'react-router'
 import { useGoToSection } from '@/hooks/use-go-to-section'
+import { listAircos } from '@/lib/api/aircos'
 import AircoGrid from './components/airco-grid'
 import ConsumptionForm from './components/consumption-form'
 import AircoHome from './components/airco-home'
 import PowerForm from './components/power-form'
 import SavingsDock from './components/savings-dock'
 import SavingsPanel from './components/savings-panel'
-import { AIRCOS } from './data/aircos'
 import {
   applyCapacity,
   calculateRequiredPower,
@@ -40,6 +41,16 @@ export default function AircoPage() {
   const [elecPrice, setElecPrice] = useState(SAVINGS_DEFAULTS.elecPriceEur)
   const [hasAdjustedConsumption, setHasAdjustedConsumption] = useState(false)
   const [selectedId, setSelectedId] = useState<string | null>(null)
+
+  const {
+    data: aircos = [],
+    isLoading: aircosLoading,
+    isError: aircosError,
+    error: aircosFetchError,
+  } = useQuery({
+    queryKey: ['aircos'],
+    queryFn: listAircos,
+  })
 
   useEffect(() => {
     const dirty =
@@ -89,7 +100,7 @@ export default function AircoPage() {
     markAdjusted()
   }
 
-  const selected = AIRCOS.find((airco) => airco.id === selectedId) ?? null
+  const selected = aircos.find((airco) => airco.id === selectedId) ?? null
   const sized = selected
     ? applyCapacity(selected, power?.requiredKw ?? null)
     : null
@@ -134,12 +145,30 @@ export default function AircoPage() {
             goToSection('modellen')
           }}
         />
-        <AircoGrid
-          aircos={AIRCOS}
-          selectedId={selectedId}
-          requiredKw={power?.requiredKw ?? null}
-          onSelect={setSelectedId}
-        />
+        {aircosLoading ? (
+          <section
+            id="modellen"
+            className="scroll-mt-24 px-4 py-10 text-center text-sm text-slate-600 sm:px-6"
+          >
+            Modellen laden…
+          </section>
+        ) : aircosError ? (
+          <section
+            id="modellen"
+            className="scroll-mt-24 px-4 py-10 text-center text-sm text-red-700 sm:px-6"
+          >
+            {aircosFetchError instanceof Error
+              ? aircosFetchError.message
+              : 'Kon aircos niet ophalen.'}
+          </section>
+        ) : (
+          <AircoGrid
+            aircos={aircos}
+            selectedId={selectedId}
+            requiredKw={power?.requiredKw ?? null}
+            onSelect={setSelectedId}
+          />
+        )}
         <ConsumptionForm
           yearlyGas={yearlyGas}
           gasPrice={gasPrice}

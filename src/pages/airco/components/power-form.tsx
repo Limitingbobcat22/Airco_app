@@ -1,4 +1,10 @@
-import { ArrowRight } from 'lucide-react'
+import { ArrowRight, Info } from 'lucide-react'
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip'
 import { cn } from '@/lib/utils'
 import { INSULATION_OPTIONS, type InsulationFactor, type PowerResult } from '../lib/power'
 import { dec } from '../lib/savings'
@@ -149,8 +155,33 @@ export default function PowerForm({
             </label>
 
             <label className="block sm:col-span-2">
-              <span className="mb-2 flex items-baseline justify-between gap-3 text-sm font-medium text-ink/70">
-                <span>Deel van de woning verwarmd via airco</span>
+              <span className="mb-2 flex items-center justify-between gap-3 text-sm font-medium text-ink/70">
+                <span className="inline-flex items-center gap-1.5">
+                  Deel van de woning verwarmd via airco
+                  <TooltipProvider delayDuration={200}>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <button
+                          type="button"
+                          className="inline-flex size-4 shrink-0 items-center justify-center rounded-full text-ink/45 transition hover:text-teal focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal"
+                          aria-label="Meer informatie over dit veld"
+                          onClick={(event) => event.preventDefault()}
+                        >
+                          <Info className="size-3.5" strokeWidth={2.25} aria-hidden />
+                        </button>
+                      </TooltipTrigger>
+                      <TooltipContent
+                        side="top"
+                        align="start"
+                        className="max-w-xs text-left leading-relaxed"
+                      >
+                        Geef aan welk percentage van uw woning u met de airco
+                        wilt verwarmen. Dit beïnvloedt het benodigde vermogen én
+                        de geschatte besparing op gasverbruik.
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                </span>
                 <span className="shrink-0 font-semibold text-teal">
                   {heatingSharePct}%
                 </span>

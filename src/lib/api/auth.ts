@@ -1,3 +1,5 @@
+import { API_URL, readApiError } from './base'
+
 export type AuthUser = {
   id: string
   email: string
@@ -11,8 +13,6 @@ export type LoginResponse = {
   user: AuthUser
 }
 
-const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:3000'
-
 export async function loginRequest(
   email: string,
   password: string,
@@ -24,15 +24,7 @@ export async function loginRequest(
   })
 
   if (!response.ok) {
-    let message = 'Inloggen mislukt'
-    try {
-      const body = (await response.json()) as { message?: string | string[] }
-      if (Array.isArray(body.message)) message = body.message.join(', ')
-      else if (body.message) message = body.message
-    } catch {
-      // ignore parse errors
-    }
-    throw new Error(message)
+    throw new Error(await readApiError(response, 'Inloggen mislukt'))
   }
 
   return response.json() as Promise<LoginResponse>

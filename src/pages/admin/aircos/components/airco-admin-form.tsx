@@ -57,7 +57,7 @@ export default function AircoAdminForm({
       <div className="space-y-1.5">
         <h2 className="text-lg font-semibold tracking-tight">{submitLabel}</h2>
         <p className="text-muted-foreground text-sm">
-          Wijzigingen blijven lokaal tot de API er is.
+          Wijzigingen blijven lokaal tot create/update aan de API gekoppeld is.
         </p>
       </div>
 
