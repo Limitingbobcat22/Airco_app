@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import {
   flexRender,
@@ -21,8 +21,10 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { useAuth } from '@/hooks/use-auth'
-import { createAirco, listAircos, updateAirco } from '@/lib/api/aircos'
+import { createAirco, deleteAirco, deleteAircoImage, listAircos, updateAirco, uploadAircoImage } from '@/lib/api/aircos'
 import type { Airco } from '@/pages/airco/data/aircos'
+import type { PendingAircoImage } from '@/pages/airco/data/airco-photos'
+import { useUnsavedChanges } from '@/providers/unsaved-changes'
 import AircoAdminCreate from './admin-airco-forms/airco-admin-create'
 import AircoAdminEdit from './admin-airco-forms/airco-admin-edit'
 import {
@@ -107,6 +109,7 @@ function loadColumnVisibility(columnIds: string[]): VisibilityState {
 
 export default function AdminAircosPage() {
   const { token } = useAuth()
+  const { setDirty } = useUnsavedChanges()
   const queryClient = useQueryClient()
   const {
     data: remoteRows,
@@ -122,7 +125,10 @@ export default function AdminAircosPage() {
 
   const [rows, setRows] = useState<Airco[]>([])
   const [editorOpen, setEditorOpen] = useState(false)
+  const [editorDirty, setEditorDirty] = useState(false)
+  const [discardOpen, setDiscardOpen] = useState(false)
   const [editing, setEditing] = useState<Airco | null>(null)
+  const [deleting, setDeleting] = useState<Airco | null>(null)
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>(
     () =>
       loadColumnVisibility([...ALL_TOGGLEABLE_COLUMN_IDS, 'actions']),
@@ -130,16 +136,48 @@ export default function AdminAircosPage() {
   const [columnPrefsReady, setColumnPrefsReady] = useState(false)
 
   const closeEditor = () => {
+    setDiscardOpen(false)
+    setEditorDirty(false)
     setEditorOpen(false)
     setEditing(null)
   }
 
+  const handleEditorDirtyChange = useCallback((dirty: boolean) => {
+    setEditorDirty(dirty)
+  }, [])
+
+  const closeDelete = () => {
+    setDeleting(null)
+  }
+
   const createMutation = useMutation({
-    mutationFn: (values: AircoFormValues) => {
+    mutationFn: async ({
+      values,
+      images,
+    }: {
+      values: AircoFormValues
+      images: PendingAircoImage[]
+    }) => {
       if (!token) {
         throw new Error('Je bent niet ingelogd als admin.')
       }
-      return createAirco(token, toCreatePayload(values))
+      const created = await createAirco(token, toCreatePayload(values))
+      try {
+        for (const image of images) {
+          await uploadAircoImage(token, created.id, image.file, {
+            sortOrder: image.sortOrder,
+            label: image.label,
+          })
+        }
+      } catch (error) {
+        void queryClient.invalidateQueries({ queryKey: ['aircos'] })
+        const reason =
+          error instanceof Error ? error.message : 'Foto uploaden mislukt'
+        throw new Error(
+          `Airco is aangemaakt, maar niet alle foto’s zijn geüpload (${reason}). Sluit dit venster en bewerk het model; opnieuw toevoegen maakt een tweede airco.`,
+        )
+      }
+      return created
     },
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: ['aircos'] })
@@ -148,21 +186,57 @@ export default function AdminAircosPage() {
   })
 
   const updateMutation = useMutation({
-    mutationFn: ({
+    mutationFn: async ({
       id,
       values,
+      images,
+      removedIds,
     }: {
       id: string
       values: AircoFormValues
+      images: PendingAircoImage[]
+      removedIds: string[]
     }) => {
       if (!token) {
         throw new Error('Je bent niet ingelogd als admin.')
       }
-      return updateAirco(token, id, toUpdatePayload(values))
+      const updated = await updateAirco(token, id, toUpdatePayload(values))
+      try {
+        for (const image of images) {
+          await uploadAircoImage(token, id, image.file, {
+            sortOrder: image.sortOrder,
+            label: image.label,
+          })
+        }
+        for (const imageId of removedIds) {
+          await deleteAircoImage(token, id, imageId)
+        }
+      } catch (error) {
+        void queryClient.invalidateQueries({ queryKey: ['aircos'] })
+        const reason =
+          error instanceof Error ? error.message : 'Foto bijwerken mislukt'
+        throw new Error(
+          `Gegevens zijn opgeslagen, maar niet alle foto’s zijn bijgewerkt (${reason}).`,
+        )
+      }
+      return updated
     },
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: ['aircos'] })
       closeEditor()
+    },
+  })
+
+  const deleteMutation = useMutation({
+    mutationFn: (id: string) => {
+      if (!token) {
+        throw new Error('Je bent niet ingelogd als admin.')
+      }
+      return deleteAirco(token, id)
+    },
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: ['aircos'] })
+      closeDelete()
     },
   })
 
@@ -177,6 +251,9 @@ export default function AdminAircosPage() {
   const openCreate = () => {
     createMutation.reset()
     updateMutation.reset()
+    deleteMutation.reset()
+    setDiscardOpen(false)
+    setEditorDirty(false)
     setEditing(null)
     setEditorOpen(true)
   }
@@ -184,17 +261,32 @@ export default function AdminAircosPage() {
   const openEdit = (airco: Airco) => {
     createMutation.reset()
     updateMutation.reset()
+    deleteMutation.reset()
+    setDiscardOpen(false)
+    setEditorDirty(false)
     setEditing(airco)
     setEditorOpen(true)
   }
 
-  const handleDelete = (airco: Airco) => {
-    const confirmed = window.confirm(
-      `Weet je zeker dat je “${airco.brand} ${airco.model}” wilt verwijderen?`,
-    )
-    if (!confirmed) return
-    setRows((prev) => prev.filter((row) => row.id !== airco.id))
+  const openDelete = (airco: Airco) => {
+    deleteMutation.reset()
+    setDeleting(airco)
   }
+
+  const requestCloseEditor = () => {
+    if (createMutation.isPending || updateMutation.isPending) return
+    if (discardOpen) return
+    if (editorDirty) {
+      setDiscardOpen(true)
+      return
+    }
+    closeEditor()
+  }
+
+  useEffect(() => {
+    setDirty(editorDirty)
+    return () => setDirty(false)
+  }, [editorDirty, setDirty])
 
   const columns = useMemo<ColumnDef<Airco>[]>(
     () => [
@@ -296,7 +388,7 @@ export default function AdminAircosPage() {
               type="button"
               variant="ghost"
               size="icon"
-              onClick={() => handleDelete(row.original)}
+              onClick={() => openDelete(row.original)}
               aria-label="Verwijderen"
             >
               <Trash2 className="size-4 text-destructive" />
@@ -479,23 +571,32 @@ export default function AdminAircosPage() {
         title={editing ? 'Airco bewerken' : 'Airco toevoegen'}
         description="Vul de gegevens van de airco in."
         isOpen={editorOpen}
-        onClose={closeEditor}
+        onClose={requestCloseEditor}
         className="max-h-[90vh] overflow-y-auto !max-w-[min(96rem,95vw)] p-4 sm:p-6"
       >
         {editing ? (
           <AircoAdminEdit
             key={editing.id}
+            aircoId={editing.id}
             initialValues={aircoToFormValues(editing)}
+            initialImages={editing.images ?? []}
             submitting={updateMutation.isPending}
             error={
               updateMutation.error instanceof Error
                 ? updateMutation.error.message
                 : null
             }
-            onSubmit={(values) =>
-              updateMutation.mutate({ id: editing.id, values })
+            onSubmit={(values, images, removedIds) =>
+              updateMutation.mutate({
+                id: editing.id,
+                values,
+                images,
+                removedIds,
+              })
             }
-            onCancel={closeEditor}
+            onAircoUpdated={setEditing}
+            onDirtyChange={handleEditorDirtyChange}
+            onCancel={requestCloseEditor}
           />
         ) : (
           <AircoAdminCreate
@@ -507,10 +608,102 @@ export default function AdminAircosPage() {
                 ? createMutation.error.message
                 : null
             }
-            onSubmit={(values) => createMutation.mutate(values)}
-            onCancel={closeEditor}
+            onSubmit={(values, images) =>
+              createMutation.mutate({ values, images })
+            }
+            onDirtyChange={handleEditorDirtyChange}
+            onCancel={requestCloseEditor}
           />
         )}
+      </Modal>
+
+      <Modal
+        title="Niet-opgeslagen wijzigingen"
+        description="Bevestig of je wilt sluiten"
+        isOpen={discardOpen}
+        onClose={() => setDiscardOpen(false)}
+        className="max-w-md"
+      >
+        <div className="space-y-5 px-1 py-2">
+          <div>
+            <h2 className="font-display text-2xl text-ink">Wijzigingen kwijt?</h2>
+            <p className="mt-2 text-sm text-ink/70">
+              Je hebt aanpassingen gedaan. Weet je zeker dat je wilt sluiten?
+              Niet-opgeslagen wijzigingen gaan verloren.
+            </p>
+          </div>
+          <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+            <button
+              type="button"
+              onClick={() => setDiscardOpen(false)}
+              className="rounded-xl border border-mist bg-white px-5 py-2.5 text-sm font-semibold text-ink hover:bg-foam"
+            >
+              Blijven bewerken
+            </button>
+            <button
+              type="button"
+              onClick={closeEditor}
+              className="rounded-xl bg-deep px-5 py-2.5 text-sm font-semibold text-white hover:bg-teal"
+            >
+              Sluiten
+            </button>
+          </div>
+        </div>
+      </Modal>
+
+      <Modal
+        title="Airco verwijderen"
+        description="Bevestig of je deze airco wilt verwijderen"
+        isOpen={deleting != null}
+        onClose={() => {
+          if (deleteMutation.isPending) return
+          closeDelete()
+        }}
+        className="max-w-md"
+      >
+        <div className="space-y-5 px-1 py-2">
+          <div>
+            <h2 className="font-display text-2xl text-ink">
+              Weet je het zeker?
+            </h2>
+            <p className="mt-2 text-sm text-ink/70">
+              Weet je zeker dat je{' '}
+              <span className="font-semibold text-ink">
+                {deleting
+                  ? `${deleting.brand} ${deleting.model}`
+                  : 'deze airco'}
+              </span>{' '}
+              wilt verwijderen? Alle foto’s van dit model verdwijnen
+              mee.
+            </p>
+          </div>
+          {deleteMutation.error instanceof Error ? (
+            <p className="rounded-xl border border-destructive/30 bg-destructive/5 px-3 py-2 text-sm text-destructive">
+              {deleteMutation.error.message}
+            </p>
+          ) : null}
+          <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+            <button
+              type="button"
+              onClick={closeDelete}
+              disabled={deleteMutation.isPending}
+              className="rounded-xl border border-mist bg-white px-5 py-2.5 text-sm font-semibold text-ink hover:bg-foam disabled:opacity-60"
+            >
+              Annuleren
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                if (!deleting) return
+                deleteMutation.mutate(deleting.id)
+              }}
+              disabled={deleteMutation.isPending}
+              className="rounded-xl bg-destructive px-5 py-2.5 text-sm font-semibold text-white hover:bg-destructive/90 disabled:opacity-60"
+            >
+              {deleteMutation.isPending ? 'Verwijderen…' : 'Verwijderen'}
+            </button>
+          </div>
+        </div>
       </Modal>
     </div>
   )

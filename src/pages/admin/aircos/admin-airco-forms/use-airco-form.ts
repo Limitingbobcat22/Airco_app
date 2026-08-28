@@ -1,11 +1,16 @@
-import { useState, type FormEvent } from 'react'
+import { useMemo, useState, type FormEvent } from 'react'
 import type { AircoFormValues } from './airco-form-values'
 
 export function useAircoForm(
   initialValues: AircoFormValues,
   onSubmit: (values: AircoFormValues) => void,
 ) {
+  const [baseline] = useState(initialValues)
   const [values, setValues] = useState<AircoFormValues>(initialValues)
+  const isDirty = useMemo(
+    () => JSON.stringify(values) !== JSON.stringify(baseline),
+    [values, baseline],
+  )
 
   const update = <K extends keyof AircoFormValues>(
     key: K,
@@ -61,6 +66,7 @@ export function useAircoForm(
 
   return {
     values,
+    isDirty,
     update,
     updateTrustPoint,
     addTrustPoint,

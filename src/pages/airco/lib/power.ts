@@ -29,7 +29,7 @@ export function calculateRequiredPower({
   const heightScale = heightM / POWER_DEFAULTS.heightM
 
   return {
-    requiredKw: (areaM2 * INSULATION_FACTOR * heightScale * share) / 1000,
+    requiredKw: (areaM2 * INSULATION_FACTOR * heightScale * share) / 750,
   }
 }
 

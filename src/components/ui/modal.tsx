@@ -24,13 +24,25 @@ export function Modal({
   children,
   className,
 }: ModalProps) {
-  const onChange = (open: boolean) => {
-    if (!open) onClose()
-  }
-
   return (
-    <Dialog open={isOpen} onOpenChange={onChange}>
-      <DialogContent className={className}>
+    <Dialog
+      open={isOpen}
+      onOpenChange={(open) => {
+        if (!open) onClose()
+      }}
+    >
+      <DialogContent
+        className={className}
+        onCloseClick={onClose}
+        onPointerDownOutside={(event) => {
+          event.preventDefault()
+          onClose()
+        }}
+        onEscapeKeyDown={(event) => {
+          event.preventDefault()
+          onClose()
+        }}
+      >
         <DialogHeader>
           <VisuallyHidden>
             <DialogTitle>{title}</DialogTitle>

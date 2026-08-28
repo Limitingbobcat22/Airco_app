@@ -8,6 +8,8 @@ import { markPathUpdatedFromScroll } from '@/lib/section-nav-sync'
 import type { Airco } from '../data/aircos'
 import { maxCoolingKw } from '../lib/power'
 import { dec, eurExact } from '../lib/savings'
+import { AIRCO_PHOTO_SLOTS } from '../data/airco-photos'
+import { aircoImageUrl } from '@/lib/api/aircos'
 
 type AircoCardProps = {
   airco: Airco
@@ -95,12 +97,6 @@ function AircoIllustration({
   )
 }
 
-const MOCK_PHOTOS = [
-  { id: 'front', label: 'Vooraanzicht', hint: 'Mockupfoto 1 van 3' },
-  { id: 'angle', label: 'Schuin aanzicht', hint: 'Mockupfoto 2 van 3' },
-  { id: 'detail', label: 'Detail', hint: 'Mockupfoto 3 van 3' },
-] as const
-
 function hasValue(value: string | number | null | undefined) {
   if (value == null) return false
   if (typeof value === 'number') return Number.isFinite(value)
@@ -139,8 +135,18 @@ function AircoPhotoPreview({
   onCalculateSavings: () => void
 }) {
   const [index, setIndex] = useState(0)
-  const photo = MOCK_PHOTOS[index]
-  const total = MOCK_PHOTOS.length
+  const photos = AIRCO_PHOTO_SLOTS.map((slot) => {
+    const image = (airco.images ?? []).find(
+      (item) => item.sortOrder === slot.sortOrder,
+    )
+    return {
+      ...slot,
+      src: image ? aircoImageUrl(image.url) : null,
+      imageLabel: image?.label || slot.label,
+    }
+  })
+  const photo = photos[index]
+  const total = photos.length
 
   const goPrev = () => setIndex((current) => (current - 1 + total) % total)
   const goNext = () => setIndex((current) => (current + 1) % total)
@@ -211,20 +217,36 @@ function AircoPhotoPreview({
 
         <div className="relative">
           <div
-            className="flex min-h-[42vh] flex-col items-center justify-center gap-3 rounded-2xl border border-dashed border-mist px-12 py-14 text-center sm:min-h-[52vh]"
+            className="relative flex min-h-[42vh] flex-col items-center justify-center overflow-hidden rounded-2xl border border-dashed border-mist px-12 py-14 text-center sm:min-h-[52vh]"
             style={{
               background: `linear-gradient(160deg, ${airco.accent}10, ${airco.accent}18 45%, #ffffff 100%)`,
             }}
             aria-live="polite"
           >
-            <span className="grid size-14 place-items-center rounded-full bg-white/80 text-ink/35 shadow-sm">
-              <ImageIcon className="size-7" aria-hidden />
-            </span>
-            <p className="font-medium text-ink/70">{photo.label}</p>
-            <p className="max-w-sm text-sm text-ink/45">
-              {photo.hint} — later komt hier de echte foto van {airco.brand}{' '}
-              {airco.model}.
-            </p>
+            {photo.src ? (
+              <img
+                src={photo.src}
+                alt={`${airco.brand} ${airco.model} — ${photo.imageLabel}`}
+                className="absolute inset-0 size-full object-contain p-4"
+              />
+            ) : (
+              <>
+                <span className="grid size-14 place-items-center rounded-full bg-white/80 text-ink/35 shadow-sm">
+                  <ImageIcon className="size-7" aria-hidden />
+                </span>
+                <p className="font-medium text-ink/70">{photo.label}</p>
+                <p className="max-w-sm text-sm text-ink/45">
+                  {photo.hint} — later komt hier de echte foto van {airco.brand}{' '}
+                  {airco.model}.
+                </p>
+              </>
+            )}
+            {photo.src ? (
+              <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-ink/55 to-transparent px-5 py-4 text-left text-white">
+                <p className="text-sm font-medium">{photo.imageLabel}</p>
+                <p className="text-xs text-white/80">{photo.hint}</p>
+              </div>
+            ) : null}
           </div>
 
           <button
@@ -247,7 +269,7 @@ function AircoPhotoPreview({
         </div>
 
         <div className="flex items-center justify-center gap-2">
-          {MOCK_PHOTOS.map((item, photoIndex) => (
+          {photos.map((item, photoIndex) => (
             <button
               key={item.id}
               type="button"
@@ -256,7 +278,9 @@ function AircoPhotoPreview({
                 'h-2 rounded-full transition',
                 photoIndex === index
                   ? 'w-6 bg-teal'
-                  : 'w-2 bg-ink/20 hover:bg-ink/35',
+                  : item.src
+                    ? 'w-2 bg-teal/45 hover:bg-teal/70'
+                    : 'w-2 bg-ink/20 hover:bg-ink/35',
               )}
               aria-label={`Ga naar ${item.label}`}
               aria-current={photoIndex === index}
@@ -354,6 +378,9 @@ export default function AircoCard({
   }
 
   const showFitGlow = requiredKw != null
+  const coverImage = [...(airco.images ?? [])].sort(
+    (left, right) => left.sortOrder - right.sortOrder,
+  )[0]
 
   return (
     <div
@@ -434,15 +461,23 @@ export default function AircoCard({
               maxHeight="max-h-[90dvh]"
               renderButton={(onClick) => (
                 <div
-                  className="relative flex min-h-44 w-full items-center justify-center rounded-3xl md:min-h-52 2xl:min-h-64"
+                  className="relative flex min-h-44 w-full items-center justify-center overflow-hidden rounded-3xl md:min-h-52 2xl:min-h-64"
                   style={{
                     background: `linear-gradient(160deg, ${airco.accent}14, ${airco.accent}28 55%, #ffffff 100%)`,
                   }}
                 >
-                  <AircoIllustration
-                    accent={airco.accent}
-                    gradientId={`unit-face-${airco.id}`}
-                  />
+                  {coverImage ? (
+                    <img
+                      src={aircoImageUrl(coverImage.url)}
+                      alt=""
+                      className="absolute inset-0 size-full object-cover"
+                    />
+                  ) : (
+                    <AircoIllustration
+                      accent={airco.accent}
+                      gradientId={`unit-face-${airco.id}`}
+                    />
+                  )}
                   <button
                     type="button"
                     onPointerDown={(event) => event.stopPropagation()}

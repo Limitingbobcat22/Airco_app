@@ -1,11 +1,18 @@
-import { Check, ImageIcon, Plus, Trash2 } from 'lucide-react'
+import { useEffect, useState } from 'react'
+import { Check, Plus, Trash2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import {
+  AIRCO_PHOTO_SLOTS,
+  pendingImagesFromFiles,
+  type PendingAircoImage,
+} from '@/pages/airco/data/airco-photos'
 import {
   SpecField,
   identityClass,
   selectClass,
   specClass,
 } from './airco-admin-form-ui'
+import AircoPhotoSlider from '../components/airco-photo-slider'
 import {
   ENERGY_CLASSES,
   parseNumberInput,
@@ -17,7 +24,8 @@ type AircoAdminCreateProps = {
   initialValues: AircoFormValues
   submitting?: boolean
   error?: string | null
-  onSubmit: (values: AircoFormValues) => void
+  onSubmit: (values: AircoFormValues, images: PendingAircoImage[]) => void
+  onDirtyChange?: (dirty: boolean) => void
   onCancel: () => void
 }
 
@@ -26,10 +34,15 @@ export default function AircoAdminCreate({
   submitting = false,
   error,
   onSubmit,
+  onDirtyChange,
   onCancel,
 }: AircoAdminCreateProps) {
+  const [photoFiles, setPhotoFiles] = useState<(File | null)[]>(() =>
+    AIRCO_PHOTO_SLOTS.map(() => null),
+  )
   const {
     values,
+    isDirty,
     update,
     updateTrustPoint,
     addTrustPoint,
@@ -37,7 +50,15 @@ export default function AircoAdminCreate({
     handleSubmit,
     headingBrand,
     headingModel,
-  } = useAircoForm(initialValues, onSubmit)
+  } = useAircoForm(initialValues, (nextValues) =>
+    onSubmit(nextValues, pendingImagesFromFiles(photoFiles)),
+  )
+
+  useEffect(() => {
+    const dirty = isDirty || photoFiles.some(Boolean)
+    onDirtyChange?.(dirty)
+    return () => onDirtyChange?.(false)
+  }, [isDirty, photoFiles, onDirtyChange])
 
   return (
     <form className="space-y-6 pb-2" onSubmit={handleSubmit}>
@@ -96,21 +117,13 @@ export default function AircoAdminCreate({
             </div>
           </div>
 
-          <div
-            className="flex min-h-[220px] flex-col items-center justify-center gap-3 rounded-2xl border border-dashed border-mist px-8 py-12 text-center"
-            style={{
-              background: `linear-gradient(160deg, ${values.accent}10, ${values.accent}18 45%, #ffffff 100%)`,
-            }}
-          >
-            <span className="grid size-14 place-items-center rounded-full bg-white/80 text-ink/35 shadow-sm">
-              <ImageIcon className="size-7" aria-hidden />
-            </span>
-            <p className="font-medium text-ink/70">Foto’s komen later</p>
-            <p className="max-w-sm text-sm text-ink/45">
-              Upload parkeren we nog. Dit model wordt zonder afbeeldingen
-              aangemaakt.
-            </p>
-          </div>
+          <AircoPhotoSlider
+            accent={values.accent || '#005A9C'}
+            brand={values.brand}
+            model={values.model}
+            files={photoFiles}
+            onChange={setPhotoFiles}
+          />
         </div>
 
         <div className="space-y-6 lg:sticky lg:top-0">
