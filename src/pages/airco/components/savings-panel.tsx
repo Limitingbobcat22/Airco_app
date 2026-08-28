@@ -48,7 +48,7 @@ export default function SavingsPanel({
           Stap 4
         </p>
         <h2 className="mt-2 font-display text-3xl text-ink sm:text-4xl">
-          Overzicht {airco.brand} {airco.series}
+          Overzicht {airco.brand} {airco.model}
         </h2>
         <p className="mt-3 max-w-2xl text-ink/70">
           Uw geschatte netto voordeel en het passende vermogen op basis van de
@@ -141,7 +141,7 @@ export default function SavingsPanel({
               <div className="flex justify-between gap-3">
                 <dt>Model</dt>
                 <dd className="font-medium text-white">
-                  {airco.series}
+                  {airco.model}
                 </dd>
               </div>
               <div className="flex justify-between gap-3">
@@ -173,7 +173,7 @@ export default function SavingsPanel({
                 <CreateKlantForm
                   onClose={onClose}
                   offerte={{
-                    aircoLabel: `${airco.brand} ${airco.series}`,
+                    aircoLabel: `${airco.brand} ${airco.model}`,
                     coolingKw: airco.coolingKw,
                     heatingKw: airco.heatingKw,
                     netEuroSavedYearly: savings.yearly.netEuroSaved,
@@ -183,7 +183,7 @@ export default function SavingsPanel({
                     console.info('Offerteaanvraag (nog zonder backend)', {
                       klant: data,
                       offerte: {
-                        aircoLabel: `${airco.brand} ${airco.series}`,
+                        aircoLabel: `${airco.brand} ${airco.model}`,
                         coolingKw: airco.coolingKw,
                         heatingKw: airco.heatingKw,
                         netEuroSavedYearly: savings.yearly.netEuroSaved,

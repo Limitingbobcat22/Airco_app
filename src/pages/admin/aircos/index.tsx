@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { useQuery } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import {
   flexRender,
   getCoreRowModel,
@@ -20,17 +20,21 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import { listAircos } from '@/lib/api/aircos'
+import { useAuth } from '@/hooks/use-auth'
+import { createAirco, listAircos } from '@/lib/api/aircos'
 import type { Airco } from '@/pages/airco/data/aircos'
-import AircoAdminForm, {
+import AircoAdminCreate from './admin-airco-forms/airco-admin-create'
+import {
+  EMPTY_AIRCO_FORM,
+  aircoToFormValues,
+  toCreatePayload,
   type AircoFormValues,
-} from './components/airco-admin-form'
+} from './admin-airco-forms/airco-form-values'
 
 const COLUMN_PREFS_KEY = 'columnPreferences_admin_aircos'
 
 const DEFAULT_VISIBLE_COLUMN_IDS = [
   'brand',
-  'series',
   'model',
   'coolingKw',
   'heatingKw',
@@ -39,7 +43,6 @@ const DEFAULT_VISIBLE_COLUMN_IDS = [
 
 const EXTRA_COLUMN_IDS = [
   'tag',
-  'slug',
   'unitType',
   'productFunction',
   'roomM2',
@@ -47,7 +50,10 @@ const EXTRA_COLUMN_IDS = [
   'scop',
   'energyClassCooling',
   'energyClassHeating',
-  'noiseSilentDba',
+  'noiseDbaInside',
+  'noiseDbaOutside',
+  'netSizeInside',
+  'netSizeOutside',
   'refrigerant',
 ] as const
 
@@ -62,56 +68,27 @@ const eur = new Intl.NumberFormat('nl-NL', {
   maximumFractionDigits: 0,
 })
 
-function slugify(brand: string, series: string) {
-  return `${brand}-${series}-${Date.now()}`
-    .toLowerCase()
-    .replace(/\s+/g, '-')
-}
-
-function createEmptyAirco(values: AircoFormValues): Airco {
-  const slug = slugify(values.brand, values.series)
+function applyFormValues(row: Airco, values: AircoFormValues): Airco {
+  const payload = toCreatePayload(values)
+  const trustPoints =
+    values.trustPoints.map((point) => point.trim()).filter(Boolean)
 
   return {
-    id: crypto.randomUUID(),
-    slug,
-    brand: values.brand,
-    series: values.series,
-    model: values.model,
-    unitType: `${values.model} (split)`,
-    tag: values.tag,
-    description: values.description || 'Nog geen beschrijving.',
-    productFunction: 'Koelen en verwarmen',
-    trustPoints: [
-      'Inclusief standaard montage',
-      'F-gassen-gecertificeerde monteur',
-    ],
-    coolingKw: values.coolingKw,
-    heatingKw: values.heatingKw,
-    seer: 8,
-    scop: 4.5,
-    energyClassCooling: 'A++',
-    energyClassHeating: 'A++',
-    noiseSilentDba: 20,
-    refrigerant: 'R32',
-    roomM2: values.roomM2,
-    heatingCoverage: 0.55,
-    priceEur: values.priceEur,
-    accent: '#005A9C',
-    images: [],
-  }
-}
-
-function toFormValues(airco: Airco): AircoFormValues {
-  return {
-    brand: airco.brand,
-    series: airco.series,
-    model: airco.model,
-    tag: airco.tag,
-    description: airco.description,
-    coolingKw: airco.coolingKw,
-    heatingKw: airco.heatingKw,
-    roomM2: airco.roomM2,
-    priceEur: airco.priceEur,
+    ...row,
+    ...payload,
+    unitType: values.unitType.trim() || `${values.model.trim()} (split)`,
+    tag: values.tag.trim(),
+    productFunction:
+      values.productFunction.trim() || 'Koelen en verwarmen',
+    trustPoints: trustPoints.length ? trustPoints : row.trustPoints,
+    netSizeInside: values.netSizeInside.trim(),
+    netSizeOutside: values.netSizeOutside.trim(),
+    refrigerant: values.refrigerant.trim() || 'R32',
+    heatingCoverage:
+      values.heatingCoverage === ''
+        ? row.heatingCoverage
+        : Number(values.heatingCoverage),
+    accent: values.accent.trim() || row.accent,
   }
 }
 
@@ -151,6 +128,8 @@ function loadColumnVisibility(columnIds: string[]): VisibilityState {
 }
 
 export default function AdminAircosPage() {
+  const { token } = useAuth()
+  const queryClient = useQueryClient()
   const {
     data: remoteRows,
     isLoading,
@@ -172,6 +151,24 @@ export default function AdminAircosPage() {
   )
   const [columnPrefsReady, setColumnPrefsReady] = useState(false)
 
+  const closeEditor = () => {
+    setEditorOpen(false)
+    setEditing(null)
+  }
+
+  const createMutation = useMutation({
+    mutationFn: (values: AircoFormValues) => {
+      if (!token) {
+        throw new Error('Je bent niet ingelogd als admin.')
+      }
+      return createAirco(token, toCreatePayload(values))
+    },
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: ['aircos'] })
+      closeEditor()
+    },
+  })
+
   useEffect(() => {
     if (remoteRows) setRows(remoteRows)
   }, [remoteRows])
@@ -181,6 +178,7 @@ export default function AdminAircosPage() {
   }, [])
 
   const openCreate = () => {
+    createMutation.reset()
     setEditing(null)
     setEditorOpen(true)
   }
@@ -190,33 +188,22 @@ export default function AdminAircosPage() {
     setEditorOpen(true)
   }
 
-  const closeEditor = () => {
-    setEditorOpen(false)
-    setEditing(null)
-  }
-
   const handleSave = (values: AircoFormValues) => {
     if (editing) {
       setRows((prev) =>
         prev.map((row) =>
-          row.id === editing.id
-            ? {
-                ...row,
-                ...values,
-                unitType: `${values.model} (split)`,
-              }
-            : row,
+          row.id === editing.id ? applyFormValues(row, values) : row,
         ),
       )
-    } else {
-      setRows((prev) => [...prev, createEmptyAirco(values)])
+      closeEditor()
+      return
     }
-    closeEditor()
+    createMutation.mutate(values)
   }
 
   const handleDelete = (airco: Airco) => {
     const confirmed = window.confirm(
-      `Weet je zeker dat je “${airco.brand} ${airco.series}” wilt verwijderen?`,
+      `Weet je zeker dat je “${airco.brand} ${airco.model}” wilt verwijderen?`,
     )
     if (!confirmed) return
     setRows((prev) => prev.filter((row) => row.id !== airco.id))
@@ -227,10 +214,6 @@ export default function AdminAircosPage() {
       {
         accessorKey: 'brand',
         header: 'Merk',
-      },
-      {
-        accessorKey: 'series',
-        header: 'Serie',
       },
       {
         accessorKey: 'model',
@@ -254,10 +237,6 @@ export default function AdminAircosPage() {
       {
         accessorKey: 'tag',
         header: 'Tag',
-      },
-      {
-        accessorKey: 'slug',
-        header: 'Slug',
       },
       {
         accessorKey: 'unitType',
@@ -290,9 +269,22 @@ export default function AdminAircosPage() {
         header: 'Label verwarmen',
       },
       {
-        accessorKey: 'noiseSilentDba',
-        header: 'Geluidsniveau',
+        accessorKey: 'noiseDbaInside',
+        header: 'Geluid binnen',
         cell: ({ getValue }) => `${getValue<number>()} dB(A)`,
+      },
+      {
+        accessorKey: 'noiseDbaOutside',
+        header: 'Geluid buiten',
+        cell: ({ getValue }) => `${getValue<number>()} dB(A)`,
+      },
+      {
+        accessorKey: 'netSizeInside',
+        header: 'Afmeting binnen',
+      },
+      {
+        accessorKey: 'netSizeOutside',
+        header: 'Afmeting buiten',
       },
       {
         accessorKey: 'refrigerant',
@@ -402,7 +394,7 @@ export default function AdminAircosPage() {
       <div className="flex flex-col gap-4 border-b px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
         <Heading
           title="Aircos beheer"
-          description="Airco-modellen uit de API. Standaard 6 kolommen; voeg er meer toe via Kolommen."
+          description="Airco-modellen uit de API. Standaard 5 kolommen; voeg er meer toe via Kolommen."
         />
         <div className="flex w-full flex-wrap items-center gap-2 sm:w-auto sm:min-w-[36rem] sm:max-w-4xl sm:justify-end">
           <span className="shrink-0 text-sm font-medium">Kolommen:</span>
@@ -498,29 +490,21 @@ export default function AdminAircosPage() {
 
       <Modal
         title={editing ? 'Airco bewerken' : 'Airco toevoegen'}
-        description="Vul de basisgegevens van de airco in."
+        description="Vul de gegevens van de airco in."
         isOpen={editorOpen}
         onClose={closeEditor}
-        className="max-h-[90vh] overflow-y-auto sm:max-w-lg"
+        className="max-h-[90vh] overflow-y-auto !max-w-[min(96rem,95vw)] p-4 sm:p-6"
       >
-        <AircoAdminForm
+        <AircoAdminCreate
           key={editing?.id ?? 'create'}
-          initialValues={
-            editing
-              ? toFormValues(editing)
-              : {
-                  brand: '',
-                  series: '',
-                  model: '',
-                  tag: '',
-                  description: '',
-                  coolingKw: 6.2,
-                  heatingKw: 4,
-                  roomM2: 'tot 40 m²',
-                  priceEur: 2000,
-                }
-          }
+          initialValues={editing ? aircoToFormValues(editing) : EMPTY_AIRCO_FORM}
           submitLabel={editing ? 'Opslaan' : 'Toevoegen'}
+          submitting={!editing && createMutation.isPending}
+          error={
+            !editing && createMutation.error instanceof Error
+              ? createMutation.error.message
+              : null
+          }
           onSubmit={handleSave}
           onCancel={closeEditor}
         />

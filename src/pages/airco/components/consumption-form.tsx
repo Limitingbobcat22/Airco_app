@@ -111,7 +111,7 @@ export default function ConsumptionForm({
           <p className="mt-6 rounded-2xl border border-mist bg-foam px-4 py-3 text-sm text-ink/70">
             Gekozen model:{' '}
             <span className="font-medium text-ink">
-              {airco.brand} {airco.series}
+              {airco.brand} {airco.model}
             </span>
             {' · '}
             SCOP {dec.format(airco.scop)} ({airco.energyClassHeating})

@@ -8,9 +8,7 @@ export type AircoImageMeta = {
 
 export type Airco = {
   id: string
-  slug: string
   brand: string
-  series: string
   model: string
   unitType: string
   tag: string
@@ -23,7 +21,10 @@ export type Airco = {
   scop: number
   energyClassCooling: string
   energyClassHeating: string
-  noiseSilentDba: number
+  noiseDbaInside: number
+  noiseDbaOutside: number
+  netSizeInside: string
+  netSizeOutside: string
   refrigerant: string
   roomM2: string
   heatingCoverage: number

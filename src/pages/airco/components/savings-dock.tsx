@@ -81,7 +81,7 @@ export default function SavingsDock({ airco, savings, visible }: SavingsDockProp
                 {hasSavings ? (
                   <>
                     <p className="truncate text-base font-semibold text-ink sm:text-lg">
-                      Besparing · {airco.brand} {airco.series}
+                      Besparing · {airco.brand} {airco.model}
                     </p>
                     {!showTiles ? (
                       <p className="truncate text-sm text-ink/55 sm:text-base">

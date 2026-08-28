@@ -101,10 +101,11 @@ const MOCK_PHOTOS = [
   { id: 'detail', label: 'Detail', hint: 'Mockupfoto 3 van 3' },
 ] as const
 
-const TRUST_POINTS = [
-  'Inclusief standaard montage',
-  'F-gassen-gecertificeerde monteur',
-] as const
+function hasValue(value: string | number | null | undefined) {
+  if (value == null) return false
+  if (typeof value === 'number') return Number.isFinite(value)
+  return value.trim() !== ''
+}
 
 function SpecRow({
   label,
@@ -145,23 +146,55 @@ function AircoPhotoPreview({
   const goNext = () => setIndex((current) => (current + 1) % total)
 
   const specs = [
-    { label: 'Type', value: `${airco.model} (split)` },
-    { label: 'Functie', value: 'Koelen en verwarmen' },
+    { label: 'Type', value: airco.unitType },
+    { label: 'Functie', value: airco.productFunction },
     { label: 'Koel vermogen', value: kwLabel(airco.coolingKw) },
     { label: 'Verwarm vermogen', value: kwLabel(airco.heatingKw) },
     {
       label: 'Energielabel',
-      value: `${airco.energyClassCooling} / ${airco.energyClassHeating}`,
+      value:
+        airco.energyClassCooling && airco.energyClassHeating
+          ? `${airco.energyClassCooling} / ${airco.energyClassHeating}`
+          : airco.energyClassCooling || airco.energyClassHeating,
     },
-    { label: 'SEER', value: `Tot ${dec.format(airco.seer)}` },
-    { label: 'SCOP', value: `Tot ${dec.format(airco.scop)}` },
+    {
+      label: 'SEER',
+      value: hasValue(airco.seer) ? `Tot ${dec.format(airco.seer)}` : '',
+    },
+    {
+      label: 'SCOP',
+      value: hasValue(airco.scop) ? `Tot ${dec.format(airco.scop)}` : '',
+    },
     {
       label: 'Geluid binnenunit',
-      value: `Vanaf ${airco.noiseSilentDba} dB(A)`,
+      value:
+        airco.noiseDbaInside > 0 ? `Vanaf ${airco.noiseDbaInside} dB(A)` : '',
+    },
+    {
+      label: 'Geluid buitenunit',
+      value:
+        airco.noiseDbaOutside > 0 ? `Vanaf ${airco.noiseDbaOutside} dB(A)` : '',
+    },
+    {
+      label: 'Netto afmeting binnenunit',
+      value: airco.netSizeInside?.trim() || '—',
+    },
+    {
+      label: 'Netto afmeting buitenunit',
+      value: airco.netSizeOutside?.trim() || '—',
     },
     { label: 'Koudemiddel', value: airco.refrigerant },
     { label: 'Geschikte ruimte', value: airco.roomM2 },
-  ]
+    { label: 'Montage', value: 'Inclusief standaard montage' },
+    {
+      label: 'Dekking verwarming',
+      value: hasValue(airco.heatingCoverage)
+        ? dec.format(airco.heatingCoverage)
+        : '',
+    },
+  ].filter((spec) => hasValue(spec.value))
+
+  const trustPoints = (airco.trustPoints ?? []).map((point) => point.trim()).filter(Boolean)
 
   return (
     <div className="grid gap-8 pb-2 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)] lg:items-start lg:gap-10">
@@ -171,7 +204,7 @@ function AircoPhotoPreview({
             Airco · {airco.brand}
           </p>
           <h3 className="mt-1 font-display text-2xl text-ink sm:text-3xl">
-            {airco.brand} {airco.series}
+            {airco.brand} {airco.model}
           </h3>
           <p className="mt-1 text-sm text-ink/60">{airco.tag}</p>
         </div>
@@ -190,7 +223,7 @@ function AircoPhotoPreview({
             <p className="font-medium text-ink/70">{photo.label}</p>
             <p className="max-w-sm text-sm text-ink/45">
               {photo.hint} — later komt hier de echte foto van {airco.brand}{' '}
-              {airco.series}.
+              {airco.model}.
             </p>
           </div>
 
@@ -235,10 +268,10 @@ function AircoPhotoPreview({
       <div className="space-y-6 lg:sticky lg:top-0">
         <div>
           <p className="font-display text-2xl text-ink sm:text-3xl">
-            {airco.brand} {airco.series} airco
+            {airco.brand} {airco.model} airco
           </p>
           <p className="mt-2 text-base font-semibold text-teal">
-            Vanaf {eur.format(airco.priceEur)} incl. standaard montage
+            Geschatte prijs: {eur.format(airco.priceEur)} incl. standaard montage
           </p>
           <p className="mt-3 text-sm leading-relaxed text-ink/70 sm:text-[15px]">
             {airco.description}
@@ -256,21 +289,23 @@ function AircoPhotoPreview({
           ))}
         </dl>
 
-        <ul className="space-y-2 border-t border-mist pt-4">
-          {TRUST_POINTS.map((point) => (
-            <li
-              key={point}
-              className="flex items-start gap-2.5 text-sm text-ink/70"
-            >
-              <Check
-                className="mt-0.5 size-4 shrink-0 text-teal"
-                strokeWidth={3}
-                aria-hidden
-              />
-              <span>{point}</span>
-            </li>
-          ))}
-        </ul>
+        {trustPoints.length ? (
+          <ul className="space-y-2 border-t border-mist pt-4">
+            {trustPoints.map((point) => (
+              <li
+                key={point}
+                className="flex items-start gap-2.5 text-sm text-ink/70"
+              >
+                <Check
+                  className="mt-0.5 size-4 shrink-0 text-teal"
+                  strokeWidth={3}
+                  aria-hidden
+                />
+                <span>{point}</span>
+              </li>
+            ))}
+          </ul>
+        ) : null}
 
         <div className="flex flex-col-reverse gap-3 border-t border-mist pt-4 sm:flex-row sm:justify-end">
           <button
@@ -388,7 +423,7 @@ export default function AircoCard({
               selected && 'pr-14',
             )}
           >
-            {airco.brand} {airco.series}
+            {airco.brand} {airco.model}
           </h3>
 
           <div className="grid gap-6 md:grid-cols-[minmax(0,0.95fr)_minmax(0,1.2fr)] md:items-start md:gap-8 2xl:grid-cols-[minmax(0,1fr)_minmax(0,1.35fr)] 2xl:gap-12">
@@ -417,7 +452,7 @@ export default function AircoCard({
                       onClick()
                     }}
                     className="absolute top-3 right-3 grid size-10 place-items-center rounded-full border border-mist/80 bg-white/90 text-ink shadow-sm transition hover:border-teal/40 hover:bg-white hover:text-teal focus-visible:ring-2 focus-visible:ring-teal focus-visible:outline-none"
-                    aria-label={`Bekijk foto van ${airco.brand} ${airco.series}`}
+                    aria-label={`Bekijk foto van ${airco.brand} ${airco.model}`}
                   >
                     <Expand className="size-5" strokeWidth={2.25} aria-hidden />
                   </button>
@@ -466,7 +501,7 @@ export default function AircoCard({
                     handlePreviewOpenChange(true)
                   }}
                   className="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-mist/80 bg-white px-3 py-1.5 text-sm font-medium text-ink/70 shadow-sm transition hover:border-teal/40 hover:text-teal focus-visible:ring-2 focus-visible:ring-teal focus-visible:outline-none"
-                  aria-label={`Meer informatie over ${airco.brand} ${airco.series}`}
+                  aria-label={`Meer informatie over ${airco.brand} ${airco.model}`}
                 >
                   <Info className="size-4" strokeWidth={2.25} aria-hidden />
                   Info
