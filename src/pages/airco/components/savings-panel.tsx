@@ -1,7 +1,6 @@
 import PopupModal from '@/components/shared/popup-modal'
 import { CreateKlantForm } from '@/pages/klant'
 import type { Airco } from '../data/aircos'
-import { type InsulationFactor, insulationLabel } from '../lib/power'
 import {
   SAVINGS_CONSTANTS,
   dec,
@@ -17,7 +16,6 @@ type SavingsPanelProps = {
   requiredKw: number | null
   areaM2: number | null
   heightM: number
-  insulationFactor: InsulationFactor
   heatingSharePct: number
   gasPrice: number
   elecPrice: number
@@ -29,7 +27,6 @@ export default function SavingsPanel({
   requiredKw,
   areaM2,
   heightM,
-  insulationFactor,
   heatingSharePct,
   gasPrice,
   elecPrice,
@@ -75,12 +72,6 @@ export default function SavingsPanel({
                 <dd className="font-medium text-ink">{dec.format(heightM)} m</dd>
               </div>
               <div className="flex justify-between gap-3">
-                <dt>Isolatie</dt>
-                <dd className="font-medium text-ink">
-                  {insulationLabel(insulationFactor, true)}
-                </dd>
-              </div>
-              <div className="flex justify-between gap-3">
                 <dt>Aandeel airco</dt>
                 <dd className="font-medium text-ink">{heatingSharePct}%</dd>
               </div>
@@ -91,9 +82,9 @@ export default function SavingsPanel({
                 </dd>
               </div>
               <div className="flex justify-between gap-3">
-                <dt>Gekozen model</dt>
+                <dt>Koel vermogen</dt>
                 <dd className="font-medium text-ink">
-                  Tot {dec.format(airco.coolingKwMax)} kW
+                  {dec.format(airco.coolingKw)} kW
                 </dd>
               </div>
             </dl>
@@ -154,9 +145,9 @@ export default function SavingsPanel({
                 </dd>
               </div>
               <div className="flex justify-between gap-3">
-                <dt>Vermogen</dt>
+                <dt>Koel vermogen</dt>
                 <dd className="font-medium text-white">
-                  {dec.format(airco.coolingKwMax)} / {dec.format(airco.heatingKw)} kW
+                  {dec.format(airco.coolingKw)} kW
                 </dd>
               </div>
               <div className="flex justify-between gap-3">
@@ -183,7 +174,7 @@ export default function SavingsPanel({
                   onClose={onClose}
                   offerte={{
                     aircoLabel: `${airco.brand} ${airco.series}`,
-                    coolingKw: airco.coolingKwMax,
+                    coolingKw: airco.coolingKw,
                     heatingKw: airco.heatingKw,
                     netEuroSavedYearly: savings.yearly.netEuroSaved,
                   }}
@@ -193,7 +184,7 @@ export default function SavingsPanel({
                       klant: data,
                       offerte: {
                         aircoLabel: `${airco.brand} ${airco.series}`,
-                        coolingKw: airco.coolingKwMax,
+                        coolingKw: airco.coolingKw,
                         heatingKw: airco.heatingKw,
                         netEuroSavedYearly: savings.yearly.netEuroSaved,
                       },

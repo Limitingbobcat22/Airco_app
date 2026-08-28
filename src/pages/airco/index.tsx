@@ -13,7 +13,6 @@ import {
   applyCapacity,
   calculateRequiredPower,
   POWER_DEFAULTS,
-  type InsulationFactor,
 } from './lib/power'
 import { SAVINGS_DEFAULTS, calculateSavings } from './lib/savings'
 import {
@@ -30,9 +29,6 @@ export default function AircoPage() {
   const goToSection = useGoToSection()
   const [areaM2, setAreaM2] = useState<number | null>(null)
   const [heightM, setHeightM] = useState(POWER_DEFAULTS.heightM)
-  const [insulationFactor, setInsulationFactor] = useState<InsulationFactor>(
-    POWER_DEFAULTS.insulationFactor,
-  )
   const [heatingSharePct, setHeatingSharePct] = useState(
     POWER_DEFAULTS.heatingSharePct,
   )
@@ -58,7 +54,6 @@ export default function AircoPage() {
       selectedId != null ||
       hasAdjustedConsumption ||
       heightM !== POWER_DEFAULTS.heightM ||
-      insulationFactor !== POWER_DEFAULTS.insulationFactor ||
       heatingSharePct !== POWER_DEFAULTS.heatingSharePct
     setDirty(dirty)
     return () => setDirty(false)
@@ -67,7 +62,6 @@ export default function AircoPage() {
     selectedId,
     hasAdjustedConsumption,
     heightM,
-    insulationFactor,
     heatingSharePct,
     setDirty,
   ])
@@ -77,10 +71,9 @@ export default function AircoPage() {
       calculateRequiredPower({
         areaM2,
         heightM,
-        insulationFactor,
         heatingSharePct,
       }),
-    [areaM2, heightM, insulationFactor, heatingSharePct],
+    [areaM2, heightM, heatingSharePct],
   )
 
   const markAdjusted = () => setHasAdjustedConsumption(true)
@@ -133,12 +126,10 @@ export default function AircoPage() {
         <PowerForm
           areaM2={areaM2}
           heightM={heightM}
-          insulationFactor={insulationFactor}
           heatingSharePct={heatingSharePct}
           result={power}
           onAreaChange={setAreaM2}
           onHeightChange={setHeightM}
-          onInsulationChange={setInsulationFactor}
           onHeatingShareChange={setHeatingSharePct}
           onViewAircos={() => {
             setSelectedId(null)
@@ -184,7 +175,6 @@ export default function AircoPage() {
           requiredKw={power?.requiredKw ?? null}
           areaM2={areaM2}
           heightM={heightM}
-          insulationFactor={insulationFactor}
           heatingSharePct={heatingSharePct}
           gasPrice={gasPrice}
           elecPrice={elecPrice}

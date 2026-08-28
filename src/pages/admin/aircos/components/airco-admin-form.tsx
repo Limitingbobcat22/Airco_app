@@ -7,8 +7,7 @@ export type AircoFormValues = {
   model: string
   tag: string
   description: string
-  coolingKwMin: number
-  coolingKwMax: number
+  coolingKw: number
   heatingKw: number
   roomM2: string
   priceEur: number
@@ -114,38 +113,23 @@ export default function AircoAdminForm({
           />
         </div>
         <div className="space-y-2">
-          <label htmlFor="airco-cooling-min" className="text-sm font-medium">
-            Koelen min (kW)
+          <label htmlFor="airco-cooling" className="text-sm font-medium">
+            Koel vermogen (kW)
           </label>
           <input
-            id="airco-cooling-min"
+            id="airco-cooling"
             type="number"
             min={0}
             step={0.1}
             required
-            value={values.coolingKwMin}
-            onChange={(e) => update('coolingKwMin', Number(e.target.value))}
-            className={fieldClass}
-          />
-        </div>
-        <div className="space-y-2">
-          <label htmlFor="airco-cooling-max" className="text-sm font-medium">
-            Koelen max (kW)
-          </label>
-          <input
-            id="airco-cooling-max"
-            type="number"
-            min={0}
-            step={0.1}
-            required
-            value={values.coolingKwMax}
-            onChange={(e) => update('coolingKwMax', Number(e.target.value))}
+            value={values.coolingKw}
+            onChange={(e) => update('coolingKw', Number(e.target.value))}
             className={fieldClass}
           />
         </div>
         <div className="space-y-2">
           <label htmlFor="airco-heating" className="text-sm font-medium">
-            Verwarmen (kW)
+            Verwarm vermogen (kW)
           </label>
           <input
             id="airco-heating"

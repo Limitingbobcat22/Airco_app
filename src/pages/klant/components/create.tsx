@@ -146,8 +146,7 @@ export default function CreateKlantForm({
             <span className="font-medium text-ink">{offerte.aircoLabel}</span>
           </p>
           <p className="mt-1">
-            Vermogen: {offerte.coolingKw.toFixed(1)} /{' '}
-            {offerte.heatingKw.toFixed(1)} kW
+            Koel vermogen: {offerte.coolingKw.toFixed(1)} kW
             {offerte.netEuroSavedYearly != null ? (
               <>
                 {' · '}Geschat voordeel:{' '}

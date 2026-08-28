@@ -16,17 +16,14 @@ export type Airco = {
   tag: string
   description: string
   productFunction: string
-  features: string[]
   trustPoints: string[]
-  coolingKwMin: number
-  coolingKwMax: number
+  coolingKw: number
   heatingKw: number
   seer: number
   scop: number
   energyClassCooling: string
   energyClassHeating: string
   noiseSilentDba: number
-  minTempC: number
   refrigerant: string
   roomM2: string
   heatingCoverage: number

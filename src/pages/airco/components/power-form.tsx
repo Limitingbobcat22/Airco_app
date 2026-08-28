@@ -6,18 +6,16 @@ import {
   TooltipTrigger,
 } from '@/components/ui/tooltip'
 import { cn } from '@/lib/utils'
-import { INSULATION_OPTIONS, type InsulationFactor, type PowerResult } from '../lib/power'
+import { type PowerResult } from '../lib/power'
 import { dec } from '../lib/savings'
 
 type PowerFormProps = {
   areaM2: number | null
   heightM: number
-  insulationFactor: InsulationFactor
   heatingSharePct: number
   result: PowerResult | null
   onAreaChange: (value: number | null) => void
   onHeightChange: (value: number) => void
-  onInsulationChange: (value: InsulationFactor) => void
   onHeatingShareChange: (value: number) => void
   onViewAircos: () => void
 }
@@ -66,12 +64,10 @@ function ResultPanel({
 export default function PowerForm({
   areaM2,
   heightM,
-  insulationFactor,
   heatingSharePct,
   result,
   onAreaChange,
   onHeightChange,
-  onInsulationChange,
   onHeatingShareChange,
   onViewAircos,
 }: PowerFormProps) {
@@ -88,8 +84,8 @@ export default function PowerForm({
           Bereken het vermogen
         </h2>
         <p className="mt-3 text-ink/70">
-          Bereken het benodigde vermogen op basis van uw ruimte, isolatie en
-          welk deel van de woning de airco verwarmt.
+          Bereken het benodigde vermogen op basis van uw ruimte en welk deel
+          van de woning de airco verwarmt.
         </p>
       </div>
 
@@ -131,27 +127,6 @@ export default function PowerForm({
                 onChange={(event) => onHeightChange(Number(event.target.value))}
                 className="w-full rounded-xl border border-mist bg-foam px-3 py-2.5 text-ink outline-none focus:border-teal"
               />
-            </label>
-
-            <label className="block sm:col-span-2">
-              <span className="mb-2 block text-sm font-medium text-ink/70">
-                Isolatiegraad van de ruimte
-              </span>
-              <select
-                value={insulationFactor}
-                onChange={(event) =>
-                  onInsulationChange(
-                    Number(event.target.value) as InsulationFactor,
-                  )
-                }
-                className="w-full rounded-xl border border-mist bg-foam px-3 py-2.5 text-ink outline-none focus:border-teal"
-              >
-                {INSULATION_OPTIONS.map((option) => (
-                  <option key={option.factor} value={option.factor}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
             </label>
 
             <label className="block sm:col-span-2">

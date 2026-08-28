@@ -17,11 +17,8 @@ type AircoCardProps = {
   onSelect: (id: string | null) => void
 }
 
-function coolingRangeLabel(airco: Airco) {
-  const min = airco.coolingKwMin
-  const max = airco.coolingKwMax
-  if (min === max) return `${dec.format(min)} kW`
-  return `${dec.format(min)} tot ${dec.format(max)} kW`
+function kwLabel(kw: number) {
+  return `${dec.format(kw)} kW`
 }
 
 function AircoIllustration({
@@ -144,20 +141,14 @@ function AircoPhotoPreview({
   const photo = MOCK_PHOTOS[index]
   const total = MOCK_PHOTOS.length
 
-  const coolingMin = airco.coolingKwMin
-  const coolingMax = airco.coolingKwMax
-  const coolingRange =
-    coolingMin === coolingMax
-      ? `${dec.format(coolingMin)} kW`
-      : `${dec.format(coolingMin)} – ${dec.format(coolingMax)} kW`
-
   const goPrev = () => setIndex((current) => (current - 1 + total) % total)
   const goNext = () => setIndex((current) => (current + 1) % total)
 
   const specs = [
     { label: 'Type', value: `${airco.model} (split)` },
     { label: 'Functie', value: 'Koelen en verwarmen' },
-    { label: 'Capaciteit koelen', value: coolingRange },
+    { label: 'Koel vermogen', value: kwLabel(airco.coolingKw) },
+    { label: 'Verwarm vermogen', value: kwLabel(airco.heatingKw) },
     {
       label: 'Energielabel',
       value: `${airco.energyClassCooling} / ${airco.energyClassHeating}`,
@@ -170,10 +161,6 @@ function AircoPhotoPreview({
     },
     { label: 'Koudemiddel', value: airco.refrigerant },
     { label: 'Geschikte ruimte', value: airco.roomM2 },
-    {
-      label: 'Werkt tot',
-      value: `${airco.minTempC} °C`,
-    },
   ]
 
   return (
@@ -257,22 +244,6 @@ function AircoPhotoPreview({
             {airco.description}
           </p>
         </div>
-
-        <ul className="space-y-2.5">
-          {airco.features.map((feature) => (
-            <li
-              key={feature}
-              className="flex items-start gap-2.5 text-sm text-ink/75"
-            >
-              <Check
-                className="mt-0.5 size-4 shrink-0 text-teal"
-                strokeWidth={3}
-                aria-hidden
-              />
-              <span>{feature}</span>
-            </li>
-          ))}
-        </ul>
 
         <dl className="overflow-hidden rounded-2xl border border-mist">
           {specs.map((spec, i) => (
@@ -485,23 +456,7 @@ export default function AircoCard({
                 {airco.description}
               </p>
 
-              <div className="mt-4 flex items-start justify-between gap-4">
-                <ul className="min-w-0 flex-1 space-y-2">
-                  {airco.features.map((feature) => (
-                    <li
-                      key={feature}
-                      className="flex items-start gap-2.5 text-sm text-ink/70 md:text-base"
-                    >
-                      <Check
-                        className="mt-0.5 size-4 shrink-0 text-mint md:size-[1.125rem]"
-                        strokeWidth={3}
-                        aria-hidden
-                      />
-                      <span>{feature}</span>
-                    </li>
-                  ))}
-                </ul>
-
+              <div className="mt-4 flex justify-end">
                 <button
                   type="button"
                   onPointerDown={(event) => event.stopPropagation()}
@@ -526,7 +481,7 @@ export default function AircoCard({
             <dl className="grid min-w-0 flex-1 grid-cols-1 gap-4 text-left sm:grid-cols-2 sm:gap-0">
               <div className="sm:pr-5">
                 <dt className="text-[11px] tracking-wide text-ink/45 uppercase md:text-xs">
-                  Vermogen
+                  Koel vermogen
                 </dt>
                 <dd
                   className={cn(
@@ -535,7 +490,7 @@ export default function AircoCard({
                     requiredKw != null && fits && 'text-teal',
                   )}
                 >
-                  {coolingRangeLabel(airco)}
+                  {kwLabel(airco.coolingKw)}
                 </dd>
               </div>
               <div className="border-mist/80 sm:border-l sm:pl-5">
