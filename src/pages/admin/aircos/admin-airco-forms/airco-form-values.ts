@@ -130,3 +130,37 @@ export function toCreatePayload(values: AircoFormValues): CreateAircoInput {
     ...(values.accent.trim() ? { accent: values.accent.trim() } : {}),
   }
 }
+
+export function toUpdatePayload(values: AircoFormValues): CreateAircoInput {
+  const trustPoints = values.trustPoints
+    .map((point) => point.trim())
+    .filter(Boolean)
+
+  return {
+    brand: values.brand.trim(),
+    model: values.model.trim(),
+    unitType: values.unitType.trim() || `${values.model.trim()} (split)`,
+    tag: values.tag.trim(),
+    description: values.description.trim(),
+    productFunction:
+      values.productFunction.trim() || 'Koelen en verwarmen',
+    trustPoints,
+    coolingKw: Number(values.coolingKw),
+    heatingKw: Number(values.heatingKw),
+    seer: Number(values.seer),
+    scop: Number(values.scop),
+    energyClassCooling: values.energyClassCooling,
+    energyClassHeating: values.energyClassHeating,
+    noiseDbaInside: Math.round(Number(values.noiseDbaInside)),
+    noiseDbaOutside: Math.round(Number(values.noiseDbaOutside)),
+    netSizeInside: values.netSizeInside.trim(),
+    netSizeOutside: values.netSizeOutside.trim(),
+    refrigerant: values.refrigerant.trim() || 'R32',
+    roomM2: values.roomM2.trim(),
+    ...(values.heatingCoverage !== ''
+      ? { heatingCoverage: Number(values.heatingCoverage) }
+      : {}),
+    priceEur: Number(values.priceEur),
+    accent: values.accent.trim() || '#005A9C',
+  }
+}

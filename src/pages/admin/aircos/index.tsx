@@ -21,13 +21,15 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { useAuth } from '@/hooks/use-auth'
-import { createAirco, listAircos } from '@/lib/api/aircos'
+import { createAirco, listAircos, updateAirco } from '@/lib/api/aircos'
 import type { Airco } from '@/pages/airco/data/aircos'
 import AircoAdminCreate from './admin-airco-forms/airco-admin-create'
+import AircoAdminEdit from './admin-airco-forms/airco-admin-edit'
 import {
   EMPTY_AIRCO_FORM,
   aircoToFormValues,
   toCreatePayload,
+  toUpdatePayload,
   type AircoFormValues,
 } from './admin-airco-forms/airco-form-values'
 
@@ -65,32 +67,8 @@ const ALL_TOGGLEABLE_COLUMN_IDS = [
 const eur = new Intl.NumberFormat('nl-NL', {
   style: 'currency',
   currency: 'EUR',
-  maximumFractionDigits: 0,
+  maximumFractionDigits: 2,
 })
-
-function applyFormValues(row: Airco, values: AircoFormValues): Airco {
-  const payload = toCreatePayload(values)
-  const trustPoints =
-    values.trustPoints.map((point) => point.trim()).filter(Boolean)
-
-  return {
-    ...row,
-    ...payload,
-    unitType: values.unitType.trim() || `${values.model.trim()} (split)`,
-    tag: values.tag.trim(),
-    productFunction:
-      values.productFunction.trim() || 'Koelen en verwarmen',
-    trustPoints: trustPoints.length ? trustPoints : row.trustPoints,
-    netSizeInside: values.netSizeInside.trim(),
-    netSizeOutside: values.netSizeOutside.trim(),
-    refrigerant: values.refrigerant.trim() || 'R32',
-    heatingCoverage:
-      values.heatingCoverage === ''
-        ? row.heatingCoverage
-        : Number(values.heatingCoverage),
-    accent: values.accent.trim() || row.accent,
-  }
-}
 
 function buildDefaultVisibility(
   columnIds: string[],
@@ -169,6 +147,25 @@ export default function AdminAircosPage() {
     },
   })
 
+  const updateMutation = useMutation({
+    mutationFn: ({
+      id,
+      values,
+    }: {
+      id: string
+      values: AircoFormValues
+    }) => {
+      if (!token) {
+        throw new Error('Je bent niet ingelogd als admin.')
+      }
+      return updateAirco(token, id, toUpdatePayload(values))
+    },
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: ['aircos'] })
+      closeEditor()
+    },
+  })
+
   useEffect(() => {
     if (remoteRows) setRows(remoteRows)
   }, [remoteRows])
@@ -179,26 +176,16 @@ export default function AdminAircosPage() {
 
   const openCreate = () => {
     createMutation.reset()
+    updateMutation.reset()
     setEditing(null)
     setEditorOpen(true)
   }
 
   const openEdit = (airco: Airco) => {
+    createMutation.reset()
+    updateMutation.reset()
     setEditing(airco)
     setEditorOpen(true)
-  }
-
-  const handleSave = (values: AircoFormValues) => {
-    if (editing) {
-      setRows((prev) =>
-        prev.map((row) =>
-          row.id === editing.id ? applyFormValues(row, values) : row,
-        ),
-      )
-      closeEditor()
-      return
-    }
-    createMutation.mutate(values)
   }
 
   const handleDelete = (airco: Airco) => {
@@ -495,19 +482,35 @@ export default function AdminAircosPage() {
         onClose={closeEditor}
         className="max-h-[90vh] overflow-y-auto !max-w-[min(96rem,95vw)] p-4 sm:p-6"
       >
-        <AircoAdminCreate
-          key={editing?.id ?? 'create'}
-          initialValues={editing ? aircoToFormValues(editing) : EMPTY_AIRCO_FORM}
-          submitLabel={editing ? 'Opslaan' : 'Toevoegen'}
-          submitting={!editing && createMutation.isPending}
-          error={
-            !editing && createMutation.error instanceof Error
-              ? createMutation.error.message
-              : null
-          }
-          onSubmit={handleSave}
-          onCancel={closeEditor}
-        />
+        {editing ? (
+          <AircoAdminEdit
+            key={editing.id}
+            initialValues={aircoToFormValues(editing)}
+            submitting={updateMutation.isPending}
+            error={
+              updateMutation.error instanceof Error
+                ? updateMutation.error.message
+                : null
+            }
+            onSubmit={(values) =>
+              updateMutation.mutate({ id: editing.id, values })
+            }
+            onCancel={closeEditor}
+          />
+        ) : (
+          <AircoAdminCreate
+            key="create"
+            initialValues={EMPTY_AIRCO_FORM}
+            submitting={createMutation.isPending}
+            error={
+              createMutation.error instanceof Error
+                ? createMutation.error.message
+                : null
+            }
+            onSubmit={(values) => createMutation.mutate(values)}
+            onCancel={closeEditor}
+          />
+        )}
       </Modal>
     </div>
   )

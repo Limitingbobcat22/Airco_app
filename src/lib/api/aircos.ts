@@ -55,3 +55,24 @@ export async function createAirco(
 
   return response.json() as Promise<Airco>
 }
+
+export async function updateAirco(
+  token: string,
+  id: string,
+  payload: CreateAircoInput,
+): Promise<Airco> {
+  const response = await fetch(`${API_URL}/aircos/${id}`, {
+    method: 'PATCH',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(payload),
+  })
+
+  if (!response.ok) {
+    throw new Error(await readApiError(response, 'Airco bijwerken mislukt'))
+  }
+
+  return response.json() as Promise<Airco>
+}

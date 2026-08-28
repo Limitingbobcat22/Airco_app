@@ -7,7 +7,7 @@ import { scrollToPageSection } from '@/lib/page-scroll'
 import { markPathUpdatedFromScroll } from '@/lib/section-nav-sync'
 import type { Airco } from '../data/aircos'
 import { maxCoolingKw } from '../lib/power'
-import { dec, eur } from '../lib/savings'
+import { dec, eurExact } from '../lib/savings'
 
 type AircoCardProps = {
   airco: Airco
@@ -271,7 +271,7 @@ function AircoPhotoPreview({
             {airco.brand} {airco.model} airco
           </p>
           <p className="mt-2 text-base font-semibold text-teal">
-            Geschatte prijs: {eur.format(airco.priceEur)} incl. standaard montage
+            Geschatte prijs: {eurExact.format(airco.priceEur)} incl. standaard montage
           </p>
           <p className="mt-3 text-sm leading-relaxed text-ink/70 sm:text-[15px]">
             {airco.description}

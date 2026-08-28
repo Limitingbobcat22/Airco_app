@@ -13,7 +13,7 @@ import {
 } from './airco-form-values'
 import { useAircoForm } from './use-airco-form'
 
-type AircoAdminCreateProps = {
+type AircoAdminEditProps = {
   initialValues: AircoFormValues
   submitting?: boolean
   error?: string | null
@@ -21,13 +21,13 @@ type AircoAdminCreateProps = {
   onCancel: () => void
 }
 
-export default function AircoAdminCreate({
+export default function AircoAdminEdit({
   initialValues,
   submitting = false,
   error,
   onSubmit,
   onCancel,
-}: AircoAdminCreateProps) {
+}: AircoAdminEditProps) {
   const {
     values,
     update,
@@ -45,7 +45,7 @@ export default function AircoAdminCreate({
         <div className="space-y-4">
           <div>
             <p className="text-xs font-medium tracking-[0.1em] text-ink/45 uppercase">
-              Airco · {values.brand.trim() || 'nieuw'}
+              Airco · {values.brand.trim() || 'bewerken'}
             </p>
             <h3 className="mt-1 font-display text-2xl text-ink sm:text-3xl">
               {headingBrand} {headingModel}
@@ -57,11 +57,14 @@ export default function AircoAdminCreate({
 
           <div className="grid gap-3 sm:grid-cols-2">
             <div className="space-y-1.5">
-              <label htmlFor="airco-brand" className="text-sm font-medium text-ink">
+              <label
+                htmlFor="airco-edit-brand"
+                className="text-sm font-medium text-ink"
+              >
                 Merk
               </label>
               <input
-                id="airco-brand"
+                id="airco-edit-brand"
                 required
                 value={values.brand}
                 onChange={(e) => update('brand', e.target.value)}
@@ -70,11 +73,14 @@ export default function AircoAdminCreate({
               />
             </div>
             <div className="space-y-1.5">
-              <label htmlFor="airco-model" className="text-sm font-medium text-ink">
+              <label
+                htmlFor="airco-edit-model"
+                className="text-sm font-medium text-ink"
+              >
                 Model
               </label>
               <input
-                id="airco-model"
+                id="airco-edit-model"
                 required
                 value={values.model}
                 onChange={(e) => update('model', e.target.value)}
@@ -83,11 +89,14 @@ export default function AircoAdminCreate({
               />
             </div>
             <div className="space-y-1.5 sm:col-span-2">
-              <label htmlFor="airco-tag" className="text-sm font-medium text-ink">
+              <label
+                htmlFor="airco-edit-tag"
+                className="text-sm font-medium text-ink"
+              >
                 Tag
               </label>
               <input
-                id="airco-tag"
+                id="airco-edit-tag"
                 value={values.tag}
                 onChange={(e) => update('tag', e.target.value)}
                 className={identityClass}
@@ -107,8 +116,7 @@ export default function AircoAdminCreate({
             </span>
             <p className="font-medium text-ink/70">Foto’s komen later</p>
             <p className="max-w-sm text-sm text-ink/45">
-              Upload parkeren we nog. Dit model wordt zonder afbeeldingen
-              aangemaakt.
+              Upload parkeren we nog. Bestaande foto’s blijven ongewijzigd.
             </p>
           </div>
         </div>
@@ -119,12 +127,12 @@ export default function AircoAdminCreate({
               {headingBrand} {headingModel} airco
             </p>
             <div className="mt-2 flex flex-wrap items-center gap-3">
-              <label htmlFor="airco-price" className="sr-only">
+              <label htmlFor="airco-edit-price" className="sr-only">
                 Prijs
               </label>
               <span className="text-base font-semibold text-teal">Vanaf</span>
               <input
-                id="airco-price"
+                id="airco-edit-price"
                 type="number"
                 min={0}
                 step={0.01}
@@ -140,11 +148,11 @@ export default function AircoAdminCreate({
                 incl. standaard montage
               </span>
             </div>
-            <label htmlFor="airco-description" className="sr-only">
+            <label htmlFor="airco-edit-description" className="sr-only">
               Beschrijving
             </label>
             <textarea
-              id="airco-description"
+              id="airco-edit-description"
               required
               rows={3}
               value={values.description}
@@ -155,9 +163,9 @@ export default function AircoAdminCreate({
           </div>
 
           <div className="overflow-hidden rounded-2xl border border-mist">
-            <SpecField label="Type" htmlFor="airco-unit-type">
+            <SpecField label="Type" htmlFor="airco-edit-unit-type">
               <input
-                id="airco-unit-type"
+                id="airco-edit-unit-type"
                 value={values.unitType}
                 onChange={(e) => update('unitType', e.target.value)}
                 className={specClass}
@@ -166,21 +174,21 @@ export default function AircoAdminCreate({
             </SpecField>
             <SpecField
               label="Functie"
-              htmlFor="airco-function"
+              htmlFor="airco-edit-function"
               striped
             >
               <input
-                id="airco-function"
+                id="airco-edit-function"
                 value={values.productFunction}
                 onChange={(e) => update('productFunction', e.target.value)}
                 className={specClass}
                 placeholder="Koelen en verwarmen"
               />
             </SpecField>
-            <SpecField label="Koel vermogen" htmlFor="airco-cooling">
+            <SpecField label="Koel vermogen" htmlFor="airco-edit-cooling">
               <div className="flex items-center justify-end gap-1.5">
                 <input
-                  id="airco-cooling"
+                  id="airco-edit-cooling"
                   type="number"
                   min={0}
                   step={0.1}
@@ -197,12 +205,12 @@ export default function AircoAdminCreate({
             </SpecField>
             <SpecField
               label="Verwarm vermogen"
-              htmlFor="airco-heating"
+              htmlFor="airco-edit-heating"
               striped
             >
               <div className="flex items-center justify-end gap-1.5">
                 <input
-                  id="airco-heating"
+                  id="airco-edit-heating"
                   type="number"
                   min={0}
                   step={0.1}
@@ -220,7 +228,7 @@ export default function AircoAdminCreate({
             <SpecField label="Energielabel">
               <div className="flex items-center justify-end gap-2">
                 <select
-                  id="airco-label-cooling"
+                  id="airco-edit-label-cooling"
                   required
                   value={values.energyClassCooling}
                   onChange={(e) => update('energyClassCooling', e.target.value)}
@@ -229,14 +237,14 @@ export default function AircoAdminCreate({
                 >
                   <option value="">Koelen</option>
                   {ENERGY_CLASSES.map((item) => (
-                    <option key={`c-${item}`} value={item}>
+                    <option key={`edit-c-${item}`} value={item}>
                       {item}
                     </option>
                   ))}
                 </select>
                 <span className="text-ink/35">/</span>
                 <select
-                  id="airco-label-heating"
+                  id="airco-edit-label-heating"
                   required
                   value={values.energyClassHeating}
                   onChange={(e) => update('energyClassHeating', e.target.value)}
@@ -245,16 +253,16 @@ export default function AircoAdminCreate({
                 >
                   <option value="">Verwarmen</option>
                   {ENERGY_CLASSES.map((item) => (
-                    <option key={`h-${item}`} value={item}>
+                    <option key={`edit-h-${item}`} value={item}>
                       {item}
                     </option>
                   ))}
                 </select>
               </div>
             </SpecField>
-            <SpecField label="SEER" htmlFor="airco-seer" striped>
+            <SpecField label="SEER" htmlFor="airco-edit-seer" striped>
               <input
-                id="airco-seer"
+                id="airco-edit-seer"
                 type="number"
                 min={0}
                 step={0.01}
@@ -267,9 +275,9 @@ export default function AircoAdminCreate({
                 placeholder="6.10"
               />
             </SpecField>
-            <SpecField label="SCOP" htmlFor="airco-scop">
+            <SpecField label="SCOP" htmlFor="airco-edit-scop">
               <input
-                id="airco-scop"
+                id="airco-edit-scop"
                 type="number"
                 min={0}
                 step={0.01}
@@ -284,12 +292,12 @@ export default function AircoAdminCreate({
             </SpecField>
             <SpecField
               label="Geluid binnenunit"
-              htmlFor="airco-noise-inside"
+              htmlFor="airco-edit-noise-inside"
               striped
             >
               <div className="flex items-center justify-end gap-1.5">
                 <input
-                  id="airco-noise-inside"
+                  id="airco-edit-noise-inside"
                   type="number"
                   min={0}
                   step={1}
@@ -306,11 +314,11 @@ export default function AircoAdminCreate({
             </SpecField>
             <SpecField
               label="Geluid buitenunit"
-              htmlFor="airco-noise-outside"
+              htmlFor="airco-edit-noise-outside"
             >
               <div className="flex items-center justify-end gap-1.5">
                 <input
-                  id="airco-noise-outside"
+                  id="airco-edit-noise-outside"
                   type="number"
                   min={0}
                   step={1}
@@ -327,11 +335,11 @@ export default function AircoAdminCreate({
             </SpecField>
             <SpecField
               label="Netto afmeting binnenunit"
-              htmlFor="airco-size-inside"
+              htmlFor="airco-edit-size-inside"
               striped
             >
               <input
-                id="airco-size-inside"
+                id="airco-edit-size-inside"
                 value={values.netSizeInside}
                 onChange={(e) => update('netSizeInside', e.target.value)}
                 className={specClass}
@@ -340,10 +348,10 @@ export default function AircoAdminCreate({
             </SpecField>
             <SpecField
               label="Netto afmeting buitenunit"
-              htmlFor="airco-size-outside"
+              htmlFor="airco-edit-size-outside"
             >
               <input
-                id="airco-size-outside"
+                id="airco-edit-size-outside"
                 value={values.netSizeOutside}
                 onChange={(e) => update('netSizeOutside', e.target.value)}
                 className={specClass}
@@ -352,20 +360,20 @@ export default function AircoAdminCreate({
             </SpecField>
             <SpecField
               label="Koudemiddel"
-              htmlFor="airco-refrigerant"
+              htmlFor="airco-edit-refrigerant"
               striped
             >
               <input
-                id="airco-refrigerant"
+                id="airco-edit-refrigerant"
                 value={values.refrigerant}
                 onChange={(e) => update('refrigerant', e.target.value)}
                 className={specClass}
                 placeholder="R32"
               />
             </SpecField>
-            <SpecField label="Geschikte ruimte" htmlFor="airco-room">
+            <SpecField label="Geschikte ruimte" htmlFor="airco-edit-room">
               <input
-                id="airco-room"
+                id="airco-edit-room"
                 required
                 value={values.roomM2}
                 onChange={(e) => update('roomM2', e.target.value)}
@@ -375,11 +383,11 @@ export default function AircoAdminCreate({
             </SpecField>
             <SpecField
               label="Dekking verwarming"
-              htmlFor="airco-coverage"
+              htmlFor="airco-edit-coverage"
               striped
             >
               <input
-                id="airco-coverage"
+                id="airco-edit-coverage"
                 type="number"
                 min={0}
                 max={1}
@@ -392,10 +400,10 @@ export default function AircoAdminCreate({
                 placeholder="0.55"
               />
             </SpecField>
-            <SpecField label="Accentkleur" htmlFor="airco-accent">
+            <SpecField label="Accentkleur" htmlFor="airco-edit-accent">
               <div className="flex items-center justify-end gap-2">
                 <input
-                  id="airco-accent"
+                  id="airco-edit-accent"
                   type="color"
                   value={values.accent || '#005A9C'}
                   onChange={(e) => update('accent', e.target.value)}
@@ -474,7 +482,7 @@ export default function AircoAdminCreate({
               disabled={submitting}
               className="rounded-xl bg-mint px-5 py-2.5 text-sm font-semibold text-ink hover:bg-white disabled:opacity-60"
             >
-              {submitting ? 'Opslaan…' : 'Toevoegen'}
+              {submitting ? 'Opslaan…' : 'Opslaan'}
             </button>
           </div>
         </div>
