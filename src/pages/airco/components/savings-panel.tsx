@@ -19,6 +19,7 @@ type SavingsPanelProps = {
   heatingSharePct: number
   gasPrice: number
   elecPrice: number
+  yearlyGas: number
 }
 
 export default function SavingsPanel({
@@ -30,6 +31,7 @@ export default function SavingsPanel({
   heatingSharePct,
   gasPrice,
   elecPrice,
+  yearlyGas,
 }: SavingsPanelProps) {
   if (!airco || !savings) {
     return (
@@ -177,6 +179,13 @@ export default function SavingsPanel({
                     aircoLabel: `${airco.brand} ${airco.model}`,
                     coolingKw: airco.coolingKw,
                     heatingKw: airco.heatingKw,
+                    areaM2,
+                    heightM,
+                    heatingSharePct,
+                    requiredKw,
+                    yearlyGasM3: yearlyGas,
+                    gasPriceEur: gasPrice,
+                    elecPriceEur: elecPrice,
                     netEuroSavedYearly: savings.yearly.netEuroSaved,
                   }}
                 />

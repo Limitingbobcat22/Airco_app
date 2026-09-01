@@ -16,6 +16,13 @@ export type OfferteContext = {
   aircoLabel: string
   coolingKw: number
   heatingKw: number
+  areaM2: number | null
+  heightM: number
+  heatingSharePct: number
+  requiredKw: number | null
+  yearlyGasM3: number
+  gasPriceEur: number
+  elecPriceEur: number
   netEuroSavedYearly: number | null
 }
 

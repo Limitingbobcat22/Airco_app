@@ -1,5 +1,5 @@
 import type { LucideIcon } from 'lucide-react'
-import { Flame, Table2, Users } from 'lucide-react'
+import { Flame, FileText, Table2, Users } from 'lucide-react'
 import AircoIcon from '@/components/icons/airco-icon'
 import {
   AIRCO_TOPIC,
@@ -15,6 +15,7 @@ import {
 
 export const ADMIN_AIRCOS_PATH = '/admin/aircos'
 export const ADMIN_KLANTEN_PATH = '/admin/klanten'
+export const ADMIN_OFFERTES_PATH = '/admin/offertes'
 
 export type NavItem = {
   title?: string
@@ -95,6 +96,13 @@ export function buildTopicNavItems(
       icon: Users,
       leavesTopic: true,
       destinationLabel: 'Klanten beheer',
+    })
+    items.push({
+      title: 'Offertes beheer',
+      href: ADMIN_OFFERTES_PATH,
+      icon: FileText,
+      leavesTopic: true,
+      destinationLabel: 'Offertes beheer',
     })
   }
 

@@ -2,6 +2,7 @@ import RequireAdmin from '@/auth/require-admin'
 import AppLayout from '@/components/layout/app-layout'
 import AdminAircosPage from '@/pages/admin/aircos'
 import AdminKlantenPage from '@/pages/admin/klanten'
+import AdminOffertesPage from '@/pages/admin/offertes'
 import AircoPage from '@/pages/airco'
 import KetelPage from '@/pages/ketel'
 import {
@@ -72,6 +73,14 @@ export default function AppRouter() {
           element: (
             <RequireAdmin>
               <AdminKlantenPage />
+            </RequireAdmin>
+          ),
+        },
+        {
+          path: 'admin/offertes',
+          element: (
+            <RequireAdmin>
+              <AdminOffertesPage />
             </RequireAdmin>
           ),
         },

@@ -21,12 +21,6 @@ type KlantAdminFormProps = {
   onCancel: () => void
 }
 
-const eur = new Intl.NumberFormat('nl-NL', {
-  style: 'currency',
-  currency: 'EUR',
-  maximumFractionDigits: 0,
-})
-
 function toFormValues(klant?: Klant | null): KlantNawData {
   if (!klant) return { ...EMPTY_KLANT_NAW, consentContact: true }
   return {
@@ -90,11 +84,6 @@ export default function KlantAdminForm({
   const generalError =
     error && Object.keys(serverFieldErrors).length === 0 ? error : null
 
-  const snapshot =
-    initial?.aircoLabel ||
-    initial?.coolingKw != null ||
-    initial?.netEuroSavedYearly != null
-
   return (
     <form className="space-y-5 py-2 pb-4" noValidate onSubmit={handleSubmit}>
       <div>
@@ -107,28 +96,6 @@ export default function KlantAdminForm({
             : 'Nieuwe klant'}
         </h3>
       </div>
-
-      {snapshot ? (
-        <div className="rounded-2xl border border-mist bg-foam px-4 py-3 text-sm text-ink/75">
-          <p>
-            Gekozen model:{' '}
-            <span className="font-medium text-ink">
-              {initial?.aircoLabel ?? '–'}
-            </span>
-          </p>
-          {initial?.coolingKw != null ? (
-            <p className="mt-1">
-              Koel vermogen: {Number(initial.coolingKw).toFixed(1)} kW
-              {initial.netEuroSavedYearly != null ? (
-                <>
-                  {' · '}Geschat voordeel:{' '}
-                  {eur.format(initial.netEuroSavedYearly)} / jaar
-                </>
-              ) : null}
-            </p>
-          ) : null}
-        </div>
-      ) : null}
 
       <div className="grid gap-4 sm:grid-cols-2">
         <NawTextField

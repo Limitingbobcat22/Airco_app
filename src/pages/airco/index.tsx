@@ -178,6 +178,7 @@ export default function AircoPage() {
           heatingSharePct={heatingSharePct}
           gasPrice={gasPrice}
           elecPrice={elecPrice}
+          yearlyGas={yearlyGas}
         />
       </div>
       <SavingsDock

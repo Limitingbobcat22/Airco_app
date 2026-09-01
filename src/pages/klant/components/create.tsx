@@ -147,11 +147,22 @@ export default function CreateKlantForm({
             <span className="font-medium text-ink">{offerte.aircoLabel}</span>
           </p>
           <p className="mt-1">
-            Koel vermogen: {offerte.coolingKw.toFixed(1)} kW
+            {offerte.areaM2 != null ? `${offerte.areaM2} m²` : '–'}
+            {' · '}
+            {offerte.heightM} m hoog
+            {' · '}
+            {offerte.heatingSharePct}% via airco
+            {offerte.requiredKw != null
+              ? ` · ${offerte.requiredKw.toFixed(1)} kW aanbevolen`
+              : ''}
+          </p>
+          <p className="mt-1">
+            Gas {offerte.yearlyGasM3} m³ · €{offerte.gasPriceEur.toFixed(2)}/m³
+            {' · '}
+            stroom €{offerte.elecPriceEur.toFixed(2)}/kWh
             {offerte.netEuroSavedYearly != null ? (
               <>
-                {' · '}Geschat voordeel:{' '}
-                {eur.format(offerte.netEuroSavedYearly)} / jaar
+                {' · '}Voordeel {eur.format(offerte.netEuroSavedYearly)} / jaar
               </>
             ) : null}
           </p>

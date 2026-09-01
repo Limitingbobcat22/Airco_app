@@ -13,11 +13,6 @@ export type Klant = {
   city: string
   note: string | null
   consentContact: boolean
-  aircoId: string | null
-  aircoLabel: string | null
-  coolingKw: number | null
-  heatingKw: number | null
-  netEuroSavedYearly: number | null
   createdAt: string
   updatedAt: string
 }
@@ -34,13 +29,28 @@ export type CreateKlantInput = {
   note?: string
   consentContact: boolean
   aircoId?: string
-  aircoLabel?: string
-  coolingKw?: number
-  heatingKw?: number
+  areaM2?: number
+  heightM?: number
+  heatingSharePct?: number
+  requiredKw?: number
+  yearlyGasM3?: number
+  gasPriceEur?: number
+  elecPriceEur?: number
   netEuroSavedYearly?: number
 }
 
-export type UpdateKlantInput = Partial<CreateKlantInput>
+export type UpdateKlantInput = Omit<
+  CreateKlantInput,
+  | 'aircoId'
+  | 'areaM2'
+  | 'heightM'
+  | 'heatingSharePct'
+  | 'requiredKw'
+  | 'yearlyGasM3'
+  | 'gasPriceEur'
+  | 'elecPriceEur'
+  | 'netEuroSavedYearly'
+>
 
 export function toCreateKlantPayload(
   data: KlantNawData,
@@ -61,9 +71,15 @@ export function toCreateKlantPayload(
   if (data.note.trim()) payload.note = data.note.trim()
   else payload.note = ''
   if (offerte?.aircoId) payload.aircoId = offerte.aircoId
-  if (offerte?.aircoLabel) payload.aircoLabel = offerte.aircoLabel
-  if (offerte?.coolingKw != null) payload.coolingKw = offerte.coolingKw
-  if (offerte?.heatingKw != null) payload.heatingKw = offerte.heatingKw
+  if (offerte?.areaM2 != null) payload.areaM2 = offerte.areaM2
+  if (offerte?.heightM != null) payload.heightM = offerte.heightM
+  if (offerte?.heatingSharePct != null) {
+    payload.heatingSharePct = offerte.heatingSharePct
+  }
+  if (offerte?.requiredKw != null) payload.requiredKw = offerte.requiredKw
+  if (offerte?.yearlyGasM3 != null) payload.yearlyGasM3 = offerte.yearlyGasM3
+  if (offerte?.gasPriceEur != null) payload.gasPriceEur = offerte.gasPriceEur
+  if (offerte?.elecPriceEur != null) payload.elecPriceEur = offerte.elecPriceEur
   if (offerte?.netEuroSavedYearly != null) {
     payload.netEuroSavedYearly = offerte.netEuroSavedYearly
   }
