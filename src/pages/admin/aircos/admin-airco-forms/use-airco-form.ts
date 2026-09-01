@@ -1,5 +1,9 @@
 import { useMemo, useState, type FormEvent } from 'react'
 import type { AircoFormValues } from './airco-form-values'
+import {
+  validateAircoForm,
+  type AircoFieldErrors,
+} from './airco-schema'
 
 export function useAircoForm(
   initialValues: AircoFormValues,
@@ -7,16 +11,27 @@ export function useAircoForm(
 ) {
   const [baseline] = useState(initialValues)
   const [values, setValues] = useState<AircoFormValues>(initialValues)
+  const [fieldErrors, setFieldErrors] = useState<AircoFieldErrors>({})
   const isDirty = useMemo(
     () => JSON.stringify(values) !== JSON.stringify(baseline),
     [values, baseline],
   )
+
+  const clearFieldError = (key: keyof AircoFormValues) => {
+    setFieldErrors((prev) => {
+      if (!prev[key]) return prev
+      const next = { ...prev }
+      delete next[key]
+      return next
+    })
+  }
 
   const update = <K extends keyof AircoFormValues>(
     key: K,
     value: AircoFormValues[K],
   ) => {
     setValues((prev) => ({ ...prev, [key]: value }))
+    clearFieldError(key)
   }
 
   const updateTrustPoint = (index: number, value: string) => {
@@ -47,7 +62,7 @@ export function useAircoForm(
 
   const handleSubmit = (event: FormEvent) => {
     event.preventDefault()
-    onSubmit({
+    const nextValues: AircoFormValues = {
       ...values,
       brand: values.brand.trim(),
       model: values.model.trim(),
@@ -61,11 +76,21 @@ export function useAircoForm(
       refrigerant: values.refrigerant.trim(),
       roomM2: values.roomM2.trim(),
       accent: values.accent.trim() || '#005A9C',
-    })
+    }
+
+    const result = validateAircoForm(nextValues)
+    if (!result.ok) {
+      setFieldErrors(result.fieldErrors)
+      return
+    }
+
+    setFieldErrors({})
+    onSubmit(nextValues)
   }
 
   return {
     values,
+    fieldErrors,
     isDirty,
     update,
     updateTrustPoint,

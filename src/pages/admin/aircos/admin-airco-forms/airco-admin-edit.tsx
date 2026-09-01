@@ -12,10 +12,13 @@ import {
   type PendingAircoImage,
 } from '@/pages/airco/data/airco-photos'
 import {
+  FieldError,
+  IdentityField,
   SpecField,
   identityClass,
   selectClass,
   specClass,
+  withFieldError,
 } from './airco-admin-form-ui'
 import AircoPhotoSlider from '../components/airco-photo-slider'
 import {
@@ -63,6 +66,7 @@ export default function AircoAdminEdit({
   const [pendingRemovedIds, setPendingRemovedIds] = useState<string[]>([])
   const {
     values,
+    fieldErrors,
     isDirty,
     update,
     updateTrustPoint,
@@ -87,7 +91,7 @@ export default function AircoAdminEdit({
   }, [isDirty, photoFiles, pendingRemovedIds, onDirtyChange])
 
   return (
-    <form className="space-y-6 pb-2" onSubmit={handleSubmit}>
+    <form className="space-y-6 pb-2" noValidate onSubmit={handleSubmit}>
       <div className="grid gap-8 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)] lg:items-start lg:gap-10">
         <div className="space-y-4">
           <div>
@@ -103,53 +107,31 @@ export default function AircoAdminEdit({
           </div>
 
           <div className="grid gap-3 sm:grid-cols-2">
-            <div className="space-y-1.5">
-              <label
-                htmlFor="airco-edit-brand"
-                className="text-sm font-medium text-ink"
-              >
-                Merk
-              </label>
-              <input
-                id="airco-edit-brand"
-                required
-                value={values.brand}
-                onChange={(e) => update('brand', e.target.value)}
-                className={identityClass}
-                placeholder="Haier"
-              />
-            </div>
-            <div className="space-y-1.5">
-              <label
-                htmlFor="airco-edit-model"
-                className="text-sm font-medium text-ink"
-              >
-                Model
-              </label>
-              <input
-                id="airco-edit-model"
-                required
-                value={values.model}
-                onChange={(e) => update('model', e.target.value)}
-                className={identityClass}
-                placeholder="Model/Series"
-              />
-            </div>
-            <div className="space-y-1.5 sm:col-span-2">
-              <label
-                htmlFor="airco-edit-tag"
-                className="text-sm font-medium text-ink"
-              >
-                Tag
-              </label>
-              <input
-                id="airco-edit-tag"
-                value={values.tag}
-                onChange={(e) => update('tag', e.target.value)}
-                className={identityClass}
-                placeholder="Voordelig & Efficient"
-              />
-            </div>
+            <IdentityField
+              id="airco-edit-brand"
+              label="Merk"
+              value={values.brand}
+              error={fieldErrors.brand}
+              placeholder="Haier"
+              onChange={(value) => update('brand', value)}
+            />
+            <IdentityField
+              id="airco-edit-model"
+              label="Model"
+              value={values.model}
+              error={fieldErrors.model}
+              placeholder="Model/Series"
+              onChange={(value) => update('model', value)}
+            />
+            <IdentityField
+              id="airco-edit-tag"
+              label="Tag"
+              value={values.tag}
+              error={fieldErrors.tag}
+              placeholder="Voordelig & Efficient"
+              className="sm:col-span-2"
+              onChange={(value) => update('tag', value)}
+            />
           </div>
 
           <AircoPhotoSlider
@@ -213,6 +195,7 @@ export default function AircoAdminEdit({
             <p className="font-display text-2xl text-ink sm:text-3xl">
               {headingBrand} {headingModel} airco
             </p>
+            <FieldError error={fieldErrors.priceEur} />
             <div className="mt-2 flex flex-wrap items-center gap-3">
               <label htmlFor="airco-edit-price" className="sr-only">
                 Prijs
@@ -223,30 +206,37 @@ export default function AircoAdminEdit({
                 type="number"
                 min={0}
                 step={0.01}
-                required
                 value={values.priceEur}
                 onChange={(e) =>
                   update('priceEur', parseNumberInput(e.target.value))
                 }
-                className="w-28 rounded-lg border border-mist bg-white px-2.5 py-1 text-left text-base font-semibold text-teal outline-none placeholder:text-teal/40 focus:border-teal"
+                className={withFieldError(
+                  'w-28 rounded-lg border border-mist bg-white px-2.5 py-1 text-left text-base font-semibold text-teal outline-none placeholder:text-teal/40 focus:border-teal',
+                  fieldErrors.priceEur,
+                )}
                 placeholder="1890"
               />
               <span className="text-base font-semibold text-teal">
                 incl. standaard montage
               </span>
             </div>
+            <div className="mt-3 space-y-1.5">
             <label htmlFor="airco-edit-description" className="sr-only">
               Beschrijving
             </label>
+            <FieldError error={fieldErrors.description} />
             <textarea
               id="airco-edit-description"
-              required
               rows={3}
               value={values.description}
               onChange={(e) => update('description', e.target.value)}
-              className="mt-3 w-full rounded-xl border border-mist bg-foam px-3 py-2.5 text-sm leading-relaxed text-ink/80 outline-none placeholder:text-ink/35 focus:border-teal"
+              className={withFieldError(
+                'w-full rounded-xl border border-mist bg-foam px-3 py-2.5 text-sm leading-relaxed text-ink/80 outline-none placeholder:text-ink/35 focus:border-teal',
+                fieldErrors.description,
+              )}
               placeholder="Korte productbeschrijving"
             />
+            </div>
           </div>
 
           <div className="overflow-hidden rounded-2xl border border-mist">
@@ -272,19 +262,22 @@ export default function AircoAdminEdit({
                 placeholder="Koelen en verwarmen"
               />
             </SpecField>
-            <SpecField label="Koel vermogen" htmlFor="airco-edit-cooling">
+            <SpecField
+              label="Koel vermogen"
+              htmlFor="airco-edit-cooling"
+              error={fieldErrors.coolingKw}
+            >
               <div className="flex items-center justify-end gap-1.5">
                 <input
                   id="airco-edit-cooling"
                   type="number"
                   min={0}
                   step={0.1}
-                  required
                   value={values.coolingKw}
                   onChange={(e) =>
                     update('coolingKw', parseNumberInput(e.target.value))
                   }
-                  className={specClass}
+                  className={withFieldError(specClass, fieldErrors.coolingKw)}
                   placeholder="6.2"
                 />
                 <span className="shrink-0 text-ink/45">kW</span>
@@ -294,6 +287,7 @@ export default function AircoAdminEdit({
               label="Verwarm vermogen"
               htmlFor="airco-edit-heating"
               striped
+              error={fieldErrors.heatingKw}
             >
               <div className="flex items-center justify-end gap-1.5">
                 <input
@@ -301,25 +295,33 @@ export default function AircoAdminEdit({
                   type="number"
                   min={0}
                   step={0.1}
-                  required
                   value={values.heatingKw}
                   onChange={(e) =>
                     update('heatingKw', parseNumberInput(e.target.value))
                   }
-                  className={specClass}
+                  className={withFieldError(specClass, fieldErrors.heatingKw)}
                   placeholder="6.3"
                 />
                 <span className="shrink-0 text-ink/45">kW</span>
               </div>
             </SpecField>
-            <SpecField label="Energielabel">
+            <SpecField
+              label="Energielabel"
+              error={
+                [fieldErrors.energyClassCooling, fieldErrors.energyClassHeating]
+                  .filter(Boolean)
+                  .join(' ')
+              }
+            >
               <div className="flex items-center justify-end gap-2">
                 <select
                   id="airco-edit-label-cooling"
-                  required
                   value={values.energyClassCooling}
                   onChange={(e) => update('energyClassCooling', e.target.value)}
-                  className={selectClass}
+                  className={withFieldError(
+                    selectClass,
+                    fieldErrors.energyClassCooling,
+                  )}
                   aria-label="Energielabel koelen"
                 >
                   <option value="">Koelen</option>
@@ -332,10 +334,12 @@ export default function AircoAdminEdit({
                 <span className="text-ink/35">/</span>
                 <select
                   id="airco-edit-label-heating"
-                  required
                   value={values.energyClassHeating}
                   onChange={(e) => update('energyClassHeating', e.target.value)}
-                  className={selectClass}
+                  className={withFieldError(
+                    selectClass,
+                    fieldErrors.energyClassHeating,
+                  )}
                   aria-label="Energielabel verwarmen"
                 >
                   <option value="">Verwarmen</option>
@@ -347,33 +351,40 @@ export default function AircoAdminEdit({
                 </select>
               </div>
             </SpecField>
-            <SpecField label="SEER" htmlFor="airco-edit-seer" striped>
+            <SpecField
+              label="SEER"
+              htmlFor="airco-edit-seer"
+              striped
+              error={fieldErrors.seer}
+            >
               <input
                 id="airco-edit-seer"
                 type="number"
                 min={0}
                 step={0.01}
-                required
                 value={values.seer}
                 onChange={(e) =>
                   update('seer', parseNumberInput(e.target.value))
                 }
-                className={specClass}
+                className={withFieldError(specClass, fieldErrors.seer)}
                 placeholder="6.10"
               />
             </SpecField>
-            <SpecField label="SCOP" htmlFor="airco-edit-scop">
+            <SpecField
+              label="SCOP"
+              htmlFor="airco-edit-scop"
+              error={fieldErrors.scop}
+            >
               <input
                 id="airco-edit-scop"
                 type="number"
                 min={0}
                 step={0.01}
-                required
                 value={values.scop}
                 onChange={(e) =>
                   update('scop', parseNumberInput(e.target.value))
                 }
-                className={specClass}
+                className={withFieldError(specClass, fieldErrors.scop)}
                 placeholder="4.00"
               />
             </SpecField>
@@ -381,6 +392,7 @@ export default function AircoAdminEdit({
               label="Geluid binnenunit"
               htmlFor="airco-edit-noise-inside"
               striped
+              error={fieldErrors.noiseDbaInside}
             >
               <div className="flex items-center justify-end gap-1.5">
                 <input
@@ -388,12 +400,14 @@ export default function AircoAdminEdit({
                   type="number"
                   min={0}
                   step={1}
-                  required
                   value={values.noiseDbaInside}
                   onChange={(e) =>
                     update('noiseDbaInside', parseNumberInput(e.target.value))
                   }
-                  className={specClass}
+                  className={withFieldError(
+                    specClass,
+                    fieldErrors.noiseDbaInside,
+                  )}
                   placeholder="19"
                 />
                 <span className="shrink-0 text-ink/45">dB(A)</span>
@@ -402,6 +416,7 @@ export default function AircoAdminEdit({
             <SpecField
               label="Geluid buitenunit"
               htmlFor="airco-edit-noise-outside"
+              error={fieldErrors.noiseDbaOutside}
             >
               <div className="flex items-center justify-end gap-1.5">
                 <input
@@ -409,12 +424,14 @@ export default function AircoAdminEdit({
                   type="number"
                   min={0}
                   step={1}
-                  required
                   value={values.noiseDbaOutside}
                   onChange={(e) =>
                     update('noiseDbaOutside', parseNumberInput(e.target.value))
                   }
-                  className={specClass}
+                  className={withFieldError(
+                    specClass,
+                    fieldErrors.noiseDbaOutside,
+                  )}
                   placeholder="48"
                 />
                 <span className="shrink-0 text-ink/45">dB(A)</span>
@@ -458,13 +475,16 @@ export default function AircoAdminEdit({
                 placeholder="R32"
               />
             </SpecField>
-            <SpecField label="Geschikte ruimte" htmlFor="airco-edit-room">
+            <SpecField
+              label="Geschikte ruimte"
+              htmlFor="airco-edit-room"
+              error={fieldErrors.roomM2}
+            >
               <input
                 id="airco-edit-room"
-                required
                 value={values.roomM2}
                 onChange={(e) => update('roomM2', e.target.value)}
-                className={specClass}
+                className={withFieldError(specClass, fieldErrors.roomM2)}
                 placeholder="tot 40 m²"
               />
             </SpecField>
@@ -472,6 +492,7 @@ export default function AircoAdminEdit({
               label="Dekking verwarming"
               htmlFor="airco-edit-coverage"
               striped
+              error={fieldErrors.heatingCoverage}
             >
               <input
                 id="airco-edit-coverage"
@@ -483,11 +504,18 @@ export default function AircoAdminEdit({
                 onChange={(e) =>
                   update('heatingCoverage', parseNumberInput(e.target.value))
                 }
-                className={specClass}
+                className={withFieldError(
+                  specClass,
+                  fieldErrors.heatingCoverage,
+                )}
                 placeholder="0.55"
               />
             </SpecField>
-            <SpecField label="Accentkleur" htmlFor="airco-edit-accent">
+            <SpecField
+              label="Accentkleur"
+              htmlFor="airco-edit-accent"
+              error={fieldErrors.accent}
+            >
               <div className="flex items-center justify-end gap-2">
                 <input
                   id="airco-edit-accent"
@@ -499,7 +527,7 @@ export default function AircoAdminEdit({
                 <input
                   value={values.accent}
                   onChange={(e) => update('accent', e.target.value)}
-                  className={specClass}
+                  className={withFieldError(specClass, fieldErrors.accent)}
                   placeholder="#005A9C"
                 />
               </div>

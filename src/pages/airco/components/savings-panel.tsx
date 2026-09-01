@@ -173,22 +173,11 @@ export default function SavingsPanel({
                 <CreateKlantForm
                   onClose={onClose}
                   offerte={{
+                    aircoId: airco.id,
                     aircoLabel: `${airco.brand} ${airco.model}`,
                     coolingKw: airco.coolingKw,
                     heatingKw: airco.heatingKw,
                     netEuroSavedYearly: savings.yearly.netEuroSaved,
-                  }}
-                  onSubmit={async (data) => {
-                    // TODO: API — e-mail versturen met NAW + offertecontext
-                    console.info('Offerteaanvraag (nog zonder backend)', {
-                      klant: data,
-                      offerte: {
-                        aircoLabel: `${airco.brand} ${airco.model}`,
-                        coolingKw: airco.coolingKw,
-                        heatingKw: airco.heatingKw,
-                        netEuroSavedYearly: savings.yearly.netEuroSaved,
-                      },
-                    })
                   }}
                 />
               )}

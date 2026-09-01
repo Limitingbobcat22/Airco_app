@@ -12,6 +12,7 @@ export type KlantNawData = {
 }
 
 export type OfferteContext = {
+  aircoId?: string
   aircoLabel: string
   coolingKw: number
   heatingKw: number
