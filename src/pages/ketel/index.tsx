@@ -132,7 +132,7 @@ export default function KetelPage() {
   }
 
   return (
-    <div className="flex h-full min-h-0 flex-col bg-foam">
+    <div className="flex h-full min-h-0 flex-col">
       <div id="page-scroll" className="min-h-0 flex-1 overflow-y-auto">
         <KetelHome />
 

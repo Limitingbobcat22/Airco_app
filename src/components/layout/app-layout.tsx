@@ -55,7 +55,7 @@ export default function AppLayout({ children }: { children: ReactNode }) {
   return (
     <UnsavedChangesProvider>
       <ActiveSectionProvider>
-        <div className="bg-secondary flex h-svh overflow-hidden">
+        <div className="app-bg flex h-svh overflow-hidden">
           <MobileSidebar
             sidebarOpen={sidebarOpen}
             setSidebarOpen={setSidebarOpen}
@@ -65,7 +65,7 @@ export default function AppLayout({ children }: { children: ReactNode }) {
             <div className="relative z-10 flex h-16 shrink-0">
               <Header onMenuClick={() => setSidebarOpen(true)} />
             </div>
-            <main className="bg-background relative mx-2 mb-2 flex min-h-0 flex-1 flex-col overflow-hidden rounded-xl focus:outline-none md:mx-0 md:mb-4 md:mr-4">
+            <main className="relative mx-2 mb-2 flex min-h-0 flex-1 flex-col overflow-hidden rounded-xl focus:outline-none md:mx-0 md:mb-4 md:mr-4">
               {children}
             </main>
           </div>

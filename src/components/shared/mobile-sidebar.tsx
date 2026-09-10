@@ -23,8 +23,8 @@ export default function MobileSidebar({
     <Sheet open={sidebarOpen} onOpenChange={setSidebarOpen}>
       <SheetContent
         side="left"
-        className="bg-secondary w-[min(20rem,85vw)] border-0 p-0 pt-2 text-ink shadow-2xl"
-        style={{ backgroundColor: 'hsl(var(--secondary))' }}
+        className="app-bg w-[min(20rem,85vw)] border-0 p-0 pt-2 text-ink shadow-2xl"
+        style={{ background: 'linear-gradient(to right, #74b8f8, #ebf3ff)' }}
       >
         <SheetTitle className="sr-only">Navigatie</SheetTitle>
         <SheetDescription className="sr-only">

@@ -74,25 +74,26 @@ export default function PowerForm({
   return (
     <section
       id="vermogen"
-      className="mx-auto max-w-7xl scroll-mt-4 px-4 py-8 sm:px-6 sm:py-10 2xl:max-w-[110rem] 2xl:px-10"
+      className="hero-bg relative mt-4 scroll-mt-4 overflow-hidden rounded-3xl px-4 py-8 sm:mt-6 sm:px-6 sm:py-12"
     >
-      <div className="max-w-3xl">
-        <p className="text-xs font-medium tracking-[0.2em] text-teal uppercase">
-          Stap 1
-        </p>
-        <h2 className="mt-2 font-display text-3xl text-ink sm:text-4xl">
-          Bereken het vermogen
-        </h2>
-        <p className="mt-3 text-ink/70">
-          Bereken het benodigde vermogen op basis van uw ruimte en welk deel
-          van de woning de airco verwarmt.
-        </p>
-      </div>
+      <div className="relative mx-auto max-w-6xl">
+        <div className="max-w-3xl">
+          <p className="text-xs font-medium tracking-[0.2em] text-teal uppercase">
+            Stap 1
+          </p>
+          <h2 className="mt-2 font-display text-3xl text-ink sm:text-4xl">
+            Bereken het vermogen
+          </h2>
+          <p className="mt-3 text-ink/70">
+            Bereken het benodigde vermogen op basis van uw ruimte en welk deel
+            van de woning de airco verwarmt.
+          </p>
+        </div>
 
-      <form
-        className="mt-8 rounded-3xl border border-mist bg-white p-5 shadow-sm sm:p-6 lg:p-8"
-        onSubmit={(event) => event.preventDefault()}
-      >
+        <form
+          className="mt-8"
+          onSubmit={(event) => event.preventDefault()}
+        >
         <div className="grid gap-6 lg:grid-cols-[minmax(0,1.7fr)_minmax(16rem,0.75fr)] lg:items-stretch lg:gap-8">
           <div className="grid gap-4 sm:grid-cols-2">
             <label className="block">
@@ -110,7 +111,7 @@ export default function PowerForm({
                   const next = event.target.value
                   onAreaChange(next === '' ? null : Number(next))
                 }}
-                className="w-full rounded-xl border border-mist bg-foam px-3 py-2.5 text-ink outline-none placeholder:text-ink/35 focus:border-teal"
+                className="w-full rounded-xl border border-mist bg-white px-3 py-2.5 text-ink outline-none placeholder:text-ink/35 focus:border-teal"
               />
             </label>
 
@@ -125,7 +126,7 @@ export default function PowerForm({
                 step={0.1}
                 value={heightM}
                 onChange={(event) => onHeightChange(Number(event.target.value))}
-                className="w-full rounded-xl border border-mist bg-foam px-3 py-2.5 text-ink outline-none focus:border-teal"
+                className="w-full rounded-xl border border-mist bg-white px-3 py-2.5 text-ink outline-none focus:border-teal"
               />
             </label>
 
@@ -178,6 +179,7 @@ export default function PowerForm({
           <ResultPanel result={result} onViewAircos={onViewAircos} />
         </div>
       </form>
+      </div>
     </section>
   )
 }

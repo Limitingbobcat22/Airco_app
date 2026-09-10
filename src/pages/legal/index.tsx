@@ -26,7 +26,7 @@ export default function LegalPage() {
   const page = LEGAL_PAGES[slugToKey(slug)]
 
   return (
-    <div className="flex h-full min-h-0 flex-col bg-foam">
+    <div className="flex h-full min-h-0 flex-col">
       <div id="page-scroll" className="min-h-0 flex-1 overflow-y-auto">
         <div className="flex min-h-full flex-col">
           <article className="mx-auto w-full max-w-3xl flex-1 px-4 py-12 sm:px-6 sm:py-16">

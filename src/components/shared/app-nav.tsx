@@ -124,7 +124,7 @@ export default function AppNav({
                 'flex items-center overflow-hidden rounded-md py-2.5 text-base font-medium hover:text-muted-foreground',
                 shouldShowIconOnly ? 'justify-center px-2' : 'gap-2.5',
                 active
-                  ? 'bg-primary text-primary-foreground hover:text-primary-foreground'
+                  ? 'bg-orange-500 text-white hover:text-white'
                   : 'transparent',
               )}
               onClick={handleClick}
