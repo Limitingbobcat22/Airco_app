@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { Navigate, useParams } from 'react-router'
+import SiteFooter from '@/components/shared/site-footer'
 import { useGoToSection } from '@/hooks/use-go-to-section'
 import { listAircos } from '@/lib/api/aircos'
 import AircoGrid from './components/airco-grid'
@@ -121,7 +122,7 @@ export default function AircoPage() {
 
   return (
     <div id="top" className="flex h-full min-h-0 flex-col bg-foam">
-      <div id="page-scroll" className="min-h-0 flex-1 overflow-y-auto pb-[45vh]">
+      <div id="page-scroll" className="min-h-0 flex-1 overflow-y-auto">
         <AircoHome />
         <PowerForm
           areaM2={areaM2}
@@ -180,6 +181,7 @@ export default function AircoPage() {
           elecPrice={elecPrice}
           yearlyGas={yearlyGas}
         />
+        <SiteFooter />
       </div>
       <SavingsDock
         airco={sized}

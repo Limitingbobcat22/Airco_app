@@ -239,7 +239,7 @@ export default function AdminKlantenPage() {
         </Button>
       </div>
 
-      <div className="min-h-0 flex-1 overflow-auto p-4 sm:p-6">
+      <div className="min-h-0 flex-1 overflow-hidden p-4 sm:p-6">
         {isLoading ? (
           <div className="text-muted-foreground rounded-xl border p-8 text-center text-sm">
             Klanten laden…
@@ -262,8 +262,8 @@ export default function AdminKlantenPage() {
             </Button>
           </div>
         ) : (
-          <div className="overflow-hidden rounded-xl border">
-            <Table>
+          <div className="admin-table-scroll h-[75%] rounded-xl border">
+            <Table className="w-max min-w-full">
               <TableHeader>
                 {table.getHeaderGroups().map((headerGroup) => (
                   <TableRow
@@ -271,7 +271,7 @@ export default function AdminKlantenPage() {
                     className="bg-muted/40 hover:bg-muted/40"
                   >
                     {headerGroup.headers.map((header) => (
-                      <TableHead key={header.id}>
+                      <TableHead key={header.id} className="whitespace-nowrap">
                         {header.isPlaceholder
                           ? null
                           : flexRender(
@@ -288,7 +288,7 @@ export default function AdminKlantenPage() {
                   table.getRowModel().rows.map((row) => (
                     <TableRow key={row.id}>
                       {row.getVisibleCells().map((cell) => (
-                        <TableCell key={cell.id}>
+                        <TableCell key={cell.id} className="whitespace-nowrap">
                           {flexRender(
                             cell.column.columnDef.cell,
                             cell.getContext(),

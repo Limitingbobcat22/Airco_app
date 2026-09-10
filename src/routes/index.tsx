@@ -5,6 +5,7 @@ import AdminKlantenPage from '@/pages/admin/klanten'
 import AdminOffertesPage from '@/pages/admin/offertes'
 import AircoPage from '@/pages/airco'
 import KetelPage from '@/pages/ketel'
+import LegalPage from '@/pages/legal'
 import {
   AIRCO_TOPIC,
   defaultSectionForTopic,
@@ -83,6 +84,18 @@ export default function AppRouter() {
               <AdminOffertesPage />
             </RequireAdmin>
           ),
+        },
+        {
+          path: 'privacy',
+          element: <LegalPage />,
+        },
+        {
+          path: 'voorwaarden',
+          element: <LegalPage />,
+        },
+        {
+          path: 'cookies',
+          element: <LegalPage />,
         },
       ],
     },

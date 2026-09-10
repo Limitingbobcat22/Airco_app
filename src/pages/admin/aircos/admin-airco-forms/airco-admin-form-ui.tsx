@@ -60,12 +60,14 @@ export function SpecField({
   htmlFor,
   striped,
   error,
+  icon,
   children,
 }: {
   label: string
   htmlFor?: string
   striped?: boolean
   error?: string
+  icon?: ReactNode
   children: ReactNode
 }) {
   return (
@@ -78,9 +80,13 @@ export function SpecField({
     >
       <label
         htmlFor={htmlFor}
-        className={cn('shrink-0 text-ink/55', error && 'pt-0.5')}
+        className={cn(
+          'inline-flex shrink-0 items-center gap-1.5 text-ink/55',
+          error && 'pt-0.5',
+        )}
       >
         {label}
+        {icon}
       </label>
       <div className="min-w-0 max-w-[18rem] flex-1">
         <FieldError error={error} />

@@ -7,6 +7,7 @@ import {
   ADMIN_AIRCOS_PATH,
   getNavTitleBySectionId,
 } from '@/lib/constants/nav-items'
+import { LEGAL_PAGES, LEGAL_PATHS } from '@/lib/company'
 import {
   AIRCO_TOPIC,
   getTopicFromPath,
@@ -22,11 +23,23 @@ export default function Header({ onMenuClick }: HeaderProps) {
   const activeSectionId = useActiveSection()
   const goToSection = useGoToSection()
   const isAdminAircos = pathname === ADMIN_AIRCOS_PATH
+  const legalTitle =
+    pathname === LEGAL_PATHS.privacy
+      ? LEGAL_PAGES.privacy.title
+      : pathname === LEGAL_PATHS.terms
+        ? LEGAL_PAGES.terms.title
+        : pathname === LEGAL_PATHS.cookies
+          ? LEGAL_PAGES.cookies.title
+          : null
   const topic = getTopicFromPath(pathname) ?? AIRCO_TOPIC
-  const topicLabel = isAdminAircos ? 'Beheer' : TOPIC_LABELS[topic]
+  const topicLabel = isAdminAircos
+    ? 'Beheer'
+    : legalTitle
+      ? 'Juridisch'
+      : TOPIC_LABELS[topic]
   const sectionTitle = isAdminAircos
     ? 'Aircos'
-    : getNavTitleBySectionId(activeSectionId, topic)
+    : (legalTitle ?? getNavTitleBySectionId(activeSectionId, topic))
 
   return (
     <div className="bg-secondary flex flex-1 items-center gap-2 px-3 md:px-4">
@@ -45,7 +58,7 @@ export default function Header({ onMenuClick }: HeaderProps) {
       <nav aria-label="Huidige locatie" className="min-w-0">
         <ol className="text-primary flex items-center gap-1.5 text-xl font-bold tracking-tight sm:gap-2 sm:text-2xl">
           <li className="min-w-0 truncate">
-            {isAdminAircos ? (
+            {isAdminAircos || legalTitle ? (
               <span className="truncate">{topicLabel}</span>
             ) : (
               <button

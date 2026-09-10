@@ -29,6 +29,7 @@ export type Airco = {
   roomM2: string
   heatingCoverage: number
   priceEur: number
+  quantity: number
   accent: string
   images: AircoImageMeta[]
   createdAt?: string

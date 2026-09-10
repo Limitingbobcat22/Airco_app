@@ -33,6 +33,7 @@ export type AircoFormValues = {
   roomM2: string
   heatingCoverage: number | ''
   priceEur: number | ''
+  quantity: number | ''
   accent: string
 }
 
@@ -58,6 +59,7 @@ export const EMPTY_AIRCO_FORM: AircoFormValues = {
   roomM2: '',
   heatingCoverage: '',
   priceEur: '',
+  quantity: 0,
   accent: '#005A9C',
 }
 
@@ -90,6 +92,7 @@ export function aircoToFormValues(airco: Airco): AircoFormValues {
     roomM2: airco.roomM2,
     heatingCoverage: airco.heatingCoverage,
     priceEur: airco.priceEur,
+    quantity: airco.quantity ?? 0,
     accent: airco.accent,
   }
 }
@@ -111,6 +114,7 @@ export function toCreatePayload(values: AircoFormValues): CreateAircoInput {
     noiseDbaOutside: Number(values.noiseDbaOutside),
     roomM2: values.roomM2.trim(),
     priceEur: Number(values.priceEur),
+    quantity: Math.round(Number(values.quantity)),
     ...(values.unitType.trim() ? { unitType: values.unitType.trim() } : {}),
     ...(values.tag.trim() ? { tag: values.tag.trim() } : {}),
     ...(values.productFunction.trim()
@@ -161,6 +165,7 @@ export function toUpdatePayload(values: AircoFormValues): CreateAircoInput {
       ? { heatingCoverage: Number(values.heatingCoverage) }
       : {}),
     priceEur: Number(values.priceEur),
+    quantity: Math.round(Number(values.quantity)),
     accent: values.accent.trim() || '#005A9C',
   }
 }

@@ -26,6 +26,21 @@ function requiredNumber(label: string) {
     })
 }
 
+function requiredInt(label: string) {
+  return z
+    .union([z.number(), z.literal('')])
+    .refine((value) => value !== '' && Number.isFinite(value), {
+      error: `${label} is verplicht.`,
+    })
+    .refine(
+      (value) =>
+        typeof value !== 'number' || (Number.isInteger(value) && value >= 0),
+      {
+        error: `${label} moet een geheel getal van 0 of hoger zijn.`,
+      },
+    )
+}
+
 export const aircoFormSchema = z.object({
   brand: requiredText('Merk', 80),
   model: requiredText('Model', 80),
@@ -58,6 +73,7 @@ export const aircoFormSchema = z.object({
       error: 'Dekking verwarming moet 0 of hoger zijn.',
     }),
   priceEur: requiredNumber('Prijs'),
+  quantity: requiredInt('Voorraad'),
   accent: z.string().refine(
     (value) =>
       value === '' || /^#([0-9A-Fa-f]{3}|[0-9A-Fa-f]{6})$/.test(value),

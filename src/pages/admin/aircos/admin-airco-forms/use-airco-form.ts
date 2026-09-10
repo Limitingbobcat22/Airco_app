@@ -81,6 +81,9 @@ export function useAircoForm(
     const result = validateAircoForm(nextValues)
     if (!result.ok) {
       setFieldErrors(result.fieldErrors)
+      event.currentTarget
+        .closest('[role="dialog"]')
+        ?.scrollTo({ top: 0, behavior: 'smooth' })
       return
     }
 

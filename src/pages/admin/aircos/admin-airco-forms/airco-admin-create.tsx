@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Check, Plus, Trash2 } from 'lucide-react'
+import { Check, Package, Plus, Trash2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import {
   AIRCO_PHOTO_SLOTS,
@@ -187,6 +187,25 @@ export default function AircoAdminCreate({
                 onChange={(e) => update('productFunction', e.target.value)}
                 className={specClass}
                 placeholder="Koelen en verwarmen"
+              />
+            </SpecField>
+            <SpecField
+              label="Voorraad"
+              htmlFor="airco-quantity"
+              error={fieldErrors.quantity}
+              icon={<Package className="size-3.5" aria-hidden />}
+            >
+              <input
+                id="airco-quantity"
+                type="number"
+                min={0}
+                step={1}
+                value={values.quantity}
+                onChange={(e) =>
+                  update('quantity', parseNumberInput(e.target.value))
+                }
+                className={withFieldError(specClass, fieldErrors.quantity)}
+                placeholder="0"
               />
             </SpecField>
             <SpecField

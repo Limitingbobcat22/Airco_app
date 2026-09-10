@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Navigate, useParams } from 'react-router'
 import { Check } from 'lucide-react'
+import SiteFooter from '@/components/shared/site-footer'
 import { cn } from '@/lib/utils'
 import {
   defaultSectionForTopic,
@@ -132,7 +133,7 @@ export default function KetelPage() {
 
   return (
     <div className="flex h-full min-h-0 flex-col bg-foam">
-      <div id="page-scroll" className="min-h-0 flex-1 overflow-y-auto pb-[45vh]">
+      <div id="page-scroll" className="min-h-0 flex-1 overflow-y-auto">
         <KetelHome />
 
         <section
@@ -315,6 +316,7 @@ export default function KetelPage() {
             </div>
           </div>
         </section>
+        <SiteFooter />
       </div>
     </div>
   )

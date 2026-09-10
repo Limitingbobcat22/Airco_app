@@ -43,6 +43,7 @@ const DEFAULT_VISIBLE_COLUMN_IDS = [
   'coolingKw',
   'heatingKw',
   'priceEur',
+  'quantity',
 ] as const
 
 const EXTRA_COLUMN_IDS = [
@@ -314,6 +315,11 @@ export default function AdminAircosPage() {
         cell: ({ getValue }) => eur.format(getValue<number>()),
       },
       {
+        accessorKey: 'quantity',
+        header: 'Voorraad',
+        cell: ({ getValue }) => getValue<number>() ?? 0,
+      },
+      {
         accessorKey: 'tag',
         header: 'Tag',
       },
@@ -473,7 +479,7 @@ export default function AdminAircosPage() {
       <div className="flex flex-col gap-4 border-b px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
         <Heading
           title="Aircos beheer"
-          description="Airco-modellen uit de API. Standaard 5 kolommen; voeg er meer toe via Kolommen."
+          description="Airco-modellen uit de API. Standaard 6 kolommen; voeg er meer toe via Kolommen."
         />
         <div className="flex w-full flex-wrap items-center gap-2 sm:w-auto sm:min-w-[36rem] sm:max-w-4xl sm:justify-end">
           <span className="shrink-0 text-sm font-medium">Kolommen:</span>
@@ -493,7 +499,7 @@ export default function AdminAircosPage() {
         </div>
       </div>
 
-      <div className="min-h-0 flex-1 overflow-auto p-4 sm:p-6">
+      <div className="min-h-0 flex-1 overflow-hidden p-4 sm:p-6">
         {isLoading ? (
           <div className="text-muted-foreground rounded-xl border p-8 text-center text-sm">
             Aircos laden…
@@ -516,8 +522,8 @@ export default function AdminAircosPage() {
             </Button>
           </div>
         ) : (
-          <div className="overflow-hidden rounded-xl border">
-            <Table>
+          <div className="admin-table-scroll h-[75%] rounded-xl border">
+            <Table className="w-max min-w-full">
               <TableHeader>
                 {table.getHeaderGroups().map((headerGroup) => (
                   <TableRow
@@ -525,7 +531,7 @@ export default function AdminAircosPage() {
                     className="bg-muted/40 hover:bg-muted/40"
                   >
                     {headerGroup.headers.map((header) => (
-                      <TableHead key={header.id}>
+                      <TableHead key={header.id} className="whitespace-nowrap">
                         {header.isPlaceholder
                           ? null
                           : flexRender(
@@ -542,7 +548,7 @@ export default function AdminAircosPage() {
                   table.getRowModel().rows.map((row) => (
                     <TableRow key={row.id}>
                       {row.getVisibleCells().map((cell) => (
-                        <TableCell key={cell.id}>
+                        <TableCell key={cell.id} className="whitespace-nowrap">
                           {flexRender(
                             cell.column.columnDef.cell,
                             cell.getContext(),

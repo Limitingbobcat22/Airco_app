@@ -23,6 +23,7 @@ export type CreateAircoInput = {
   roomM2: string
   heatingCoverage?: number
   priceEur: number
+  quantity?: number
   accent?: string
 }
 

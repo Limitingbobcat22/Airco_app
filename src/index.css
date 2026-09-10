@@ -145,6 +145,27 @@
     box-shadow: 0 8px 22px rgba(7, 20, 28, 0.06);
   }
 
+  .admin-table-scroll {
+    overflow: scroll;
+    scrollbar-gutter: stable;
+    scrollbar-width: thin;
+    scrollbar-color: #0f766e #ecf8f5;
+  }
+
+  .admin-table-scroll::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+
+  .admin-table-scroll::-webkit-scrollbar-thumb {
+    background: #0f766e;
+    border-radius: 999px;
+  }
+
+  .admin-table-scroll::-webkit-scrollbar-track {
+    background: #ecf8f5;
+  }
+
   @media (prefers-reduced-motion: reduce) {
     .airco-card-glow--fit {
       animation: none;
