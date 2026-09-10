@@ -12,6 +12,7 @@ import { UnsavedChangesProvider } from '@/providers/unsaved-changes'
 import Header from '../shared/header'
 import MobileSidebar from '../shared/mobile-sidebar'
 import Sidebar from '../shared/sidebar'
+import UnreadOffertesAlert from '../shared/unread-offertes-alert'
 
 export default function AppLayout({ children }: { children: ReactNode }) {
   const [sidebarOpen, setSidebarOpen] = useState(false)
@@ -69,6 +70,7 @@ export default function AppLayout({ children }: { children: ReactNode }) {
             </main>
           </div>
         </div>
+        <UnreadOffertesAlert />
       </ActiveSectionProvider>
     </UnsavedChangesProvider>
   )

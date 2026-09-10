@@ -39,6 +39,7 @@ export type Offerte = {
   gasPriceEur: number | null
   elecPriceEur: number | null
   netEuroSavedYearly: number | null
+  read: boolean
   klant: Klant | null
   airco: OfferteAirco | null
   createdAt: string
@@ -118,6 +119,29 @@ export async function updateOfferte(
 
   if (!response.ok) {
     throw new Error(await readApiError(response, 'Offerte bijwerken mislukt'))
+  }
+
+  return response.json() as Promise<Offerte>
+}
+
+export async function updateOfferteRead(
+  token: string,
+  id: string,
+  read: boolean,
+): Promise<Offerte> {
+  const response = await fetch(`${API_URL}/offertes/${id}/read`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({ read }),
+  })
+
+  if (!response.ok) {
+    throw new Error(
+      await readApiError(response, 'Gelezen-status bijwerken mislukt'),
+    )
   }
 
   return response.json() as Promise<Offerte>

@@ -15,6 +15,8 @@ type AuthContextValue = {
   isLoggedIn: boolean
   user: AuthUser | null
   token: string | null
+  /** Tijdstip van de laatste login in deze tab; null bij sessieherstel. */
+  lastLoginAt: number | null
   login: (token: string, user: AuthUser) => void
   logout: () => void
 }
@@ -36,12 +38,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     localStorage.getItem(TOKEN_KEY),
   )
   const [user, setUser] = useState<AuthUser | null>(() => readStoredUser())
+  const [lastLoginAt, setLastLoginAt] = useState<number | null>(null)
 
   const login = useCallback((nextToken: string, nextUser: AuthUser) => {
     localStorage.setItem(TOKEN_KEY, nextToken)
     localStorage.setItem(USER_KEY, JSON.stringify(nextUser))
     setToken(nextToken)
     setUser(nextUser)
+    setLastLoginAt(Date.now())
   }, [])
 
   const logout = useCallback(() => {
@@ -49,6 +53,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     localStorage.removeItem(USER_KEY)
     setToken(null)
     setUser(null)
+    setLastLoginAt(null)
   }, [])
 
   const value = useMemo(
@@ -56,10 +61,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       isLoggedIn: Boolean(token && user),
       user,
       token,
+      lastLoginAt,
       login,
       logout,
     }),
-    [token, user, login, logout],
+    [token, user, lastLoginAt, login, logout],
   )
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>

@@ -5,11 +5,14 @@ import {
   getCoreRowModel,
   useReactTable,
   type ColumnDef,
+  type VisibilityState,
 } from '@tanstack/react-table'
 import { Pencil, Plus, Trash2 } from 'lucide-react'
 import Heading from '@/components/shared/heading'
+import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Modal } from '@/components/ui/modal'
+import { MultiSelect } from '@/components/ui/multi-select'
 import {
   Table,
   TableBody,
@@ -28,6 +31,7 @@ import {
   offerteAircoLabel,
   offerteKlantNaam,
   updateOfferte,
+  updateOfferteRead,
   type CreateOfferteInput,
   type Offerte,
 } from '@/lib/api/offertes'
@@ -51,6 +55,67 @@ const eurExact = new Intl.NumberFormat('nl-NL', {
   minimumFractionDigits: 2,
   maximumFractionDigits: 2,
 })
+
+const COLUMN_PREFS_KEY = 'columnPreferences_admin_offertes'
+
+const DEFAULT_VISIBLE_COLUMN_IDS = [
+  'read',
+  'name',
+  'email',
+  'airco',
+  'netEuroSavedYearly',
+  'createdAt',
+] as const
+
+const EXTRA_COLUMN_IDS = [
+  'coolingKw',
+  'areaM2',
+  'heightM',
+  'heatingSharePct',
+  'requiredKw',
+  'yearlyGasM3',
+  'gasPriceEur',
+  'elecPriceEur',
+] as const
+
+const ALL_TOGGLEABLE_COLUMN_IDS = [
+  ...DEFAULT_VISIBLE_COLUMN_IDS,
+  ...EXTRA_COLUMN_IDS,
+] as const
+
+function buildDefaultVisibility(columnIds: string[]): VisibilityState {
+  const visibility: VisibilityState = {}
+  for (const id of columnIds) {
+    if (id === 'actions') {
+      visibility[id] = true
+      continue
+    }
+    visibility[id] = (DEFAULT_VISIBLE_COLUMN_IDS as readonly string[]).includes(
+      id,
+    )
+  }
+  return visibility
+}
+
+function loadColumnVisibility(columnIds: string[]): VisibilityState {
+  const defaults = buildDefaultVisibility(columnIds)
+  try {
+    const raw = localStorage.getItem(COLUMN_PREFS_KEY)
+    if (!raw) return defaults
+    const saved = JSON.parse(raw) as VisibilityState
+    const merged: VisibilityState = { ...defaults }
+    for (const id of columnIds) {
+      if (id === 'actions') {
+        merged[id] = true
+        continue
+      }
+      if (id in saved) merged[id] = Boolean(saved[id])
+    }
+    return merged
+  } catch {
+    return defaults
+  }
+}
 
 export default function AdminOffertesPage() {
   const { token } = useAuth()
@@ -92,6 +157,10 @@ export default function AdminOffertesPage() {
   const [discardOpen, setDiscardOpen] = useState(false)
   const [editing, setEditing] = useState<Offerte | null>(null)
   const [deleting, setDeleting] = useState<Offerte | null>(null)
+  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>(
+    () => loadColumnVisibility([...ALL_TOGGLEABLE_COLUMN_IDS, 'actions']),
+  )
+  const [columnPrefsReady, setColumnPrefsReady] = useState(false)
 
   const closeEditor = () => {
     setDiscardOpen(false)
@@ -147,9 +216,38 @@ export default function AdminOffertesPage() {
     },
   })
 
+  const markReadMutation = useMutation({
+    mutationFn: (id: string) => {
+      if (!token) throw new Error('Je bent niet ingelogd als admin.')
+      return updateOfferteRead(token, id, true)
+    },
+    onMutate: async (id) => {
+      await queryClient.cancelQueries({ queryKey: ['offertes'] })
+      const previous = queryClient.getQueryData<Offerte[]>(['offertes'])
+      const markRead = (rows: Offerte[] | undefined) =>
+        rows?.map((row) => (row.id === id ? { ...row, read: true } : row))
+      queryClient.setQueryData(['offertes'], markRead(previous))
+      setRows((current) => markRead(current) ?? current)
+      return { previous }
+    },
+    onError: (_error, _id, context) => {
+      if (context?.previous) {
+        queryClient.setQueryData(['offertes'], context.previous)
+        setRows(context.previous)
+      }
+    },
+    onSettled: () => {
+      void queryClient.invalidateQueries({ queryKey: ['offertes'] })
+    },
+  })
+
   useEffect(() => {
     if (remoteRows) setRows(remoteRows)
   }, [remoteRows])
+
+  useEffect(() => {
+    setColumnPrefsReady(true)
+  }, [])
 
   const openCreate = () => {
     createMutation.reset()
@@ -169,6 +267,9 @@ export default function AdminOffertesPage() {
     setEditorDirty(false)
     setEditing(offerte)
     setEditorOpen(true)
+    if (!offerte.read) {
+      markReadMutation.mutate(offerte.id)
+    }
   }
 
   const openDelete = (offerte: Offerte) => {
@@ -193,6 +294,18 @@ export default function AdminOffertesPage() {
 
   const columns = useMemo<ColumnDef<Offerte>[]>(
     () => [
+      {
+        accessorKey: 'read',
+        header: 'Status',
+        cell: ({ getValue }) => {
+          const read = getValue<boolean>()
+          return read ? (
+            <Badge variant="secondary">Gelezen</Badge>
+          ) : (
+            <Badge>Nieuw</Badge>
+          )
+        },
+      },
       {
         id: 'name',
         header: 'Klant',
@@ -295,6 +408,7 @@ export default function AdminOffertesPage() {
       {
         id: 'actions',
         header: 'Acties',
+        enableHiding: false,
         cell: ({ row }) => (
           <div className="flex items-center gap-1">
             <Button
@@ -322,14 +436,76 @@ export default function AdminOffertesPage() {
     [],
   )
 
+  const selectableColumnIds = useMemo(
+    () =>
+      columns
+        .map((column) => {
+          if (column.id === 'actions') return null
+          if (column.id) return column.id
+          if (
+            'accessorKey' in column &&
+            typeof column.accessorKey === 'string'
+          ) {
+            return column.accessorKey
+          }
+          return null
+        })
+        .filter((id): id is string => Boolean(id)),
+    [columns],
+  )
+
+  const columnOptions = useMemo(
+    () =>
+      selectableColumnIds.map((id) => {
+        const column = columns.find((item) => {
+          if (item.id === id) return true
+          return (
+            'accessorKey' in item &&
+            typeof item.accessorKey === 'string' &&
+            item.accessorKey === id
+          )
+        })
+        const header = typeof column?.header === 'string' ? column.header : id
+        return { value: id, label: header }
+      }),
+    [columns, selectableColumnIds],
+  )
+
+  useEffect(() => {
+    if (!columnPrefsReady) return
+    localStorage.setItem(COLUMN_PREFS_KEY, JSON.stringify(columnVisibility))
+  }, [columnVisibility, columnPrefsReady])
+
+  const resetColumnVisibility = () => {
+    localStorage.removeItem(COLUMN_PREFS_KEY)
+    setColumnVisibility(
+      buildDefaultVisibility([...selectableColumnIds, 'actions']),
+    )
+  }
+
+  const handleColumnVisibilityChange = (selectedColumns: string[]) => {
+    const next: VisibilityState = { actions: true }
+    for (const id of selectableColumnIds) {
+      next[id] = selectedColumns.includes(id)
+    }
+    setColumnVisibility(next)
+  }
+
+  const visibleColumns = Object.keys(columnVisibility).filter(
+    (key) => columnVisibility[key] && key !== 'actions',
+  )
+
   const table = useReactTable({
     data: rows,
     columns,
+    state: { columnVisibility },
+    onColumnVisibilityChange: setColumnVisibility,
     getCoreRowModel: getCoreRowModel(),
     getRowId: (row) => row.id,
   })
 
   const visibleColumnCount = table.getVisibleLeafColumns().length
+  const unreadCount = rows.filter((row) => !row.read).length
   const saveError = editing ? updateMutation.error : createMutation.error
   const formError = saveError instanceof Error ? saveError.message : null
   const label = (offerte: Offerte | null) =>
@@ -340,12 +516,28 @@ export default function AdminOffertesPage() {
       <div className="flex flex-col gap-4 border-b px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
         <Heading
           title="Offertes beheer"
-          description="Aanvragen gekoppeld aan klant en airco. Het jaarvoordeel wordt bewaard zoals berekend bij de aanvraag."
+          description={
+            unreadCount > 0
+              ? `${unreadCount} ongelezen aanvraag${unreadCount === 1 ? '' : 'en'}. Aanvragen gekoppeld aan klant en airco.`
+              : 'Aanvragen gekoppeld aan klant en airco. Het jaarvoordeel wordt bewaard zoals berekend bij de aanvraag.'
+          }
         />
-        <Button type="button" onClick={openCreate} className="gap-2">
-          <Plus className="size-4" />
-          Toevoegen
-        </Button>
+        <div className="flex w-full flex-wrap items-center gap-2 sm:w-auto sm:min-w-[36rem] sm:max-w-4xl sm:justify-end">
+          <span className="shrink-0 text-sm font-medium">Kolommen:</span>
+          <MultiSelect
+            value={visibleColumns}
+            options={columnOptions}
+            onValueChange={handleColumnVisibilityChange}
+            onClear={resetColumnVisibility}
+            placeholder="Selecteer kolommen"
+            variant="inverted"
+            className="min-w-[20rem] flex-1 sm:min-w-[32rem]"
+          />
+          <Button type="button" onClick={openCreate} className="shrink-0 gap-2">
+            <Plus className="size-4" />
+            Toevoegen
+          </Button>
+        </div>
       </div>
 
       <div className="min-h-0 flex-1 overflow-hidden p-4 sm:p-6">
@@ -395,7 +587,14 @@ export default function AdminOffertesPage() {
               <TableBody>
                 {table.getRowModel().rows.length ? (
                   table.getRowModel().rows.map((row) => (
-                    <TableRow key={row.id}>
+                    <TableRow
+                      key={row.id}
+                      className={
+                        row.original.read
+                          ? undefined
+                          : 'bg-teal/5 font-medium'
+                      }
+                    >
                       {row.getVisibleCells().map((cell) => (
                         <TableCell key={cell.id} className="whitespace-nowrap">
                           {flexRender(
