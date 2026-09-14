@@ -1,9 +1,11 @@
 import RequireAdmin from '@/auth/require-admin'
 import AppLayout from '@/components/layout/app-layout'
 import AdminAircosPage from '@/pages/admin/aircos'
+import AdminHandleidingenPage from '@/pages/admin/handleidingen'
 import AdminKlantenPage from '@/pages/admin/klanten'
 import AdminOffertesPage from '@/pages/admin/offertes'
 import AircoPage from '@/pages/airco'
+import HandleidingenPage from '@/pages/handleidingen'
 import KetelPage from '@/pages/ketel'
 import LegalPage from '@/pages/legal'
 import {
@@ -84,6 +86,18 @@ export default function AppRouter() {
               <AdminOffertesPage />
             </RequireAdmin>
           ),
+        },
+        {
+          path: 'admin/handleidingen',
+          element: (
+            <RequireAdmin>
+              <AdminHandleidingenPage />
+            </RequireAdmin>
+          ),
+        },
+        {
+          path: 'handleidingen',
+          element: <HandleidingenPage />,
         },
         {
           path: 'privacy',

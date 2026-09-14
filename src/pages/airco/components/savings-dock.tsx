@@ -66,7 +66,7 @@ export default function SavingsDock({ airco, savings, visible }: SavingsDockProp
       )}
     >
       <div className="min-h-0 overflow-hidden">
-        <div className="border border-ink/15 bg-white shadow-[0_-4px_16px_rgba(7,20,28,0.04)]">
+        <div className="hero-bg page-block border-t border-black shadow-[0_-6px_22px_rgba(11,37,69,0.12)]">
           <div
             className={cn(
               'flex items-center justify-between gap-3 px-3 sm:gap-4 sm:px-4',

@@ -146,9 +146,9 @@ export default function SiteFooter() {
   return (
     <section
       aria-label="Footer"
-      className="mx-auto max-w-7xl px-4 pb-8 pt-4 sm:px-6 sm:pb-10 2xl:max-w-[110rem] 2xl:px-10"
+      className="mx-2 mt-4 pb-2 sm:mx-4 sm:mt-6 sm:pb-4"
     >
-      <footer className="overflow-hidden rounded-3xl bg-navy text-white">
+      <footer className="page-block overflow-hidden rounded-3xl bg-navy text-white">
       <div className="h-1 bg-gradient-to-r from-teal via-mint to-teal" />
       <div className="px-5 py-10 sm:px-8 sm:py-12">
         <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-4 lg:gap-8">

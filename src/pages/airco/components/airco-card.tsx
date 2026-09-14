@@ -342,7 +342,7 @@ function AircoPhotoPreview({
           <button
             type="button"
             onClick={onCalculateSavings}
-            className="rounded-xl bg-mint px-5 py-2.5 text-sm font-semibold text-ink hover:bg-white"
+            className="rounded-xl bg-[#74b8f8] px-5 py-2.5 text-sm font-semibold text-ink hover:bg-[#5aa6ef]"
           >
             Bereken besparing
           </button>
@@ -429,7 +429,7 @@ export default function AircoCard({
         )}
       >
         {selected ? (
-          <span className="absolute top-5 right-5 z-10 grid size-10 place-items-center rounded-full bg-mint text-ink shadow-md">
+          <span className="absolute top-5 right-5 z-10 grid size-10 translate-x-[5px] place-items-center rounded-full bg-mint text-ink shadow-md">
             <Check className="size-5" strokeWidth={3} aria-hidden />
             <span className="sr-only">Geselecteerd</span>
           </span>
@@ -444,16 +444,11 @@ export default function AircoCard({
         ) : null}
 
         <div className="flex flex-1 flex-col gap-4 p-6 md:gap-5 md:p-8 2xl:p-10">
-          <h3
-            className={cn(
-              'font-display text-3xl leading-tight text-ink md:text-[2rem] 2xl:text-4xl',
-              selected && 'pr-14',
-            )}
-          >
+          <h3 className="font-display text-3xl leading-tight text-ink md:text-[2rem] 2xl:text-4xl">
             {airco.brand} {airco.model}
           </h3>
 
-          <div className="grid gap-6 md:grid-cols-[minmax(0,0.95fr)_minmax(0,1.2fr)] md:items-start md:gap-8 2xl:grid-cols-[minmax(0,1fr)_minmax(0,1.35fr)] 2xl:gap-12">
+          <div className="grid gap-6 md:grid-cols-[minmax(0,1.25fr)_minmax(0,1fr)] md:items-start md:gap-8 2xl:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)] 2xl:gap-12">
             <PopupModal
               isOpen={previewOpen}
               onOpenChange={handlePreviewOpenChange}
@@ -461,7 +456,7 @@ export default function AircoCard({
               maxHeight="max-h-[90dvh]"
               renderButton={(onClick) => (
                 <div
-                  className="relative flex min-h-44 w-full items-center justify-center overflow-hidden rounded-3xl md:min-h-52 2xl:min-h-64"
+                  className="relative flex min-h-52 w-full items-center justify-center overflow-hidden rounded-3xl md:min-h-64 2xl:min-h-72"
                   style={{
                     background: `linear-gradient(160deg, ${airco.accent}14, ${airco.accent}28 55%, #ffffff 100%)`,
                   }}
@@ -470,7 +465,7 @@ export default function AircoCard({
                     <img
                       src={aircoImageUrl(coverImage.url)}
                       alt=""
-                      className="absolute inset-0 size-full object-cover"
+                      className="absolute inset-0 size-full object-contain p-3"
                     />
                   ) : (
                     <AircoIllustration
@@ -525,28 +520,11 @@ export default function AircoCard({
               <p className="mt-3 line-clamp-3 max-w-xl text-sm leading-relaxed text-ink/65 md:text-base 2xl:line-clamp-none">
                 {airco.description}
               </p>
-
-              <div className="mt-4 flex justify-end">
-                <button
-                  type="button"
-                  onPointerDown={(event) => event.stopPropagation()}
-                  onClick={(event) => {
-                    event.stopPropagation()
-                    event.preventDefault()
-                    handlePreviewOpenChange(true)
-                  }}
-                  className="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-mist/80 bg-white px-3 py-1.5 text-sm font-medium text-ink/70 shadow-sm transition hover:border-teal/40 hover:text-teal focus-visible:ring-2 focus-visible:ring-teal focus-visible:outline-none"
-                  aria-label={`Meer informatie over ${airco.brand} ${airco.model}`}
-                >
-                  <Info className="size-4" strokeWidth={2.25} aria-hidden />
-                  Info
-                </button>
-              </div>
             </div>
           </div>
         </div>
 
-        <div className="mt-auto border-t border-mist/80 px-6 py-5 md:px-8 2xl:px-10 2xl:py-6">
+        <div className="mt-auto border-t border-mist/80 px-6 pt-7 pb-5 md:px-8 md:pt-8 2xl:px-10 2xl:pt-9 2xl:pb-6">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between sm:gap-6">
             <dl className="grid min-w-0 flex-1 grid-cols-1 gap-4 text-left sm:grid-cols-2 sm:gap-0">
               <div className="sm:pr-5">
@@ -573,26 +551,42 @@ export default function AircoCard({
               </div>
             </dl>
 
-            {selected ? (
+            <div className="flex w-full shrink-0 flex-col items-stretch gap-2 sm:w-auto sm:min-w-[13.5rem]">
               <button
                 type="button"
                 onPointerDown={(event) => event.stopPropagation()}
                 onClick={(event) => {
                   event.stopPropagation()
                   event.preventDefault()
-                  markPathUpdatedFromScroll()
-                  navigate('/airco/verbruik', { replace: true })
-                  scrollToPageSection('verbruik', 'smooth')
+                  handlePreviewOpenChange(true)
                 }}
-                className="inline-flex cursor-pointer shrink-0 items-center justify-center rounded-full bg-teal px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-deep focus-visible:ring-2 focus-visible:ring-teal focus-visible:outline-none md:text-base"
+                className="inline-flex w-full items-center justify-center gap-1.5 rounded-full border border-mist/80 bg-white px-5 py-2.5 text-sm font-medium text-ink/70 shadow-sm transition hover:border-teal/40 hover:text-teal focus-visible:ring-2 focus-visible:ring-teal focus-visible:outline-none md:text-base"
+                aria-label={`Meer informatie over ${airco.brand} ${airco.model}`}
               >
-                Bereken besparing
+                <Info className="size-4" strokeWidth={2.25} aria-hidden />
+                Info
               </button>
-            ) : (
-              <span className="inline-flex shrink-0 items-center justify-center rounded-full bg-ink px-5 py-2.5 text-sm font-semibold text-white transition group-hover:bg-deep md:text-base">
-                Kies dit model
-              </span>
-            )}
+              {selected ? (
+                <button
+                  type="button"
+                  onPointerDown={(event) => event.stopPropagation()}
+                  onClick={(event) => {
+                    event.stopPropagation()
+                    event.preventDefault()
+                    markPathUpdatedFromScroll()
+                    navigate('/airco/verbruik', { replace: true })
+                    scrollToPageSection('verbruik', 'smooth')
+                  }}
+                  className="inline-flex w-full cursor-pointer items-center justify-center rounded-full bg-[#74b8f8] px-5 py-2.5 text-sm font-semibold text-ink transition hover:bg-[#5aa6ef] focus-visible:ring-2 focus-visible:ring-[#74b8f8] focus-visible:outline-none md:text-base"
+                >
+                  Bereken besparing
+                </button>
+              ) : (
+                <span className="inline-flex w-full items-center justify-center rounded-full bg-ink px-5 py-2.5 text-sm font-semibold text-white transition group-hover:bg-deep md:text-base">
+                  Kies dit model
+                </span>
+              )}
+            </div>
           </div>
         </div>
       </div>

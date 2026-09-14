@@ -1,5 +1,5 @@
 import type { LucideIcon } from 'lucide-react'
-import { Flame, FileText, Table2, Users } from 'lucide-react'
+import { BookOpen, Flame, FileText, Table2, Users } from 'lucide-react'
 import AircoIcon from '@/components/icons/airco-icon'
 import {
   AIRCO_TOPIC,
@@ -16,6 +16,8 @@ import {
 export const ADMIN_AIRCOS_PATH = '/admin/aircos'
 export const ADMIN_KLANTEN_PATH = '/admin/klanten'
 export const ADMIN_OFFERTES_PATH = '/admin/offertes'
+export const ADMIN_HANDLEIDINGEN_PATH = '/admin/handleidingen'
+export const HANDLEIDINGEN_PATH = '/handleidingen'
 
 export type NavItem = {
   title?: string
@@ -67,6 +69,16 @@ export function buildTopicNavItems(
   const target = otherTopic(topic)
   const canSwitchToTarget = target !== KETEL_TOPIC || isAdmin
 
+  items.push({ separator: true })
+  items.push({ sectionHeader: 'Info' })
+  items.push({
+    title: 'Handleidingen',
+    href: HANDLEIDINGEN_PATH,
+    icon: BookOpen,
+    leavesTopic: true,
+    destinationLabel: 'Handleidingen',
+  })
+
   if (canSwitchToTarget) {
     const label = TOPIC_LABELS[target]
     items.push({ separator: true })
@@ -103,6 +115,13 @@ export function buildTopicNavItems(
       icon: FileText,
       leavesTopic: true,
       destinationLabel: 'Offertes beheer',
+    })
+    items.push({
+      title: 'Handleidingen beheer',
+      href: ADMIN_HANDLEIDINGEN_PATH,
+      icon: BookOpen,
+      leavesTopic: true,
+      destinationLabel: 'Handleidingen beheer',
     })
   }
 

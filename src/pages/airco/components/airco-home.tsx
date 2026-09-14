@@ -48,7 +48,7 @@ export default function AircoHome() {
   return (
     <section
       id="home"
-      className="hero-bg relative scroll-mt-4 overflow-hidden rounded-b-3xl px-4 pb-10 pt-5 sm:px-6 sm:pb-14 sm:pt-8"
+      className="hero-bg page-block relative mx-2 mt-2 scroll-mt-4 overflow-hidden rounded-3xl px-4 pb-10 pt-5 sm:mx-4 sm:mt-4 sm:px-6 sm:pb-14 sm:pt-8"
     >
       <div
         aria-hidden
@@ -58,18 +58,18 @@ export default function AircoHome() {
         aria-hidden
         className="pointer-events-none absolute -right-24 top-24 h-80 w-80 rounded-full bg-[radial-gradient(circle,rgba(116,184,248,0.45),transparent_70%)]"
       />
-      <div className="relative mx-auto grid max-w-6xl items-center gap-10 lg:grid-cols-[1.05fr_0.95fr]">
+      <div className="relative grid items-center gap-10 lg:grid-cols-[1.05fr_0.95fr]">
         <div>
           <p className="text-sm font-medium tracking-[0.22em] text-teal uppercase">
             Duurzame Airconditioning op Maat
           </p>
-          <h1 className="mt-4 max-w-xl font-display text-4xl leading-[1.05] text-ink sm:text-6xl">
+          <h1 className="mt-4 font-display text-4xl leading-[1.05] text-ink sm:text-6xl">
             Koel in de zomer.
             <span className="block text-teal">Bespaar in de winter.</span>
           </h1>
-          <p className="mt-5 max-w-lg text-base text-ink/70 sm:text-lg">
+          <p className="mt-5 text-base text-ink/70 sm:text-lg">
             Bereken het vermogen voor uw ruimte, of bekijk meteen alle Haier-
-            en Mitsubishi-modellen. Bereken uw vermogen en besparing voor een juiste airco-keuze.
+            en Mitsubishi-modellen. Een airco-keuze op basis van een persoonlijke berekening.
           </p>
           <div
             className={cn(
@@ -133,7 +133,7 @@ export default function AircoHome() {
             ))}
           </ul>
         </div>
-        <figure className="relative mx-auto w-full max-w-md lg:max-w-lg xl:max-w-none xl:scale-105 xl:origin-center">
+        <figure className="relative mx-auto w-full max-w-md sm:max-w-lg lg:max-w-xl">
           <img
             src="/images/bedrijf.png"
             alt="Onze installateurs bij een airco-installatie"

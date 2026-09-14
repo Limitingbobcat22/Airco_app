@@ -27,6 +27,7 @@ type PopupModalProps = {
   maxHeight?: string
   isOpen?: boolean
   onOpenChange?: (open: boolean) => void
+  className?: string
 }
 
 export default function PopupModal({
@@ -36,6 +37,7 @@ export default function PopupModal({
   maxHeight = 'h-[80dvh]',
   isOpen: controlledIsOpen,
   onOpenChange,
+  className,
 }: PopupModalProps) {
   const [internalIsOpen, setInternalIsOpen] = useState(false)
   const closeHandlerRef = useRef<(() => void) | null>(null)
@@ -94,7 +96,7 @@ export default function PopupModal({
           <Modal
             isOpen={isOpen}
             onClose={handleModalClose}
-            className={`!bg-background w-full !px-1 ${maxWidth}`}
+            className={`w-full !px-1 ${maxWidth} ${className ?? '!bg-background'}`}
           >
             <div className={`overflow-y-auto px-6 ${maxHeight}`}>
               {renderModal(forceClose)}

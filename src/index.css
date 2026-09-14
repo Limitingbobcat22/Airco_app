@@ -113,6 +113,10 @@
     background: linear-gradient(to right, #74b8f8, #ebf3ff);
   }
 
+  .page-block {
+    box-shadow: 0 8px 28px rgba(11, 37, 69, 0.14);
+  }
+
   .airco-card-glow {
     pointer-events: none;
     position: absolute;
@@ -155,6 +159,7 @@
     scrollbar-gutter: stable;
     scrollbar-width: thin;
     scrollbar-color: #0f766e #ecf8f5;
+    background: #ffffff;
   }
 
   .admin-table-scroll::-webkit-scrollbar {

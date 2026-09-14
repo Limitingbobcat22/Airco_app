@@ -50,7 +50,7 @@ export default function Sidebar({ className }: SidebarProps) {
             <ChevronsLeft
               className={cn(
                 'bg-background text-foreground size-8 shrink-0 cursor-pointer rounded-full border',
-                isMinimized && 'rotate-180',
+                isMinimized ? 'rotate-180' : '-translate-x-[15px]',
               )}
               onClick={toggle}
             />

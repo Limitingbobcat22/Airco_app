@@ -140,14 +140,14 @@ export default function AircoPage() {
         {aircosLoading ? (
           <section
             id="modellen"
-            className="scroll-mt-24 px-4 py-10 text-center text-sm text-slate-600 sm:px-6"
+            className="hero-bg page-block relative mx-2 mt-4 scroll-mt-4 overflow-hidden rounded-3xl px-4 py-10 text-center text-sm text-slate-600 sm:mx-4 sm:mt-6 sm:px-6"
           >
             Modellen laden…
           </section>
         ) : aircosError ? (
           <section
             id="modellen"
-            className="scroll-mt-24 px-4 py-10 text-center text-sm text-red-700 sm:px-6"
+            className="hero-bg page-block relative mx-2 mt-4 scroll-mt-4 overflow-hidden rounded-3xl px-4 py-10 text-center text-sm text-red-700 sm:mx-4 sm:mt-6 sm:px-6"
           >
             {aircosFetchError instanceof Error
               ? aircosFetchError.message

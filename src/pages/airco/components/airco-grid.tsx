@@ -46,9 +46,12 @@ export default function AircoGrid({
   }, [aircos, requiredKw])
 
   return (
-    <section id="modellen" className="mx-auto max-w-7xl scroll-mt-4 px-4 py-8 sm:px-6 sm:py-10 2xl:max-w-[110rem] 2xl:px-10">
-      <div className="max-w-2xl">
-        <p className="text-xs font-medium tracking-[0.2em] text-teal uppercase">
+    <section
+      id="modellen"
+      className="hero-bg page-block relative mx-2 mt-4 scroll-mt-4 overflow-hidden rounded-3xl px-4 py-8 sm:mx-4 sm:mt-6 sm:px-6 sm:py-12"
+    >
+      <div className="relative">
+        <p className="text-sm font-medium tracking-[0.2em] text-teal uppercase sm:text-base">
           Stap 2
         </p>
         <h2 className="mt-2 font-display text-3xl text-ink sm:text-4xl">
@@ -56,11 +59,11 @@ export default function AircoGrid({
         </h2>
         <p className="mt-3 text-ink/70">
           {requiredKw != null
-            ? `Uw ruimte vraagt ${dec.format(requiredKw)} kW. Geschikte modellen staan vooraan, goedkoopste eerst. Groene rand = genoeg vermogen, grijs = te weinig (nog wel kiesbaar).`
+            ? `Uw ruimte vraagt ${dec.format(requiredKw)} kW. Geschikte modellen zijn groen gemarkeerd, selecteer een model wat bij uw ruimte past.`
             : 'Bereken eerst het vermogen in stap 1. Kies daarna zelf een airco die bij dat vermogen past.'}
         </p>
       </div>
-      <div className="mt-8 grid gap-6 2xl:grid-cols-2 2xl:gap-8">
+      <div className="relative mt-8 grid gap-6 2xl:grid-cols-2 2xl:gap-8">
         {sorted.map((airco) => (
           <AircoCard
             key={airco.id}

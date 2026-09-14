@@ -74,21 +74,19 @@ export default function PowerForm({
   return (
     <section
       id="vermogen"
-      className="hero-bg relative mt-4 scroll-mt-4 overflow-hidden rounded-3xl px-4 py-8 sm:mt-6 sm:px-6 sm:py-12"
+      className="hero-bg page-block relative mx-2 mt-4 scroll-mt-4 overflow-hidden rounded-3xl px-4 py-8 sm:mx-4 sm:mt-6 sm:px-6 sm:py-12"
     >
-      <div className="relative mx-auto max-w-6xl">
-        <div className="max-w-3xl">
-          <p className="text-xs font-medium tracking-[0.2em] text-teal uppercase">
-            Stap 1
-          </p>
-          <h2 className="mt-2 font-display text-3xl text-ink sm:text-4xl">
-            Bereken het vermogen
-          </h2>
-          <p className="mt-3 text-ink/70">
-            Bereken het benodigde vermogen op basis van uw ruimte en welk deel
-            van de woning de airco verwarmt.
-          </p>
-        </div>
+      <div className="relative">
+        <p className="text-sm font-medium tracking-[0.2em] text-teal uppercase sm:text-base">
+          Stap 1
+        </p>
+        <h2 className="mt-2 font-display text-3xl text-ink sm:text-4xl">
+          Bereken het vermogen
+        </h2>
+        <p className="mt-3 text-ink/70">
+          Bereken het benodigde vermogen op basis van uw ruimte en welk deel
+          van de woning de airco verwarmt.
+        </p>
 
         <form
           className="mt-8"
