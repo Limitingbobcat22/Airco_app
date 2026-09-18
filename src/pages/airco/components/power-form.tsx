@@ -77,7 +77,7 @@ export default function PowerForm({
       className="hero-bg page-block relative mx-2 mt-4 scroll-mt-4 overflow-hidden rounded-3xl px-4 py-8 sm:mx-4 sm:mt-6 sm:px-6 sm:py-12"
     >
       <div className="relative">
-        <p className="text-sm font-medium tracking-[0.2em] text-teal uppercase sm:text-base">
+        <p className="text-sm font-medium tracking-[0.2em] text-orange-500 uppercase sm:text-base">
           Stap 1
         </p>
         <h2 className="mt-2 font-display text-3xl text-ink sm:text-4xl">
@@ -149,9 +149,9 @@ export default function PowerForm({
                         align="start"
                         className="max-w-xs text-left leading-relaxed"
                       >
-                        Geef aan welk percentage van uw woning u met de airco
-                        wilt verwarmen. Dit beïnvloedt het benodigde vermogen én
-                        de geschatte besparing op gasverbruik.
+                        Hoeveel procent gaat u uw woning verwarmen met de airco?
+                        Hoe hoger dit percentage, hoe minder vaak uw cv-ketel hoeft in te schakelen.
+                        Zo bespaart u direct op uw gasverbruik én verlaagt u uw energienota.
                       </TooltipContent>
                     </Tooltip>
                   </TooltipProvider>
@@ -169,7 +169,7 @@ export default function PowerForm({
                 onChange={(event) =>
                   onHeatingShareChange(Number(event.target.value))
                 }
-                className="h-2 w-full cursor-pointer appearance-none rounded-full bg-mist accent-teal"
+                className="heating-share-slider"
               />
             </label>
           </div>

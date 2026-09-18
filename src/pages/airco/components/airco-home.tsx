@@ -22,9 +22,9 @@ const HOME_HIGHLIGHTS = [
 
 const topicButtonClass = (active: boolean) =>
   cn(
-    'inline-flex w-full min-w-0 items-center gap-1.5 rounded-xl px-2 py-3 text-xs leading-snug font-semibold transition focus-visible:ring-2 focus-visible:ring-mint focus-visible:ring-offset-2 focus-visible:ring-offset-[#ebf3ff] focus-visible:outline-none sm:gap-2 sm:px-3 sm:py-3.5 sm:text-sm',
+    'inline-flex w-full min-w-0 items-center gap-1.5 rounded-xl px-2 py-3 text-xs leading-snug font-semibold transition focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:ring-offset-2 focus-visible:ring-offset-[#ebf3ff] focus-visible:outline-none sm:gap-2 sm:px-3 sm:py-3.5 sm:text-sm',
     active
-      ? 'bg-white text-ink shadow-md ring-2 ring-mint'
+      ? 'bg-white text-ink shadow-md ring-2 ring-orange-500'
       : 'bg-[#f0f6ff] text-ink shadow-sm hover:bg-white',
   )
 
@@ -60,12 +60,12 @@ export default function AircoHome() {
       />
       <div className="relative grid items-center gap-10 lg:grid-cols-[1.05fr_0.95fr]">
         <div>
-          <p className="text-sm font-medium tracking-[0.22em] text-teal uppercase">
+          <p className="text-sm font-medium tracking-[0.22em]  text-ink uppercase">
             Duurzame Airconditioning op Maat
           </p>
-          <h1 className="mt-4 font-display text-4xl leading-[1.05] text-ink sm:text-6xl">
+          <h1 className="mt-4 font-display text-4xl leading-[1.05] text-[#2596be] sm:text-6xl">
             Koel in de zomer.
-            <span className="block text-teal">Bespaar in de winter.</span>
+            <span className="block text-ink">Bespaar in de winter.</span>
           </h1>
           <p className="mt-5 text-base text-ink/70 sm:text-lg">
             Bereken het vermogen voor uw ruimte, of bekijk meteen alle Haier-
@@ -80,7 +80,7 @@ export default function AircoHome() {
             <button
               type="button"
               onClick={() => goToSection('vermogen')}
-              className="inline-flex w-full min-w-0 items-center justify-center gap-1.5 rounded-xl bg-mint px-2 py-3 text-xs leading-snug font-semibold text-ink transition hover:bg-mint/90 focus-visible:ring-2 focus-visible:ring-mint focus-visible:ring-offset-2 focus-visible:ring-offset-[#ebf3ff] focus-visible:outline-none sm:gap-2 sm:px-3 sm:py-3.5 sm:text-sm"
+              className="inline-flex w-full min-w-0 items-center justify-center gap-1.5 rounded-xl bg-orange-500 px-2 py-3 text-xs leading-snug font-semibold text-white transition hover:bg-orange-500/90 focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:ring-offset-2 focus-visible:ring-offset-[#ebf3ff] focus-visible:outline-none sm:gap-2 sm:px-3 sm:py-3.5 sm:text-sm"
             >
               <Gauge className="size-4 shrink-0 sm:size-5" aria-hidden />
               <span className="min-w-0 flex-1 text-center">Bereken vermogen</span>

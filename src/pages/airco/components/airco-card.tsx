@@ -360,6 +360,9 @@ export default function AircoCard({
   onSelect,
 }: AircoCardProps) {
   const fits = requiredKw != null && maxCoolingKw(airco) >= requiredKw
+  const showBestChoiceGlow = isBestChoice
+  const showMissGlow = requiredKw != null && !fits
+  const showGlow = showBestChoiceGlow || showMissGlow
   const [previewOpen, setPreviewOpen] = useState(false)
   const ignoreSelectUntilRef = useRef(0)
   const navigate = useNavigate()
@@ -377,7 +380,6 @@ export default function AircoCard({
     onSelect(selected ? null : airco.id)
   }
 
-  const showFitGlow = requiredKw != null
   const coverImage = [...(airco.images ?? [])].sort(
     (left, right) => left.sortOrder - right.sortOrder,
   )[0]
@@ -386,16 +388,16 @@ export default function AircoCard({
     <div
       className={cn(
         'relative h-full rounded-[2rem] transition duration-200',
-        showFitGlow && fits && 'airco-card-shadow--fit',
-        showFitGlow && !fits && 'airco-card-shadow--miss',
+        showBestChoiceGlow && 'airco-card-shadow--fit',
+        showMissGlow && 'airco-card-shadow--miss',
       )}
     >
-      {showFitGlow ? (
+      {showGlow ? (
         <span
           aria-hidden
           className={cn(
             'airco-card-glow rounded-[2rem]',
-            fits ? 'airco-card-glow--fit' : 'airco-card-glow--miss',
+            showBestChoiceGlow ? 'airco-card-glow--fit' : 'airco-card-glow--miss',
           )}
         />
       ) : null}
@@ -415,17 +417,15 @@ export default function AircoCard({
           'group relative z-[1] flex h-full w-full cursor-pointer flex-col overflow-hidden rounded-[2rem] border text-left transition duration-200',
           selected
             ? 'bg-white shadow-[0_22px_48px_rgba(15,118,110,0.16)] ring-4 ring-mint/35'
-            : showFitGlow && !fits
+            : showMissGlow
               ? 'bg-white/80'
-              : showFitGlow
-                ? 'bg-white'
-                : 'bg-white/90 hover:-translate-y-0.5 hover:shadow-[0_16px_36px_rgba(7,20,28,0.08)]',
-          showFitGlow
+              : 'bg-white/90 hover:-translate-y-0.5 hover:shadow-[0_16px_36px_rgba(7,20,28,0.08)]',
+          showGlow
             ? 'border border-transparent'
             : selected
               ? 'border-teal'
               : 'border-mist hover:border-teal/35',
-          showFitGlow && !fits && !selected && 'opacity-70 hover:opacity-90',
+          showMissGlow && !selected && 'opacity-70 hover:opacity-90',
         )}
       >
         {selected ? (
@@ -435,12 +435,10 @@ export default function AircoCard({
           </span>
         ) : null}
 
-        {showFitGlow ? (
-          <span className="sr-only">
-            {fits
-              ? 'Geschikt voor uw berekende vermogen'
-              : 'Onvoldoende vermogen voor uw berekening'}
-          </span>
+        {isBestChoice ? (
+          <span className="sr-only">Beste keuze voor uw berekende vermogen</span>
+        ) : requiredKw != null && !fits ? (
+          <span className="sr-only">Onvoldoende vermogen voor uw berekening</span>
         ) : null}
 
         <div className="flex flex-1 flex-col gap-4 p-6 md:gap-5 md:p-8 2xl:p-10">
@@ -511,7 +509,7 @@ export default function AircoCard({
                   {airco.tag}
                 </p>
                 {isBestChoice ? (
-                  <span className="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-mint/50 bg-mint/20 px-3 py-1.5 text-xs font-semibold tracking-wide text-deep uppercase md:text-[13px]">
+                  <span className="airco-best-choice-badge inline-flex shrink-0 items-center gap-1.5 rounded-full border border-mint/50 bg-mint/20 px-3 py-1.5 text-xs font-semibold tracking-wide text-deep uppercase md:text-[13px]">
                     <Sparkles className="size-3.5" strokeWidth={2.25} aria-hidden />
                     Beste keuze
                   </span>
@@ -535,7 +533,7 @@ export default function AircoCard({
                   className={cn(
                     'mt-1.5 text-base font-semibold text-ink md:text-lg',
                     requiredKw != null && !fits && 'text-ink/35',
-                    requiredKw != null && fits && 'text-teal',
+                    isBestChoice && 'airco-kw-pulse',
                   )}
                 >
                   {kwLabel(airco.coolingKw)}

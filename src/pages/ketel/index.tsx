@@ -30,7 +30,7 @@ function StepHeader({
 }) {
   return (
     <div className="max-w-2xl">
-      <p className="text-xs font-medium tracking-[0.2em] text-teal uppercase">
+      <p className="text-xs font-medium tracking-[0.2em] text-orange-500 uppercase">
         {step}
       </p>
       <h2 className="mt-2 font-display text-3xl text-ink sm:text-4xl">{title}</h2>

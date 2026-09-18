@@ -52,7 +52,7 @@ export default function SavingsPanel({
       className="hero-bg page-block relative mx-2 mt-4 scroll-mt-4 overflow-hidden rounded-3xl px-4 py-8 sm:mx-4 sm:mt-6 sm:px-6 sm:py-12"
     >
       <div className="relative">
-        <p className="text-sm font-medium tracking-[0.2em] text-teal uppercase sm:text-base">
+        <p className="text-sm font-medium tracking-[0.2em] text-orange-500 uppercase sm:text-base">
           Stap 4
         </p>
         <h2 className="mt-2 font-display text-3xl text-ink sm:text-4xl">

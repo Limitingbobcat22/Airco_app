@@ -154,6 +154,17 @@
     box-shadow: 0 8px 22px rgba(7, 20, 28, 0.06);
   }
 
+  .airco-kw-pulse {
+    color: #0f766e;
+    animation: var(--animate-kw-pulse);
+  }
+
+  .airco-best-choice-badge {
+    animation: var(--animate-card-glow-pulse);
+    --glow-dark: #d1fae5;
+    --glow-light: #99f6e4;
+  }
+
   .admin-table-scroll {
     overflow: scroll;
     scrollbar-gutter: stable;
@@ -176,10 +187,73 @@
     background: #ecf8f5;
   }
 
+  .heating-share-slider {
+    --heating-share-track: linear-gradient(to right, #ef4444, #f59e0b, #22c55e);
+    appearance: none;
+    height: 1.125rem;
+    width: 100%;
+    cursor: pointer;
+    background: transparent;
+  }
+
+  .heating-share-slider:focus-visible {
+    outline: 2px solid #0f766e;
+    outline-offset: 4px;
+  }
+
+  .heating-share-slider::-webkit-slider-runnable-track {
+    height: 0.5rem;
+    border-radius: 9999px;
+    background: var(--heating-share-track);
+  }
+
+  .heating-share-slider::-webkit-slider-thumb {
+    appearance: none;
+    width: 1.125rem;
+    height: 1.125rem;
+    margin-top: -0.3125rem;
+    border-radius: 9999px;
+    background: #ffffff;
+    border: 2px solid #07141c;
+    box-shadow: 0 1px 4px rgba(7, 20, 28, 0.25);
+  }
+
+  .heating-share-slider::-moz-range-track {
+    height: 0.5rem;
+    border: none;
+    border-radius: 9999px;
+    background: var(--heating-share-track);
+  }
+
+  .heating-share-slider::-moz-range-progress {
+    background: transparent;
+    height: 0.5rem;
+    border-radius: 9999px;
+  }
+
+  .heating-share-slider::-moz-range-thumb {
+    width: 1.125rem;
+    height: 1.125rem;
+    border: 2px solid #07141c;
+    border-radius: 9999px;
+    background: #ffffff;
+    box-shadow: 0 1px 4px rgba(7, 20, 28, 0.25);
+  }
+
   @media (prefers-reduced-motion: reduce) {
     .airco-card-glow--fit {
       animation: none;
       background: var(--glow-light);
+    }
+
+    .airco-kw-pulse {
+      animation: none;
+      color: #0f766e;
+    }
+
+    .airco-best-choice-badge {
+      animation: none;
+      background: #d1fae5;
     }
   }
 }

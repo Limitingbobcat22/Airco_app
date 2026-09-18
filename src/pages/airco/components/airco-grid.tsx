@@ -51,7 +51,7 @@ export default function AircoGrid({
       className="hero-bg page-block relative mx-2 mt-4 scroll-mt-4 overflow-hidden rounded-3xl px-4 py-8 sm:mx-4 sm:mt-6 sm:px-6 sm:py-12"
     >
       <div className="relative">
-        <p className="text-sm font-medium tracking-[0.2em] text-teal uppercase sm:text-base">
+        <p className="text-sm font-medium tracking-[0.2em] text-orange-500 uppercase sm:text-base">
           Stap 2
         </p>
         <h2 className="mt-2 font-display text-3xl text-ink sm:text-4xl">
@@ -59,7 +59,7 @@ export default function AircoGrid({
         </h2>
         <p className="mt-3 text-ink/70">
           {requiredKw != null
-            ? `Uw ruimte vraagt ${dec.format(requiredKw)} kW. Geschikte modellen zijn groen gemarkeerd, selecteer een model wat bij uw ruimte past.`
+            ? `Uw ruimte vraagt ${dec.format(requiredKw)} kW. De beste keuze is groen gemarkeerd. Selecteer een model dat bij uw ruimte past.`
             : 'Bereken eerst het vermogen in stap 1. Kies daarna zelf een airco die bij dat vermogen past.'}
         </p>
       </div>
