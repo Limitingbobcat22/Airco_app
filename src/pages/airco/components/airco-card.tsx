@@ -416,15 +416,15 @@ export default function AircoCard({
         className={cn(
           'group relative z-[1] flex h-full w-full cursor-pointer flex-col overflow-hidden rounded-[2rem] border text-left transition duration-200',
           selected
-            ? 'bg-white shadow-[0_22px_48px_rgba(15,118,110,0.16)] ring-4 ring-mint/35'
+            ? 'bg-white shadow-[0_22px_48px_rgba(7,20,28,0.12)]'
             : showMissGlow
               ? 'bg-white/80'
               : 'bg-white/90 hover:-translate-y-0.5 hover:shadow-[0_16px_36px_rgba(7,20,28,0.08)]',
           showGlow
             ? 'border border-transparent'
             : selected
-              ? 'border-teal'
-              : 'border-mist hover:border-teal/35',
+              ? 'border-[#9aa6ad]'
+              : 'border-[#e5e7eb] hover:border-[#9aa6ad]',
           showMissGlow && !selected && 'opacity-70 hover:opacity-90',
         )}
       >
@@ -505,11 +505,11 @@ export default function AircoCard({
 
             <div className="flex min-w-0 flex-col">
               <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-2">
-                <p className="text-sm font-medium text-teal md:text-base">
+                <p className="text-sm font-medium text-[#2596be] md:text-base">
                   {airco.tag}
                 </p>
                 {isBestChoice ? (
-                  <span className="airco-best-choice-badge inline-flex shrink-0 items-center gap-1.5 rounded-full border border-mint/50 bg-mint/20 px-3 py-1.5 text-xs font-semibold tracking-wide text-deep uppercase md:text-[13px]">
+                  <span className="airco-best-choice-badge inline-flex shrink-0 items-center gap-1.5 rounded-full border border-[#e5e7eb] bg-[#e5e7eb] px-3 py-1.5 text-xs font-semibold tracking-wide text-ink uppercase md:text-[13px]">
                     <Sparkles className="size-3.5" strokeWidth={2.25} aria-hidden />
                     Beste keuze
                   </span>
@@ -527,7 +527,7 @@ export default function AircoCard({
             <dl className="grid min-w-0 flex-1 grid-cols-1 gap-4 text-left sm:grid-cols-2 sm:gap-0">
               <div className="sm:pr-5">
                 <dt className="text-[11px] tracking-wide text-ink/45 uppercase md:text-xs">
-                  Koel vermogen
+                  Vermogen
                 </dt>
                 <dd
                   className={cn(

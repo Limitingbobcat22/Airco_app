@@ -11,39 +11,35 @@ type AircoGridProps = {
   onSelect: (id: string | null) => void
 }
 
-function compareByBestFit(left: Airco, right: Airco, requiredKw: number | null) {
-  if (requiredKw != null) {
-    const leftFits = maxCoolingKw(left) >= requiredKw
-    const rightFits = maxCoolingKw(right) >= requiredKw
-    if (leftFits !== rightFits) return leftFits ? -1 : 1
-  }
-
-  return left.priceEur - right.priceEur
-}
-
 export default function AircoGrid({
   aircos,
   selectedId,
   requiredKw,
   onSelect,
 }: AircoGridProps) {
-  const sorted = useMemo(
-    () => [...aircos].sort((left, right) => compareByBestFit(left, right, requiredKw)),
-    [aircos, requiredKw],
-  )
+  const visible = useMemo(() => {
+    const list =
+      requiredKw != null
+        ? aircos.filter((airco) => maxCoolingKw(airco) >= requiredKw)
+        : aircos
+
+    return [...list].sort((left, right) => left.priceEur - right.priceEur)
+  }, [aircos, requiredKw])
 
   const bestChoiceId = useMemo(() => {
-    if (requiredKw == null) return null
+    if (requiredKw == null || visible.length === 0) return null
 
-    const suitable = aircos.filter(
-      (airco) => maxCoolingKw(airco) >= requiredKw,
-    )
-    if (suitable.length === 0) return null
-
-    return suitable.reduce((best, airco) =>
+    return visible.reduce((best, airco) =>
       airco.priceEur < best.priceEur ? airco : best,
     ).id
-  }, [aircos, requiredKw])
+  }, [requiredKw, visible])
+
+  const intro =
+    requiredKw == null
+      ? 'Bereken eerst het vermogen in stap 1. Kies daarna zelf een airco die bij dat vermogen past.'
+      : visible.length === 0
+        ? `Uw ruimte vraagt ${dec.format(requiredKw)} kW. Geen van de aircos heeft voldoende koelvermogen. Pas de berekening in stap 1 aan.`
+        : `Uw ruimte vraagt ${dec.format(requiredKw)} kW. Alleen aircos met voldoende koelvermogen worden getoond. De beste keuze is oranje gemarkeerd.`
 
   return (
     <section
@@ -57,24 +53,28 @@ export default function AircoGrid({
         <h2 className="mt-2 font-display text-3xl text-ink sm:text-4xl">
           Kies een airco
         </h2>
-        <p className="mt-3 text-ink/70">
+        <p className="mt-3 text-ink/70">{intro}</p>
+      </div>
+      {visible.length === 0 ? (
+        <p className="relative mt-8 rounded-2xl border border-mist bg-white/70 px-5 py-8 text-center text-sm text-ink/60">
           {requiredKw != null
-            ? `Uw ruimte vraagt ${dec.format(requiredKw)} kW. De beste keuze is groen gemarkeerd. Selecteer een model dat bij uw ruimte past.`
-            : 'Bereken eerst het vermogen in stap 1. Kies daarna zelf een airco die bij dat vermogen past.'}
+            ? 'Er zijn geen passende aircos voor dit vermogen.'
+            : 'Er zijn nog geen aircos beschikbaar.'}
         </p>
-      </div>
-      <div className="relative mt-8 grid gap-6 2xl:grid-cols-2 2xl:gap-8">
-        {sorted.map((airco) => (
-          <AircoCard
-            key={airco.id}
-            airco={airco}
-            selected={selectedId === airco.id}
-            requiredKw={requiredKw}
-            isBestChoice={airco.id === bestChoiceId}
-            onSelect={onSelect}
-          />
-        ))}
-      </div>
+      ) : (
+        <div className="relative mt-8 grid gap-6 2xl:grid-cols-2 2xl:gap-8">
+          {visible.map((airco) => (
+            <AircoCard
+              key={airco.id}
+              airco={airco}
+              selected={selectedId === airco.id}
+              requiredKw={requiredKw}
+              isBestChoice={airco.id === bestChoiceId}
+              onSelect={onSelect}
+            />
+          ))}
+        </div>
+      )}
     </section>
   )
 }

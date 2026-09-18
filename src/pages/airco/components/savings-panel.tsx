@@ -66,7 +66,7 @@ export default function SavingsPanel({
 
       <div className="relative mt-8 grid gap-4 lg:grid-cols-3">
         <div className="rounded-3xl border border-mist bg-white p-5 sm:p-6">
-          <p className="text-xs font-medium tracking-wide text-teal uppercase">
+          <p className="text-xs font-medium tracking-wide text-[#2596be] uppercase">
             Uw ruimte
           </p>
           <dl className="mt-4 space-y-3 text-sm text-ink/75">
@@ -100,7 +100,7 @@ export default function SavingsPanel({
         </div>
 
         <div className="rounded-3xl border border-mist bg-white p-5 sm:p-6">
-          <p className="text-xs font-medium tracking-wide text-teal uppercase">
+          <p className="text-xs font-medium tracking-wide text-[#2596be] uppercase">
             Geschat netto voordeel
           </p>
           <p className="mt-3 font-display text-3xl text-ink">
@@ -135,8 +135,8 @@ export default function SavingsPanel({
           </dl>
         </div>
 
-        <div className="rounded-3xl bg-deep p-5 text-white sm:p-6">
-          <p className="text-xs font-medium tracking-wide text-mint uppercase">
+        <div className="rounded-3xl bg-[#002451] p-5 text-white sm:p-6">
+          <p className="text-xs font-medium tracking-wide text-[#2596be] uppercase">
             Volgende stap
           </p>
           <p className="mt-3 font-display text-2xl leading-snug sm:text-3xl">
@@ -171,7 +171,7 @@ export default function SavingsPanel({
               <button
                 type="button"
                 onClick={onClick}
-                className="mt-6 w-full rounded-xl bg-mint py-3 text-sm font-semibold text-ink hover:bg-white"
+                className="mt-6 w-full rounded-xl bg-orange-500 py-3 text-sm font-semibold text-white hover:bg-orange-500/90"
               >
                 Offerte aanvragen
               </button>

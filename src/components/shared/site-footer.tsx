@@ -59,7 +59,7 @@ const SOCIAL_ICONS = {
 
 function FooterHeading({ children }: { children: ReactNode }) {
   return (
-    <h2 className="text-xs font-semibold tracking-[0.22em] text-mint uppercase">
+    <h2 className="text-xs font-semibold tracking-[0.22em] text-orange-500 uppercase">
       {children}
     </h2>
   )
@@ -67,7 +67,7 @@ function FooterHeading({ children }: { children: ReactNode }) {
 
 function footerLinkClass(className?: string) {
   return cn(
-    'text-sm text-white/70 transition hover:text-mint focus-visible:rounded-md focus-visible:text-mint focus-visible:ring-2 focus-visible:ring-mint focus-visible:outline-none',
+    'text-sm text-white/70 transition hover:text-orange-500 focus-visible:rounded-md focus-visible:text-orange-500 focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:outline-none',
     className,
   )
 }
@@ -148,8 +148,7 @@ export default function SiteFooter() {
       aria-label="Footer"
       className="mx-2 mt-4 pb-2 sm:mx-4 sm:mt-6 sm:pb-4"
     >
-      <footer className="page-block overflow-hidden rounded-3xl bg-navy text-white">
-      <div className="h-1 bg-gradient-to-r from-teal via-mint to-teal" />
+      <footer className="page-block overflow-hidden rounded-3xl bg-[#002451] text-white">
       <div className="px-5 py-10 sm:px-8 sm:py-12">
         <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-4 lg:gap-8">
           <div className="sm:col-span-2 lg:col-span-1">
@@ -162,7 +161,7 @@ export default function SiteFooter() {
               <span className="sr-only">{COMPANY.name}</span>
             </FooterRouteLink>
             <p className="mt-4 font-display text-2xl text-white">{COMPANY.name}</p>
-            <p className="mt-1 text-xs font-medium tracking-[0.14em] text-mint uppercase">
+            <p className="mt-1 text-xs font-medium tracking-[0.14em] text-orange-500 uppercase">
               {COMPANY.tagline}
             </p>
             <p className="mt-3 max-w-xs text-sm leading-relaxed text-white/70">
@@ -178,7 +177,7 @@ export default function SiteFooter() {
                       target="_blank"
                       rel="noreferrer"
                       aria-label={social.label}
-                      className="grid size-11 place-items-center rounded-2xl border border-white/15 bg-white/5 text-white transition hover:border-mint/60 hover:bg-mint hover:text-ink focus-visible:ring-2 focus-visible:ring-mint focus-visible:outline-none"
+                      className="grid size-11 place-items-center rounded-2xl border border-white/15 bg-white/5 text-white transition hover:border-orange-500/60 hover:bg-orange-500 hover:text-white focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:outline-none"
                     >
                       <Icon className="size-5" />
                     </a>

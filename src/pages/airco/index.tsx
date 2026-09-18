@@ -13,6 +13,7 @@ import SavingsPanel from './components/savings-panel'
 import {
   applyCapacity,
   calculateRequiredPower,
+  maxCoolingKw,
   POWER_DEFAULTS,
 } from './lib/power'
 import { SAVINGS_DEFAULTS, calculateSavings } from './lib/savings'
@@ -76,6 +77,14 @@ export default function AircoPage() {
       }),
     [areaM2, heightM, heatingSharePct],
   )
+
+  useEffect(() => {
+    if (!selectedId || power == null) return
+    const selectedAirco = aircos.find((airco) => airco.id === selectedId)
+    if (selectedAirco && maxCoolingKw(selectedAirco) < power.requiredKw) {
+      setSelectedId(null)
+    }
+  }, [aircos, power, selectedId])
 
   const markAdjusted = () => setHasAdjustedConsumption(true)
 

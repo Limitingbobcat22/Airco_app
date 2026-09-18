@@ -97,9 +97,11 @@
     0%,
     100% {
       background: var(--glow-dark);
+      border-color: var(--glow-dark);
     }
     50% {
       background: var(--glow-light);
+      border-color: var(--glow-light);
     }
   }
 }
@@ -133,8 +135,8 @@
   }
 
   .airco-card-glow--fit {
-    --glow-dark: #0f766e;
-    --glow-light: #3ee0c0;
+    --glow-dark: #9aa6ad;
+    --glow-light: #ea580c;
     animation: var(--animate-card-glow-pulse);
   }
 
@@ -145,9 +147,9 @@
 
   .airco-card-shadow--fit {
     box-shadow:
-      0 0 0 1px rgba(15, 118, 110, 0.28),
-      0 0 18px rgba(62, 224, 192, 0.22),
-      0 10px 28px rgba(15, 118, 110, 0.12);
+      0 0 0 1px rgba(154, 166, 173, 0.32),
+      0 0 18px rgba(234, 88, 12, 0.22),
+      0 10px 28px rgba(154, 166, 173, 0.12);
   }
 
   .airco-card-shadow--miss {
@@ -160,9 +162,9 @@
   }
 
   .airco-best-choice-badge {
+    --glow-dark: #e5e7eb;
+    --glow-light: #ea580c;
     animation: var(--animate-card-glow-pulse);
-    --glow-dark: #d1fae5;
-    --glow-light: #99f6e4;
   }
 
   .admin-table-scroll {
@@ -253,7 +255,8 @@
 
     .airco-best-choice-badge {
       animation: none;
-      background: #d1fae5;
+      background: #e5e7eb;
+      border-color: #e5e7eb;
     }
   }
 }
