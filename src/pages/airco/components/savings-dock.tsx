@@ -26,14 +26,14 @@ function Tile({
       className={cn(
         'min-w-0 rounded-2xl border px-3 py-2.5 shadow-sm sm:px-4 sm:py-3',
         accent
-          ? 'border-mint/50 bg-mint text-ink'
+          ? 'border-orange-500/50 bg-orange-500 text-white'
           : 'border-mist bg-white text-ink',
       )}
     >
       <p
         className={cn(
-          'text-[11px] font-medium sm:text-xs',
-          accent ? 'text-ink/70' : 'text-ink/50',
+          'font-medium',
+          accent ? 'text-sm text-white/80 sm:text-base' : 'text-[11px] text-ink/50 sm:text-xs',
         )}
       >
         {label}
@@ -43,8 +43,8 @@ function Tile({
       </p>
       <p
         className={cn(
-          'mt-0.5 truncate text-[10px] sm:text-xs',
-          accent ? 'text-ink/55' : 'text-ink/40',
+          'mt-0.5 truncate',
+          accent ? 'text-xs text-white/70 sm:text-sm' : 'text-[10px] text-ink/40 sm:text-xs',
         )}
       >
         {hint}
