@@ -121,7 +121,7 @@ export default function AppNav({
             <Link
               to={href}
               className={cn(
-                'flex items-center overflow-hidden rounded-md py-2.5 text-base font-medium hover:text-muted-foreground',
+                'flex items-center overflow-hidden rounded-md py-2.5 text-base font-medium hover:text-orange-500',
                 shouldShowIconOnly ? 'justify-center px-2' : 'gap-2.5',
                 active
                   ? 'bg-orange-500 text-white hover:text-white'

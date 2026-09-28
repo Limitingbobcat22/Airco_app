@@ -29,9 +29,6 @@ export default function HandleidingenPage() {
           <div className="hero-bg relative flex-1 overflow-hidden px-4 py-10 sm:px-6 sm:py-14">
             <div className="relative mx-auto max-w-6xl">
               <div className="max-w-3xl">
-                <p className="text-xs font-medium tracking-[0.2em] text-teal uppercase">
-                  Documentatie
-                </p>
                 <h1 className="mt-2 font-display text-3xl text-ink sm:text-5xl">
                   Handleidingen
                 </h1>

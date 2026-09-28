@@ -50,7 +50,7 @@ export default function SidebarAuthFooter({
                 type="button"
                 onClick={handleLogout}
                 className={cn(
-                  'hover:text-muted-foreground flex w-full items-center rounded-md py-2.5 text-base font-medium',
+                  'hover:text-orange-500 flex w-full items-center rounded-md py-2.5 text-base font-medium',
                   isCollapsed && !isMobileNav
                     ? 'justify-center px-2'
                     : 'gap-2.5',
@@ -78,7 +78,7 @@ export default function SidebarAuthFooter({
                 type="button"
                 onClick={handleLogin}
                 className={cn(
-                  'hover:text-muted-foreground flex w-full items-center rounded-md py-2.5 text-base font-medium',
+                  'hover:text-orange-500 flex w-full items-center rounded-md py-2.5 text-base font-medium',
                   isCollapsed && !isMobileNav
                     ? 'justify-center px-2'
                     : 'gap-2.5',

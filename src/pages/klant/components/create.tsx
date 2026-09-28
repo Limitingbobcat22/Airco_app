@@ -320,7 +320,7 @@ export default function CreateKlantForm({
         <button
           type="submit"
           disabled={submitting}
-          className="inline-flex items-center justify-center gap-2 rounded-xl bg-sky-100 px-5 py-3 text-sm font-semibold text-ink hover:bg-white disabled:opacity-60"
+          className="inline-flex items-center justify-center gap-2 rounded-xl bg-sky-400 px-5 py-3 text-sm font-semibold text-ink hover:bg-sky-300 disabled:opacity-60"
         >
           <Send className="size-4" aria-hidden />
           {submitting ? 'Versturen…' : 'Verzend Email'}
