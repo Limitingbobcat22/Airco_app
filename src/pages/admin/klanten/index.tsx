@@ -1,23 +1,15 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import {
-  flexRender,
   getCoreRowModel,
   useReactTable,
   type ColumnDef,
 } from '@tanstack/react-table'
 import { Pencil, Plus, Trash2 } from 'lucide-react'
+import { AdminResponsiveTable } from '@/components/shared/admin-responsive-table'
 import Heading from '@/components/shared/heading'
 import { Button } from '@/components/ui/button'
 import { Modal } from '@/components/ui/modal'
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table'
 import { useAuth } from '@/hooks/use-auth'
 import {
   createKlant,
@@ -220,7 +212,6 @@ export default function AdminKlantenPage() {
     getRowId: (row) => row.id,
   })
 
-  const visibleColumnCount = table.getVisibleLeafColumns().length
   const saveError = editing ? updateMutation.error : createMutation.error
   const formError = saveError instanceof Error ? saveError.message : null
   const fullName = (klant: Klant | null) =>
@@ -233,13 +224,17 @@ export default function AdminKlantenPage() {
           title="Klanten beheer"
           description="NAW-gegevens van klanten. Aanmaken kan via de offerte-popup; bekijken, wijzigen en verwijderen is alleen voor admins."
         />
-        <Button type="button" onClick={openCreate} className="gap-2">
+        <Button
+          type="button"
+          onClick={openCreate}
+          className="gap-2 bg-sky-400 text-white shadow hover:bg-sky-500"
+        >
           <Plus className="size-4" />
           Toevoegen
         </Button>
       </div>
 
-      <div className="min-h-0 flex-1 overflow-hidden p-4 sm:p-6">
+      <div className="flex min-h-0 flex-1 flex-col overflow-hidden p-4 sm:p-6">
         {isLoading ? (
           <div className="text-muted-foreground rounded-xl border p-8 text-center text-sm">
             Klanten laden…
@@ -262,54 +257,11 @@ export default function AdminKlantenPage() {
             </Button>
           </div>
         ) : (
-          <div className="admin-table-scroll h-[75%] rounded-xl border">
-            <Table className="w-max min-w-full">
-              <TableHeader>
-                {table.getHeaderGroups().map((headerGroup) => (
-                  <TableRow
-                    key={headerGroup.id}
-                    className="bg-muted/40 hover:bg-muted/40"
-                  >
-                    {headerGroup.headers.map((header) => (
-                      <TableHead key={header.id} className="whitespace-nowrap">
-                        {header.isPlaceholder
-                          ? null
-                          : flexRender(
-                              header.column.columnDef.header,
-                              header.getContext(),
-                            )}
-                      </TableHead>
-                    ))}
-                  </TableRow>
-                ))}
-              </TableHeader>
-              <TableBody>
-                {table.getRowModel().rows.length ? (
-                  table.getRowModel().rows.map((row) => (
-                    <TableRow key={row.id}>
-                      {row.getVisibleCells().map((cell) => (
-                        <TableCell key={cell.id} className="whitespace-nowrap">
-                          {flexRender(
-                            cell.column.columnDef.cell,
-                            cell.getContext(),
-                          )}
-                        </TableCell>
-                      ))}
-                    </TableRow>
-                  ))
-                ) : (
-                  <TableRow>
-                    <TableCell
-                      colSpan={visibleColumnCount || 1}
-                      className="text-muted-foreground h-24 text-center"
-                    >
-                      Nog geen klanten.
-                    </TableCell>
-                  </TableRow>
-                )}
-              </TableBody>
-            </Table>
-          </div>
+          <AdminResponsiveTable
+            table={table}
+            emptyMessage="Nog geen klanten."
+            titleColumnIds={['name']}
+          />
         )}
       </div>
 

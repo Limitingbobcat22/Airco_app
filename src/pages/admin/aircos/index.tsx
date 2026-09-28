@@ -1,25 +1,17 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import {
-  flexRender,
   getCoreRowModel,
   useReactTable,
   type ColumnDef,
   type VisibilityState,
 } from '@tanstack/react-table'
 import { Pencil, Plus, Trash2 } from 'lucide-react'
+import { AdminResponsiveTable } from '@/components/shared/admin-responsive-table'
 import Heading from '@/components/shared/heading'
 import { Button } from '@/components/ui/button'
 import { Modal } from '@/components/ui/modal'
 import { MultiSelect } from '@/components/ui/multi-select'
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table'
 import { useAuth } from '@/hooks/use-auth'
 import { createAirco, deleteAirco, deleteAircoImage, listAircos, updateAirco, uploadAircoImage } from '@/lib/api/aircos'
 import type { Airco } from '@/pages/airco/data/aircos'
@@ -472,16 +464,14 @@ export default function AdminAircosPage() {
     getRowId: (row) => row.id,
   })
 
-  const visibleColumnCount = table.getVisibleLeafColumns().length
-
   return (
     <div className="flex h-full flex-col overflow-hidden">
-      <div className="flex flex-col gap-4 border-b px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
+      <div className="flex flex-col gap-4 border-b px-4 py-4 xl:px-6">
         <Heading
           title="Aircos beheer"
           description="Airco-modellen uit de API. Standaard 6 kolommen; voeg er meer toe via Kolommen."
         />
-        <div className="flex w-full flex-wrap items-center gap-2 sm:w-auto sm:min-w-[36rem] sm:max-w-4xl sm:justify-end">
+        <div className="flex w-full flex-col items-stretch gap-3 xl:flex-row xl:items-center">
           <span className="shrink-0 text-sm font-medium">Kolommen:</span>
           <MultiSelect
             value={visibleColumns}
@@ -490,16 +480,20 @@ export default function AdminAircosPage() {
             onClear={resetColumnVisibility}
             placeholder="Selecteer kolommen"
             variant="inverted"
-            className="min-w-[20rem] flex-1 sm:min-w-[32rem]"
+            className="w-full xl:min-w-0 xl:flex-1"
           />
-          <Button type="button" onClick={openCreate} className="shrink-0 gap-2">
+          <Button
+            type="button"
+            onClick={openCreate}
+            className="w-full gap-2 bg-sky-400 text-white shadow hover:bg-sky-500 xl:w-auto"
+          >
             <Plus className="size-4" />
             Toevoegen
           </Button>
         </div>
       </div>
 
-      <div className="min-h-0 flex-1 overflow-hidden p-4 sm:p-6">
+      <div className="flex min-h-0 flex-1 flex-col overflow-hidden p-4 sm:p-6">
         {isLoading ? (
           <div className="text-muted-foreground rounded-xl border p-8 text-center text-sm">
             Aircos laden…
@@ -522,54 +516,11 @@ export default function AdminAircosPage() {
             </Button>
           </div>
         ) : (
-          <div className="admin-table-scroll h-[75%] rounded-xl border">
-            <Table className="w-max min-w-full">
-              <TableHeader>
-                {table.getHeaderGroups().map((headerGroup) => (
-                  <TableRow
-                    key={headerGroup.id}
-                    className="bg-muted/40 hover:bg-muted/40"
-                  >
-                    {headerGroup.headers.map((header) => (
-                      <TableHead key={header.id} className="whitespace-nowrap">
-                        {header.isPlaceholder
-                          ? null
-                          : flexRender(
-                              header.column.columnDef.header,
-                              header.getContext(),
-                            )}
-                      </TableHead>
-                    ))}
-                  </TableRow>
-                ))}
-              </TableHeader>
-              <TableBody>
-                {table.getRowModel().rows.length ? (
-                  table.getRowModel().rows.map((row) => (
-                    <TableRow key={row.id}>
-                      {row.getVisibleCells().map((cell) => (
-                        <TableCell key={cell.id} className="whitespace-nowrap">
-                          {flexRender(
-                            cell.column.columnDef.cell,
-                            cell.getContext(),
-                          )}
-                        </TableCell>
-                      ))}
-                    </TableRow>
-                  ))
-                ) : (
-                  <TableRow>
-                    <TableCell
-                      colSpan={visibleColumnCount || 1}
-                      className="text-muted-foreground h-24 text-center"
-                    >
-                      Geen aircos gevonden.
-                    </TableCell>
-                  </TableRow>
-                )}
-              </TableBody>
-            </Table>
-          </div>
+          <AdminResponsiveTable
+            table={table}
+            emptyMessage="Geen aircos gevonden."
+            titleColumnIds={['brand', 'model']}
+          />
         )}
       </div>
 

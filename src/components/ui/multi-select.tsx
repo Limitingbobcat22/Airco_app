@@ -156,8 +156,8 @@ export const MultiSelect = React.forwardRef<
             )}
           >
             {selectedValues.length > 0 ? (
-              <div className="flex w-full items-center justify-between">
-                <div className="flex flex-wrap items-center">
+              <div className="flex w-full items-center justify-between gap-1">
+                <div className="flex min-w-0 flex-1 flex-wrap items-center">
                   {selectedValues.slice(0, maxCount).map((item) => {
                     const option = options.find((o) => o.value === item)
                     const IconComponent = option?.icon
