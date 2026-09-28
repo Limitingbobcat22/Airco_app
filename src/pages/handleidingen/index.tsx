@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { BookOpen, Eye } from 'lucide-react'
+import { PdfDocumentPreview } from '@/components/shared/pdf-document-preview'
 import SiteFooter from '@/components/shared/site-footer'
 import { Modal } from '@/components/ui/modal'
 import {
@@ -108,10 +109,9 @@ export default function HandleidingenPage() {
             ) : null}
           </div>
           {preview ? (
-            <iframe
+            <PdfDocumentPreview
+              url={handleidingFileUrl(preview)}
               title={preview.title}
-              src={handleidingFileUrl(preview)}
-              className="h-[70dvh] w-full rounded-xl border border-mist bg-white"
             />
           ) : null}
         </div>

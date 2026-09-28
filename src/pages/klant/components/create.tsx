@@ -110,7 +110,7 @@ export default function CreateKlantForm({
       className="space-y-5 py-2 pb-4"
     >
       <div>
-        <h2 className="text-xl font-medium tracking-[0.2em] text-teal uppercase">
+        <h2 className="text-xl font-medium tracking-[0.2em] text-[#74b8f8] uppercase">
           Offerte
         </h2>
         <p className="mt-2 text-sm text-ink/70">
@@ -119,7 +119,7 @@ export default function CreateKlantForm({
         </p>
       </div>
 
-      <div className="rounded-2xl border border-mist bg-foam px-4 py-3 text-sm text-ink/75">
+      <div className="rounded-2xl border border-sky-200 bg-sky-100 px-4 py-3 text-sm text-ink/75">
         <p className="font-medium text-ink">Algemene informatie</p>
         <ul className="mt-2 list-disc space-y-1.5 pl-4">
           <li>
@@ -320,7 +320,7 @@ export default function CreateKlantForm({
         <button
           type="submit"
           disabled={submitting}
-          className="inline-flex items-center justify-center gap-2 rounded-xl bg-mint px-5 py-3 text-sm font-semibold text-ink hover:bg-white disabled:opacity-60"
+          className="inline-flex items-center justify-center gap-2 rounded-xl bg-sky-100 px-5 py-3 text-sm font-semibold text-ink hover:bg-white disabled:opacity-60"
         >
           <Send className="size-4" aria-hidden />
           {submitting ? 'Versturen…' : 'Verzend Email'}

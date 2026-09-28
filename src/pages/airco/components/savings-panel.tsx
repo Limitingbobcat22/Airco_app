@@ -201,28 +201,6 @@ export default function SavingsPanel({
           </p>
         </div>
       </div>
-
-      <div className="relative mt-4 rounded-3xl border border-mist bg-white p-5 sm:p-6">
-        <h3 className="font-display text-xl">Uitgangspunten</h3>
-        <ul className="mt-4 grid gap-3 text-sm text-ink/75 lg:grid-cols-2">
-          <li>
-            {heatingSharePct}% van uw jaarlijkse gasverbruik wordt vervangen
-            door verwarming via de airco.
-          </li>
-          <li>
-            1 m³ gas ≈ {SAVINGS_CONSTANTS.gasKwhPerM3} kWh warmte. De airco
-            levert die warmte met SCOP {dec.format(airco.scop)}.
-          </li>
-          <li>
-            Tarieven: gas {eurExact.format(gasPrice)}/m³, stroom{' '}
-            {eurExact.format(elecPrice)}/kWh.
-          </li>
-          <li>
-            CO₂-reductie: {SAVINGS_CONSTANTS.co2GasKgPerM3} kg per m³
-            bespaard gas.
-          </li>
-        </ul>
-      </div>
     </section>
   )
 }

@@ -116,7 +116,7 @@ function SpecRow({
     <div
       className={cn(
         'flex items-baseline justify-between gap-4 px-3 py-2.5 text-sm',
-        striped ? 'bg-foam/80' : 'bg-white',
+        striped ? 'bg-[#ebf3ff]' : 'bg-white',
       )}
     >
       <dt className="text-ink/55">{label}</dt>
@@ -212,7 +212,7 @@ function AircoPhotoPreview({
           <h3 className="mt-1 font-display text-2xl text-ink sm:text-3xl">
             {airco.brand} {airco.model}
           </h3>
-          <p className="mt-1 text-sm text-ink/60">{airco.tag}</p>
+          <p className="mt-1 text-sm font-medium text-[#74b8f8]">{airco.tag}</p>
         </div>
 
         <div className="relative">
@@ -277,9 +277,9 @@ function AircoPhotoPreview({
               className={cn(
                 'h-2 rounded-full transition',
                 photoIndex === index
-                  ? 'w-6 bg-teal'
+                  ? 'w-6 bg-orange-500'
                   : item.src
-                    ? 'w-2 bg-teal/45 hover:bg-teal/70'
+                    ? 'w-2 bg-orange-500/45 hover:bg-orange-500/70'
                     : 'w-2 bg-ink/20 hover:bg-ink/35',
               )}
               aria-label={`Ga naar ${item.label}`}
@@ -294,7 +294,7 @@ function AircoPhotoPreview({
           <p className="font-display text-2xl text-ink sm:text-3xl">
             {airco.brand} {airco.model} airco
           </p>
-          <p className="mt-2 text-base font-semibold text-teal">
+          <p className="mt-2 text-base font-semibold text-[#74b8f8]">
             Geschatte prijs: {eurExact.format(airco.priceEur)} incl. standaard montage
           </p>
           <p className="mt-3 text-sm leading-relaxed text-ink/70 sm:text-[15px]">
@@ -505,7 +505,7 @@ export default function AircoCard({
 
             <div className="flex min-w-0 flex-col">
               <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-2">
-                <p className="text-sm font-medium text-[#2596be] md:text-base">
+                <p className="text-sm font-medium text-[#74b8f8] md:text-base">
                   {airco.tag}
                 </p>
                 {isBestChoice ? (
