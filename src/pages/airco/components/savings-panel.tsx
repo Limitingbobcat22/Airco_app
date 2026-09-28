@@ -1,14 +1,7 @@
 import PopupModal from '@/components/shared/popup-modal'
 import { CreateKlantForm } from '@/pages/klant'
 import type { Airco } from '../data/aircos'
-import {
-  SAVINGS_CONSTANTS,
-  dec,
-  eur,
-  eurExact,
-  num,
-  type SavingsResult,
-} from '../lib/savings'
+import { dec, eur, num, type SavingsResult } from '../lib/savings'
 
 type SavingsPanelProps = {
   airco: Airco | null
