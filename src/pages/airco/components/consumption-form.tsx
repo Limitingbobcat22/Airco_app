@@ -1,3 +1,5 @@
+import { ArrowRight } from 'lucide-react'
+import { useGoToSection } from '@/hooks/use-go-to-section'
 import type { Airco } from '../data/aircos'
 import { dec } from '../lib/savings'
 
@@ -58,6 +60,8 @@ export default function ConsumptionForm({
   onGasPriceChange,
   onElecPriceChange,
 }: ConsumptionFormProps) {
+  const goToSection = useGoToSection()
+
   return (
     <section
       id="verbruik"
@@ -123,6 +127,17 @@ export default function ConsumptionForm({
                 Kies eerst een airco in stap 2 om de besparing te berekenen.
               </p>
             )}
+
+            <div className="mt-6 flex justify-start">
+              <button
+                type="button"
+                onClick={() => goToSection('overzicht')}
+                className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#74b8f8] px-5 py-2.5 text-sm font-semibold text-ink transition hover:bg-[#5aa6ef] focus-visible:ring-2 focus-visible:ring-[#74b8f8] focus-visible:outline-none"
+              >
+                Naar overzicht
+                <ArrowRight className="size-4" aria-hidden />
+              </button>
+            </div>
         </form>
       </div>
     </section>

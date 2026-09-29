@@ -142,7 +142,6 @@ function AircoPhotoPreview({
     return {
       ...slot,
       src: image ? aircoImageUrl(image.url) : null,
-      imageLabel: image?.label || slot.label,
     }
   })
   const photo = photos[index]
@@ -226,7 +225,7 @@ function AircoPhotoPreview({
             {photo.src ? (
               <img
                 src={photo.src}
-                alt={`${airco.brand} ${airco.model} — ${photo.imageLabel}`}
+                alt={`${airco.brand} ${airco.model}`}
                 className="absolute inset-0 size-full object-contain p-4"
               />
             ) : (
@@ -234,7 +233,6 @@ function AircoPhotoPreview({
                 <span className="grid size-14 place-items-center rounded-full bg-white/80 text-ink/35 shadow-sm">
                   <ImageIcon className="size-7" aria-hidden />
                 </span>
-                <p className="font-medium text-ink/70">{photo.label}</p>
                 <p className="max-w-sm text-sm text-ink/45">
                   {photo.hint} — later komt hier de echte foto van {airco.brand}{' '}
                   {airco.model}.
@@ -243,8 +241,7 @@ function AircoPhotoPreview({
             )}
             {photo.src ? (
               <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-ink/55 to-transparent px-5 py-4 text-left text-white">
-                <p className="text-sm font-medium">{photo.imageLabel}</p>
-                <p className="text-xs text-white/80">{photo.hint}</p>
+                <p className="text-sm font-medium">{photo.hint}</p>
               </div>
             ) : null}
           </div>
@@ -282,7 +279,7 @@ function AircoPhotoPreview({
                     ? 'w-2 bg-orange-500/45 hover:bg-orange-500/70'
                     : 'w-2 bg-ink/20 hover:bg-ink/35',
               )}
-              aria-label={`Ga naar ${item.label}`}
+              aria-label={`Ga naar ${item.hint}`}
               aria-current={photoIndex === index}
             />
           ))}

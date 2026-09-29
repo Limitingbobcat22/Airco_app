@@ -82,7 +82,7 @@ export function UnsavedChangesProvider({ children }: { children: ReactNode }) {
             <button
               type="button"
               onClick={confirmLeave}
-              className="rounded-xl bg-deep px-5 py-2.5 text-sm font-semibold text-white hover:bg-teal"
+              className="rounded-xl bg-[#74b8f8] px-5 py-2.5 text-sm font-semibold text-ink transition hover:bg-[#5aa6ef]"
             >
               Naar {pending?.label ?? '…'}
             </button>

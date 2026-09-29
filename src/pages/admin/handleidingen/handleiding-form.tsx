@@ -185,7 +185,7 @@ export default function HandleidingForm({
         <button
           type="submit"
           disabled={submitting}
-          className="rounded-xl bg-deep px-5 py-2.5 text-sm font-semibold text-white hover:bg-teal disabled:opacity-60"
+          className="rounded-xl bg-[#74b8f8] px-5 py-2.5 text-sm font-semibold text-ink transition hover:bg-[#5aa6ef] disabled:opacity-60"
         >
           {submitting
             ? isEdit

@@ -614,7 +614,7 @@ export default function AircoAdminEdit({
             <button
               type="submit"
               disabled={submitting}
-              className="rounded-xl bg-mint px-5 py-2.5 text-sm font-semibold text-ink hover:bg-white disabled:opacity-60"
+              className="rounded-xl bg-[#74b8f8] px-5 py-2.5 text-sm font-semibold text-ink transition hover:bg-[#5aa6ef] disabled:opacity-60"
             >
               {submitting ? 'Opslaan…' : 'Opslaan'}
             </button>

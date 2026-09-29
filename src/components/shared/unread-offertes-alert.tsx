@@ -84,7 +84,7 @@ export default function UnreadOffertesAlert() {
           <button
             type="button"
             onClick={goToOffertes}
-            className="rounded-xl bg-deep px-5 py-2.5 text-sm font-semibold text-white hover:bg-teal"
+            className="rounded-xl bg-[#74b8f8] px-5 py-2.5 text-sm font-semibold text-ink transition hover:bg-[#5aa6ef]"
           >
             Naar offertes beheer
           </button>

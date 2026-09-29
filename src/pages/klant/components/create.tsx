@@ -83,19 +83,19 @@ export default function CreateKlantForm({
   if (submitted) {
     return (
       <div className="py-6 text-center">
-        <p className="text-xs font-medium tracking-[0.2em] text-teal uppercase">
+        <p className="text-xs font-medium tracking-[0.2em] text-[#74b8f8] uppercase">
           Aanvraag ontvangen
         </p>
         <h2 className="mt-2 font-display text-2xl text-ink sm:text-3xl">
           Bedankt, {form.firstName}
         </h2>
         <p className="mt-3 text-sm text-ink/70">
-          Wij nemen zo snel mogelijk contact met u op over uw offerte.
+          Wij nemen zo snel mogelijk telefonisch contact met u op over uw offerte.
         </p>
         <button
           type="button"
           onClick={onClose}
-          className="mt-6 w-full rounded-xl bg-deep py-3 text-sm font-semibold text-white hover:bg-teal sm:w-auto sm:px-8"
+          className="mt-6 w-full rounded-xl bg-[#74b8f8] py-3 text-sm font-semibold text-ink transition hover:bg-[#5aa6ef] sm:w-auto sm:px-8"
         >
           Sluiten
         </button>

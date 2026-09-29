@@ -244,7 +244,7 @@ export default function KlantAdminForm({
         <button
           type="submit"
           disabled={submitting || (!initial && !form.consentContact)}
-          className="rounded-xl bg-mint px-5 py-3 text-sm font-semibold text-ink hover:bg-white disabled:opacity-60"
+          className="rounded-xl bg-[#74b8f8] px-5 py-3 text-sm font-semibold text-ink transition hover:bg-[#5aa6ef] disabled:opacity-60"
         >
           {submitting ? 'Opslaan…' : 'Opslaan'}
         </button>
