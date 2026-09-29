@@ -12,7 +12,7 @@ export default function BrandMark({
   if (withText) {
     return (
       <img
-        src="/images/LogoMetNaam-removebg.png"
+        src="/images/logo-wordmark-2026.png"
         alt="Airco & Warmte"
         width={895}
         height={279}
@@ -23,7 +23,7 @@ export default function BrandMark({
 
   return (
     <img
-      src="/images/logo-icon.png"
+      src="/images/logo-icon-2026.png"
       alt="Airco & Warmte"
       width={500}
       height={500}

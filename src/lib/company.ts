@@ -5,7 +5,7 @@ export const COMPANY = {
   description:
     'Aircos en ketels, vakkundig geplaatst door onze eigen monteurs. Koel in de zomer, bespaar in de winter.',
   email: 'info@aircoenwarmte.nl',
-  phoneDisplay: '06 12 34 56 78',
+  phoneDisplay: '+31644454681',
   phoneHref: 'tel:+31612345678',
   addressLines: ['Nederland'],
   kvk: '12345678',
