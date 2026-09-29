@@ -152,7 +152,11 @@ export default function LoginModal() {
           </p>
         ) : null}
 
-        <Button type="submit" className="w-full" disabled={isLoading}>
+        <Button
+          type="submit"
+          className="w-full bg-sky-400 text-white shadow hover:bg-sky-500"
+          disabled={isLoading}
+        >
           {isLoading ? 'Bezig…' : 'Inloggen'}
         </Button>
       </form>
