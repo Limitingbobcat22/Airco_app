@@ -12,7 +12,7 @@ export default function BrandMark({
   if (withText) {
     return (
       <img
-        src="/images/logo-wordmark-2026.png"
+        src="/images/ANW-Full-Logo-SVG.svg"
         alt="Airco & Warmte"
         width={895}
         height={279}
