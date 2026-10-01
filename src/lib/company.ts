@@ -3,7 +3,7 @@ export const COMPANY = {
   name: 'Airco & Warmte',
   tagline: 'Klimaattechniek en duurzame warmte',
   description:
-    'Aircos en ketels, vakkundig geplaatst door onze eigen monteurs. Koel in de zomer, bespaar in de winter.',
+    'Aircos en ketels, vakkundig geplaatst door onze eigen monteurs. Fris in de zomer, voordelig in de winter.',
   email: 'info@aircoenwarmte.nl',
   phoneDisplay: '+31644454681',
   phoneHref: 'tel:+31644454681',
