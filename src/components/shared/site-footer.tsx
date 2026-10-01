@@ -57,6 +57,29 @@ const SOCIAL_ICONS = {
   tiktok: TikTokIcon,
 } as const
 
+function FooterSocials({ className }: { className?: string }) {
+  return (
+    <ul className={cn('flex flex-wrap gap-2.5', className)}>
+      {COMPANY.socials.map((social) => {
+        const Icon = SOCIAL_ICONS[social.id]
+        return (
+          <li key={social.id}>
+            <a
+              href={social.href}
+              target="_blank"
+              rel="noreferrer"
+              aria-label={social.label}
+              className="grid size-14 place-items-center rounded-2xl border border-white/15 bg-white/5 text-white transition hover:border-orange-500/60 hover:bg-orange-500 hover:text-white focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:outline-none"
+            >
+              <Icon className="size-7" />
+            </a>
+          </li>
+        )
+      })}
+    </ul>
+  )
+}
+
 function FooterHeading({ children }: { children: ReactNode }) {
   return (
     <h2 className="text-xs font-semibold tracking-[0.22em] text-orange-500 uppercase">
@@ -150,7 +173,7 @@ export default function SiteFooter() {
     >
       <footer className="page-block overflow-hidden rounded-3xl bg-[#002451] text-white">
       <div className="px-5 py-10 sm:px-8 sm:py-12">
-        <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-4 lg:gap-8">
+        <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-3 lg:gap-8">
           <div>
             <FooterRouteLink
               href={aircoHome}
@@ -167,6 +190,7 @@ export default function SiteFooter() {
             <p className="mt-3 max-w-xs text-sm leading-relaxed text-white/70">
               {COMPANY.description}
             </p>
+            <FooterSocials className="mt-4 hidden sm:flex" />
           </div>
 
           <div>
@@ -216,27 +240,7 @@ export default function SiteFooter() {
             </address>
           </div>
 
-          <div>
-            <FooterHeading>Socials</FooterHeading>
-            <ul className="mt-4 flex flex-wrap gap-2.5 sm:flex-col sm:items-start">
-              {COMPANY.socials.map((social) => {
-                const Icon = SOCIAL_ICONS[social.id]
-                return (
-                  <li key={social.id}>
-                    <a
-                      href={social.href}
-                      target="_blank"
-                      rel="noreferrer"
-                      aria-label={social.label}
-                      className="grid size-14 place-items-center rounded-2xl border border-white/15 bg-white/5 text-white transition hover:border-orange-500/60 hover:bg-orange-500 hover:text-white focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:outline-none"
-                    >
-                      <Icon className="size-7" />
-                    </a>
-                  </li>
-                )
-              })}
-            </ul>
-          </div>
+          <FooterSocials className="sm:hidden" />
         </div>
       </div>
 
