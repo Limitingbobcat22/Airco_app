@@ -17,6 +17,9 @@ dist-ssr
 .env.*
 !.env.example
 
+# Oude afbeeldingen (lokaal bewaren, niet in git)
+public/images/Old/
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

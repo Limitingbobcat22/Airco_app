@@ -64,8 +64,8 @@ export default function AircoHome() {
             Duurzame Airconditioning op Maat
           </p>
           <h1 className="mt-4 font-display text-4xl leading-[1.05] text-[#2596be] sm:text-6xl">
-            Koel in de zomer.
-            <span className="block text-ink">Bespaar in de winter.</span>
+            Fris in de zomer,
+            <span className="block text-ink">Voordelig in de winter.</span>
           </h1>
           <p className="mt-5 text-base text-ink/70 sm:text-lg">
             Bereken het vermogen voor uw ruimte, of bekijk meteen alle Haier-

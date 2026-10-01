@@ -151,13 +151,13 @@ export default function SiteFooter() {
       <footer className="page-block overflow-hidden rounded-3xl bg-[#002451] text-white">
       <div className="px-5 py-10 sm:px-8 sm:py-12">
         <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-4 lg:gap-8">
-          <div className="sm:col-span-2 lg:col-span-1">
+          <div>
             <FooterRouteLink
               href={aircoHome}
               label="Home"
               className="inline-flex max-w-[16rem] items-center text-white hover:text-white"
             >
-              <BrandMark className="size-14" />
+              <BrandMark className="size-23" />
               <span className="sr-only">{COMPANY.name}</span>
             </FooterRouteLink>
             <p className="mt-4 font-display text-2xl text-white">{COMPANY.name}</p>
@@ -167,24 +167,6 @@ export default function SiteFooter() {
             <p className="mt-3 max-w-xs text-sm leading-relaxed text-white/70">
               {COMPANY.description}
             </p>
-            <ul className="mt-5 flex flex-wrap gap-2.5">
-              {COMPANY.socials.map((social) => {
-                const Icon = SOCIAL_ICONS[social.id]
-                return (
-                  <li key={social.id}>
-                    <a
-                      href={social.href}
-                      target="_blank"
-                      rel="noreferrer"
-                      aria-label={social.label}
-                      className="grid size-11 place-items-center rounded-2xl border border-white/15 bg-white/5 text-white transition hover:border-orange-500/60 hover:bg-orange-500 hover:text-white focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:outline-none"
-                    >
-                      <Icon className="size-5" />
-                    </a>
-                  </li>
-                )
-              })}
-            </ul>
           </div>
 
           <div>
@@ -215,22 +197,6 @@ export default function SiteFooter() {
             </ul>
           </div>
 
-          <div>
-            <FooterHeading>Bedrijf</FooterHeading>
-            <ul className="mt-4 space-y-2.5">
-              <li>
-                <FooterRouteLink href={aircoHome} label="Over ons">
-                  Over ons
-                </FooterRouteLink>
-              </li>
-              <li>
-                <FooterRouteLink href="#contact" label="Contact">
-                  Contact
-                </FooterRouteLink>
-              </li>
-            </ul>
-          </div>
-
           <div id="contact" className="scroll-mt-4">
             <FooterHeading>Contact</FooterHeading>
             <address className="mt-4 space-y-2.5 text-sm not-italic text-white/70">
@@ -248,6 +214,28 @@ export default function SiteFooter() {
                 </a>
               </p>
             </address>
+          </div>
+
+          <div>
+            <FooterHeading>Socials</FooterHeading>
+            <ul className="mt-4 flex flex-wrap gap-2.5 sm:flex-col sm:items-start">
+              {COMPANY.socials.map((social) => {
+                const Icon = SOCIAL_ICONS[social.id]
+                return (
+                  <li key={social.id}>
+                    <a
+                      href={social.href}
+                      target="_blank"
+                      rel="noreferrer"
+                      aria-label={social.label}
+                      className="grid size-14 place-items-center rounded-2xl border border-white/15 bg-white/5 text-white transition hover:border-orange-500/60 hover:bg-orange-500 hover:text-white focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:outline-none"
+                    >
+                      <Icon className="size-7" />
+                    </a>
+                  </li>
+                )
+              })}
+            </ul>
           </div>
         </div>
       </div>
