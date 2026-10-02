@@ -69,7 +69,7 @@ export default function AircoHome() {
           </h1>
           <p className="mt-5 text-base text-ink/70 sm:text-lg">
             Bereken het vermogen voor uw ruimte, of bekijk meteen alle Haier-
-            en Mitsubishi-modellen. Een airco-keuze op basis van een persoonlijke berekening.
+            en Mitsubishi-modellen. Kies de perfecte airco op basis van uw persoonlijke berekening.
           </p>
           <div
             className={cn(

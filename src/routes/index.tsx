@@ -7,7 +7,6 @@ import AdminOffertesPage from '@/pages/admin/offertes'
 import AircoPage from '@/pages/airco'
 import HandleidingenPage from '@/pages/handleidingen'
 import KetelPage from '@/pages/ketel'
-import LegalPage from '@/pages/legal'
 import {
   AIRCO_TOPIC,
   defaultSectionForTopic,
@@ -101,15 +100,15 @@ export default function AppRouter() {
         },
         {
           path: 'privacy',
-          element: <LegalPage />,
+          element: <Navigate to={aircoStart} replace />,
         },
         {
           path: 'voorwaarden',
-          element: <LegalPage />,
+          element: <Navigate to={aircoStart} replace />,
         },
         {
           path: 'cookies',
-          element: <LegalPage />,
+          element: <Navigate to={aircoStart} replace />,
         },
       ],
     },

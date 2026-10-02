@@ -72,7 +72,7 @@ export default function ConsumptionForm({
           Stap 3
         </p>
         <h2 className="mt-2 font-display text-3xl text-ink sm:text-4xl">
-          Bereken uw besparing
+          Bereken uw mogelijke besparing
         </h2>
         <p className="mt-3 text-ink/70">
           Vul uw jaarlijks gasverbruik en energietarieven in. We rekenen direct

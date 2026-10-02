@@ -1,8 +1,9 @@
-import { type MouseEvent, type ReactNode, type SVGProps } from 'react'
+import { useState, type MouseEvent, type ReactNode, type SVGProps } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router'
+import { Modal } from '@/components/ui/modal'
 import { useAuth } from '@/hooks/use-auth'
 import { useGoToSection } from '@/hooks/use-go-to-section'
-import { COMPANY, LEGAL_PATHS } from '@/lib/company'
+import { COMPANY, LEGAL_PAGES } from '@/lib/company'
 import { scrollToPageSection } from '@/lib/page-scroll'
 import {
   AIRCO_TOPIC,
@@ -51,10 +52,19 @@ function TikTokIcon({ className }: { className?: string }) {
   )
 }
 
+function WhatsAppIcon({ className }: { className?: string }) {
+  return (
+    <SocialSvg className={className}>
+      <path d="M20.52 3.48A11.86 11.86 0 0 0 12.04 0C5.5 0 .2 5.3.2 11.84c0 2.09.55 4.13 1.59 5.93L0 24l6.38-1.67a11.8 11.8 0 0 0 5.66 1.44h.01c6.54 0 11.84-5.3 11.84-11.84 0-3.16-1.23-6.13-3.37-8.45zM12.05 21.8h-.01a9.8 9.8 0 0 1-5-1.36l-.36-.21-3.79.99 1.01-3.69-.23-.38a9.82 9.82 0 0 1-1.5-5.24c0-5.42 4.41-9.83 9.84-9.83 2.63 0 5.1 1.02 6.96 2.89a9.77 9.77 0 0 1 2.88 6.95c0 5.42-4.42 9.83-9.84 9.84zm5.39-7.36c-.29-.15-1.74-.86-2.01-.96-.27-.1-.47-.15-.66.15-.2.29-.76.96-.93 1.16-.17.2-.34.22-.63.07-.29-.14-1.24-.46-2.36-1.46-.87-.78-1.46-1.74-1.63-2.03-.17-.29-.02-.45.13-.6.13-.13.29-.34.44-.51.15-.17.2-.29.29-.49.1-.2.05-.37-.02-.52-.08-.15-.66-1.6-.91-2.19-.24-.58-.48-.5-.66-.51h-.56c-.2 0-.51.07-.78.37-.27.29-1.02 1-1.02 2.44 0 1.44 1.05 2.83 1.2 3.03.15.2 2.06 3.15 5 4.42.7.3 1.24.48 1.67.61.7.22 1.34.19 1.84.12.56-.08 1.74-.71 1.98-1.4.25-.68.25-1.27.17-1.39-.07-.12-.27-.2-.56-.34z" />
+    </SocialSvg>
+  )
+}
+
 const SOCIAL_ICONS = {
   instagram: InstagramIcon,
   facebook: FacebookIcon,
   tiktok: TikTokIcon,
+  whatsapp: WhatsAppIcon,
 } as const
 
 function FooterSocials({ className }: { className?: string }) {
@@ -154,11 +164,73 @@ function FooterRouteLink({
   )
 }
 
+type LegalKey = keyof typeof LEGAL_PAGES
+type LegalPage = (typeof LEGAL_PAGES)[LegalKey]
+type LegalArticlesList = Extract<LegalPage, { articles: readonly unknown[] }>['articles']
+
+const LEGAL_KEYS = ['privacy', 'terms', 'cookies'] as const satisfies readonly LegalKey[]
+
+function LegalText({ text }: { text: string }) {
+  const email = COMPANY.email
+  if (!text.includes(email)) return text
+
+  const [before, after] = text.split(email)
+  return (
+    <>
+      {before}
+      <a
+        href={`mailto:${email}`}
+        className="font-medium text-[#74b8f8] underline decoration-[#74b8f8]/40 underline-offset-2 hover:text-[#5aa6ef]"
+      >
+        {email}
+      </a>
+      {after}
+    </>
+  )
+}
+
+function LegalArticles({ articles }: { articles: LegalArticlesList }) {
+  return (
+    <div className="mt-5 divide-y divide-mist">
+      {articles.map((article) => {
+        const useBullets = 'bullets' in article && article.bullets
+        const ListTag = useBullets ? 'ul' : 'ol'
+        return (
+          <article key={article.title} className="py-4 first:pt-0 last:pb-1">
+            <h3 className="text-sm font-semibold text-ink">{article.title}</h3>
+            {'lead' in article ? (
+              <p className="mt-2 text-sm leading-relaxed text-ink/75">
+                <LegalText text={article.lead} />
+              </p>
+            ) : null}
+            {'items' in article ? (
+              <ListTag
+                className={cn(
+                  'mt-2 space-y-2 pl-5 text-sm leading-relaxed text-ink/75 marker:text-[#74b8f8]',
+                  useBullets ? 'list-disc' : 'list-decimal marker:font-medium',
+                )}
+              >
+                {article.items.map((item) => (
+                  <li key={item} className="pl-1">
+                    <LegalText text={item} />
+                  </li>
+                ))}
+              </ListTag>
+            ) : null}
+          </article>
+        )
+      })}
+    </div>
+  )
+}
+
 export default function SiteFooter() {
   const { pathname } = useLocation()
   const { user, isLoggedIn } = useAuth()
   const isAdmin = isLoggedIn && Boolean(user?.isAdmin)
+  const [legalKey, setLegalKey] = useState<LegalKey | null>(null)
   const year = new Date().getFullYear()
+  const legalPage = legalKey ? LEGAL_PAGES[legalKey] : null
   const topic = getTopicFromPath(pathname) ?? AIRCO_TOPIC
   const aircoHome = topicSectionPath(AIRCO_TOPIC, 'home')
   const aircoModels = topicSectionPath(AIRCO_TOPIC, 'modellen')
@@ -258,19 +330,50 @@ export default function SiteFooter() {
             <span>btw {COMPANY.vat}</span>
           </p>
           <nav aria-label="Juridisch" className="flex flex-wrap gap-x-4 gap-y-1">
-            <FooterRouteLink href={LEGAL_PATHS.privacy} label="Privacybeleid">
-              Privacybeleid
-            </FooterRouteLink>
-            <FooterRouteLink href={LEGAL_PATHS.terms} label="Algemene voorwaarden">
-              Algemene voorwaarden
-            </FooterRouteLink>
-            <FooterRouteLink href={LEGAL_PATHS.cookies} label="Cookiebeleid">
-              Cookiebeleid
-            </FooterRouteLink>
+            {LEGAL_KEYS.map((key) => (
+              <button
+                key={key}
+                type="button"
+                className={footerLinkClass('cursor-pointer border-0 bg-transparent p-0')}
+                onClick={() => setLegalKey(key)}
+              >
+                {LEGAL_PAGES[key].title}
+              </button>
+            ))}
           </nav>
         </div>
       </div>
       </footer>
+      <Modal
+        title={legalPage?.title ?? 'Juridisch'}
+        description="Juridische informatie"
+        isOpen={legalPage != null}
+        onClose={() => setLegalKey(null)}
+        className={cn(
+          'overflow-hidden',
+          legalPage && 'articles' in legalPage ? 'sm:max-w-2xl' : 'sm:max-w-lg',
+        )}
+      >
+        {legalPage ? (
+          <div
+            className={cn(
+              'pr-8',
+              'articles' in legalPage && 'max-h-[min(72vh,42rem)] overflow-y-auto',
+            )}
+          >
+            <p className="text-xs font-medium tracking-[0.2em] text-[#74b8f8] uppercase">
+              Juridisch
+            </p>
+            <h2 className="mt-2 font-display text-2xl text-ink">{legalPage.title}</h2>
+            {'intro' in legalPage ? (
+              <p className="mt-4 text-sm leading-relaxed text-ink/75">{legalPage.intro}</p>
+            ) : null}
+            {'articles' in legalPage ? (
+              <LegalArticles articles={legalPage.articles} />
+            ) : null}
+          </div>
+        ) : null}
+      </Modal>
     </section>
   )
 }
