@@ -1,5 +1,5 @@
 import type { LucideIcon } from 'lucide-react'
-import { BookOpen, Flame, FileText, Table2, Users } from 'lucide-react'
+import { BookOpen, Flame, FileText, Table2, Users, Wrench } from 'lucide-react'
 import AircoIcon from '@/components/icons/airco-icon'
 import {
   AIRCO_TOPIC,
@@ -18,6 +18,7 @@ export const ADMIN_KLANTEN_PATH = '/admin/klanten'
 export const ADMIN_OFFERTES_PATH = '/admin/offertes'
 export const ADMIN_HANDLEIDINGEN_PATH = '/admin/handleidingen'
 export const HANDLEIDINGEN_PATH = '/handleidingen'
+export const ONDERHOUD_PATH = '/onderhoud'
 
 export type NavItem = {
   title?: string
@@ -77,6 +78,13 @@ export function buildTopicNavItems(
     icon: BookOpen,
     leavesTopic: true,
     destinationLabel: 'Handleidingen',
+  })
+  items.push({
+    title: 'Onderhoud',
+    href: ONDERHOUD_PATH,
+    icon: Wrench,
+    leavesTopic: true,
+    destinationLabel: 'Onderhoud',
   })
 
   if (canSwitchToTarget) {

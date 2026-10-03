@@ -6,6 +6,7 @@ import AdminKlantenPage from '@/pages/admin/klanten'
 import AdminOffertesPage from '@/pages/admin/offertes'
 import AircoPage from '@/pages/airco'
 import HandleidingenPage from '@/pages/handleidingen'
+import OnderhoudPage from '@/pages/onderhoud'
 import KetelPage from '@/pages/ketel'
 import {
   AIRCO_TOPIC,
@@ -97,6 +98,10 @@ export default function AppRouter() {
         {
           path: 'handleidingen',
           element: <HandleidingenPage />,
+        },
+        {
+          path: 'onderhoud',
+          element: <OnderhoudPage />,
         },
         {
           path: 'privacy',

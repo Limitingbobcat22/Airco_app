@@ -4,6 +4,7 @@ import { Modal } from '@/components/ui/modal'
 import { useAuth } from '@/hooks/use-auth'
 import { useGoToSection } from '@/hooks/use-go-to-section'
 import { COMPANY, LEGAL_PAGES } from '@/lib/company'
+import { ONDERHOUD_PATH } from '@/lib/constants/nav-items'
 import { scrollToPageSection } from '@/lib/page-scroll'
 import {
   AIRCO_TOPIC,
@@ -288,6 +289,11 @@ export default function SiteFooter() {
               <li>
                 <FooterRouteLink href={offerteHref} label="Offerte">
                   Offerte
+                </FooterRouteLink>
+              </li>
+              <li>
+                <FooterRouteLink href={ONDERHOUD_PATH} label="Onderhoud">
+                  Onderhoud
                 </FooterRouteLink>
               </li>
             </ul>

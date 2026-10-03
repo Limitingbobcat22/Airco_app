@@ -261,7 +261,7 @@ export default function CreateKlantForm({
           rows={3}
           value={form.note}
           onChange={(event) => updateField('note', event.target.value)}
-          placeholder="Bijvoorbeeld voorkeur voor contactmoment…"
+          placeholder="Bijvoorbeeld contact methode: Telefoon of E-mail"
           className={cn(
             'w-full resize-y rounded-xl border bg-foam px-3 py-2.5 text-ink outline-none',
             fieldErrors.note

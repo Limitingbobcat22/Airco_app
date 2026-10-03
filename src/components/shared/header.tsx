@@ -6,6 +6,8 @@ import { useGoToSection } from '@/hooks/use-go-to-section'
 import {
   ADMIN_AIRCOS_PATH,
   getNavTitleBySectionId,
+  HANDLEIDINGEN_PATH,
+  ONDERHOUD_PATH,
 } from '@/lib/constants/nav-items'
 import {
   AIRCO_TOPIC,
@@ -22,11 +24,23 @@ export default function Header({ onMenuClick }: HeaderProps) {
   const activeSectionId = useActiveSection()
   const goToSection = useGoToSection()
   const isAdminAircos = pathname === ADMIN_AIRCOS_PATH
+  const infoTitle =
+    pathname === ONDERHOUD_PATH
+      ? 'Onderhoud'
+      : pathname === HANDLEIDINGEN_PATH
+        ? 'Handleidingen'
+        : null
   const topic = getTopicFromPath(pathname) ?? AIRCO_TOPIC
-  const topicLabel = isAdminAircos ? 'Beheer' : TOPIC_LABELS[topic]
+  const topicLabel = isAdminAircos
+    ? 'Beheer'
+    : infoTitle
+      ? 'Info'
+      : TOPIC_LABELS[topic]
   const sectionTitle = isAdminAircos
     ? 'Aircos'
-    : getNavTitleBySectionId(activeSectionId, topic)
+    : infoTitle
+      ? infoTitle
+      : getNavTitleBySectionId(activeSectionId, topic)
 
   return (
     <div className="flex flex-1 items-center gap-2 px-3 md:px-4">
@@ -45,7 +59,7 @@ export default function Header({ onMenuClick }: HeaderProps) {
       <nav aria-label="Huidige locatie" className="min-w-0">
         <ol className="text-ink flex items-center gap-1.5 text-xl font-bold tracking-tight sm:gap-2 sm:text-2xl">
           <li className="min-w-0 truncate">
-            {isAdminAircos ? (
+            {isAdminAircos || infoTitle ? (
               <span className="truncate">{topicLabel}</span>
             ) : (
               <button
