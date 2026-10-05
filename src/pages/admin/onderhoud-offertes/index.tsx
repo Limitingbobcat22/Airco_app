@@ -8,6 +8,7 @@ import {
 import { Pencil, Plus, Trash2 } from 'lucide-react'
 import { AdminResponsiveTable } from '@/components/shared/admin-responsive-table'
 import Heading from '@/components/shared/heading'
+import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Modal } from '@/components/ui/modal'
 import { useAuth } from '@/hooks/use-auth'
@@ -17,6 +18,7 @@ import {
   getOnderhoudOfferte,
   listOnderhoudOffertes,
   updateOnderhoudOfferte,
+  updateOnderhoudOfferteRead,
   type OnderhoudOfferteOverview,
 } from '@/lib/api/onderhoud-offertes'
 import { listKlanten } from '@/lib/api/klanten'
@@ -142,6 +144,33 @@ export default function AdminOnderhoudOffertesPage() {
     },
   })
 
+  const markReadMutation = useMutation({
+    mutationFn: (id: string) => {
+      if (!token) throw new Error('Je bent niet ingelogd als admin.')
+      return updateOnderhoudOfferteRead(token, id, true)
+    },
+    onMutate: async (id) => {
+      await queryClient.cancelQueries({ queryKey: ['onderhoud-offertes'] })
+      const previous = queryClient.getQueryData<OnderhoudOfferteOverview[]>([
+        'onderhoud-offertes',
+      ])
+      const markRead = (current: OnderhoudOfferteOverview[] | undefined) =>
+        current?.map((row) => (row.id === id ? { ...row, read: true } : row))
+      queryClient.setQueryData(['onderhoud-offertes'], markRead(previous))
+      setRows((current) => markRead(current) ?? current)
+      return { previous }
+    },
+    onError: (_error, _id, context) => {
+      if (context?.previous) {
+        queryClient.setQueryData(['onderhoud-offertes'], context.previous)
+        setRows(context.previous)
+      }
+    },
+    onSettled: () => {
+      void queryClient.invalidateQueries({ queryKey: ['onderhoud-offertes'] })
+    },
+  })
+
   useEffect(() => {
     if (remoteRows) setRows(remoteRows)
   }, [remoteRows])
@@ -171,6 +200,18 @@ export default function AdminOnderhoudOffertesPage() {
 
   const columns = useMemo<ColumnDef<OnderhoudOfferteOverview>[]>(
     () => [
+      {
+        accessorKey: 'read',
+        header: 'Status',
+        cell: ({ getValue }) => {
+          const read = getValue<boolean>()
+          return read ? (
+            <Badge variant="secondary">Gelezen</Badge>
+          ) : (
+            <Badge>Nieuw</Badge>
+          )
+        },
+      },
       {
         accessorKey: 'name',
         header: 'Naam',
@@ -222,6 +263,9 @@ export default function AdminOnderhoudOffertesPage() {
                 setEditorDirty(false)
                 setEditingId(row.original.id)
                 setEditorOpen(true)
+                if (!row.original.read) {
+                  markReadMutation.mutate(row.original.id)
+                }
               }}
               aria-label="Bewerken"
             >
@@ -243,7 +287,7 @@ export default function AdminOnderhoudOffertesPage() {
         ),
       },
     ],
-    [createMutation, deleteMutation, updateMutation],
+    [createMutation, deleteMutation, markReadMutation, updateMutation],
   )
 
   const table = useReactTable({
@@ -253,6 +297,7 @@ export default function AdminOnderhoudOffertesPage() {
     getRowId: (row) => row.id,
   })
 
+  const unreadCount = rows.filter((row) => !row.read).length
   const saveError = editing ? updateMutation.error : createMutation.error
   const formError = saveError instanceof Error ? saveError.message : null
   const fullName = deleting?.name?.trim() || 'deze offerte'
@@ -262,7 +307,11 @@ export default function AdminOnderhoudOffertesPage() {
       <div className="flex flex-col gap-4 border-b px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
         <Heading
           title="Onderhoud-offerte"
-          description="Aanvragen gekoppeld aan een klant, met onderhoudtypes en foto's."
+          description={
+            unreadCount > 0
+              ? `${unreadCount} ongelezen aanvraag${unreadCount === 1 ? '' : 'en'}. Aanvragen gekoppeld aan een klant, met onderhoudtypes en foto's.`
+              : "Aanvragen gekoppeld aan een klant, met onderhoudtypes en foto's."
+          }
         />
         <Button
           type="button"
@@ -301,6 +350,9 @@ export default function AdminOnderhoudOffertesPage() {
             table={table}
             emptyMessage="Nog geen onderhoudoffertes."
             titleColumnIds={['name']}
+            getRowClassName={(row) =>
+              row.original.read ? undefined : 'bg-teal/5 font-medium'
+            }
           />
         )}
       </div>

@@ -45,6 +45,7 @@ export type OnderhoudOfferteOverview = {
   city: string | null
   typeNames: string | null
   imageCount: number
+  read: boolean
   createdAt: string
   updatedAt: string
 }
@@ -166,6 +167,29 @@ export async function updateOnderhoudOfferte(
   }
 
   return response.json() as Promise<OnderhoudOfferte>
+}
+
+export async function updateOnderhoudOfferteRead(
+  token: string,
+  id: string,
+  read: boolean,
+): Promise<OnderhoudOfferteOverview> {
+  const response = await fetch(`${API_URL}/onderhoud-offertes/${id}/read`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({ read }),
+  })
+
+  if (!response.ok) {
+    throw new Error(
+      await readApiError(response, 'Gelezen-status bijwerken mislukt'),
+    )
+  }
+
+  return response.json() as Promise<OnderhoudOfferteOverview>
 }
 
 export async function deleteOnderhoudOfferte(
