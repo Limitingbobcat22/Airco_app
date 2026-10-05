@@ -36,11 +36,15 @@ export const klantNawSchema = z.object({
   city: requiredText('Woonplaats', 80),
   note: z.string().max(2000, 'Opmerking is te lang.'),
   consentContact: z.boolean(),
+  consentTerms: z.boolean(),
 })
 
 const klantNawCreateSchema = klantNawSchema.extend({
   consentContact: z.boolean().refine((value) => value === true, {
     error: 'Toestemming voor contact is verplicht.',
+  }),
+  consentTerms: z.boolean().refine((value) => value === true, {
+    error: 'Acceptatie van de algemene voorwaarden is verplicht.',
   }),
 })
 
@@ -89,6 +93,13 @@ export function mapApiValidationToFields(message: string): KlantFieldErrors {
       fieldErrors.street = 'Straat is verplicht.'
     } else if (lower.includes('city')) {
       fieldErrors.city = 'Woonplaats is verplicht.'
+    } else if (
+      lower.includes('voorwaarden') ||
+      lower.includes('consentterms') ||
+      lower.includes('consent terms')
+    ) {
+      fieldErrors.consentTerms =
+        'Acceptatie van de algemene voorwaarden is verplicht.'
     } else if (lower.includes('consent')) {
       fieldErrors.consentContact = 'Toestemming voor contact is verplicht.'
     }

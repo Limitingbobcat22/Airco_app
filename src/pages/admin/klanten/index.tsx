@@ -165,6 +165,11 @@ export default function AdminKlantenPage() {
         header: 'Woonplaats',
       },
       {
+        accessorKey: 'consentTerms',
+        header: 'Voorwaarden',
+        cell: ({ getValue }) => (getValue<boolean>() ? 'Ja' : 'Nee'),
+      },
+      {
         accessorKey: 'createdAt',
         header: 'Aangemaakt',
         cell: ({ getValue }) => {

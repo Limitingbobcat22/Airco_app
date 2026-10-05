@@ -1,6 +1,9 @@
 import { Send } from 'lucide-react'
-import { useState, type FormEvent } from 'react'
+import { useState, type FormEvent, type MouseEvent } from 'react'
+import { LegalPageContent } from '@/components/shared/legal-page-content'
+import { Modal } from '@/components/ui/modal'
 import { createKlant, toCreateKlantPayload } from '@/lib/api/klanten'
+import { LEGAL_PAGES } from '@/lib/company'
 import { cn } from '@/lib/utils'
 import {
   mapApiValidationToFields,
@@ -36,6 +39,13 @@ export default function CreateKlantForm({
   const [submitted, setSubmitted] = useState(false)
   const [fieldErrors, setFieldErrors] = useState<KlantFieldErrors>({})
   const [error, setError] = useState<string | null>(null)
+  const [termsOpen, setTermsOpen] = useState(false)
+
+  const openTerms = (event: MouseEvent<HTMLButtonElement>) => {
+    event.preventDefault()
+    event.stopPropagation()
+    setTermsOpen(true)
+  }
 
   const updateField = (name: keyof KlantNawData, value: string) => {
     setForm((prev) => ({ ...prev, [name]: value }))
@@ -271,9 +281,9 @@ export default function CreateKlantForm({
         />
       </label>
 
-      <div>
+      <div className="space-y-3">
         {fieldErrors.consentContact ? (
-          <p className="mb-2 text-sm text-destructive">
+          <p className="text-sm text-destructive">
             {fieldErrors.consentContact}
           </p>
         ) : null}
@@ -301,6 +311,41 @@ export default function CreateKlantForm({
             deze offerteaanvraag.
           </span>
         </label>
+
+        {fieldErrors.consentTerms ? (
+          <p className="text-sm text-destructive">{fieldErrors.consentTerms}</p>
+        ) : null}
+        <label className="flex cursor-pointer items-start gap-3 text-sm text-ink/80">
+          <input
+            type="checkbox"
+            name="consentTerms"
+            checked={form.consentTerms}
+            onChange={(event) => {
+              setForm((prev) => ({
+                ...prev,
+                consentTerms: event.target.checked,
+              }))
+              setFieldErrors((prev) => {
+                if (!prev.consentTerms) return prev
+                const next = { ...prev }
+                delete next.consentTerms
+                return next
+              })
+            }}
+            className="mt-0.5 size-4 shrink-0 rounded border-mist accent-teal"
+          />
+          <span>
+            Ik accepteer de{' '}
+            <button
+              type="button"
+              onClick={openTerms}
+              className="font-medium text-[#74b8f8] underline decoration-[#74b8f8]/40 underline-offset-2 hover:text-[#5aa6ef]"
+            >
+              algemene voorwaarden
+            </button>
+            .
+          </span>
+        </label>
       </div>
 
       {error ? (
@@ -326,6 +371,17 @@ export default function CreateKlantForm({
           {submitting ? 'Versturen…' : 'Verzend Email'}
         </button>
       </div>
+
+      <Modal
+        stacked
+        title="Algemene voorwaarden"
+        description="Juridische informatie"
+        isOpen={termsOpen}
+        onClose={() => setTermsOpen(false)}
+        className="overflow-hidden sm:max-w-2xl"
+      >
+        <LegalPageContent page={LEGAL_PAGES.terms} />
+      </Modal>
     </form>
   )
 }

@@ -13,6 +13,7 @@ export type Klant = {
   city: string
   note: string | null
   consentContact: boolean
+  consentTerms: boolean
   createdAt: string
   updatedAt: string
 }
@@ -28,6 +29,7 @@ export type CreateKlantInput = {
   city: string
   note?: string
   consentContact: boolean
+  consentTerms: boolean
   aircoId?: string
   areaM2?: number
   heightM?: number
@@ -66,6 +68,7 @@ export function toCreateKlantPayload(
     postalCode: data.postalCode.trim(),
     city: data.city.trim(),
     consentContact: data.consentContact,
+    consentTerms: data.consentTerms,
   }
 
   if (data.note.trim()) payload.note = data.note.trim()

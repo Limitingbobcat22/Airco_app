@@ -9,6 +9,7 @@ export type KlantNawData = {
   city: string
   note: string
   consentContact: boolean
+  consentTerms: boolean
 }
 
 export type OfferteContext = {
@@ -37,4 +38,5 @@ export const EMPTY_KLANT_NAW: KlantNawData = {
   city: '',
   note: '',
   consentContact: false,
+  consentTerms: false,
 }

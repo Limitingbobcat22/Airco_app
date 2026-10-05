@@ -3,6 +3,7 @@ import { Link, useLocation, useNavigate } from 'react-router'
 import { Modal } from '@/components/ui/modal'
 import { useAuth } from '@/hooks/use-auth'
 import { useGoToSection } from '@/hooks/use-go-to-section'
+import { LegalPageContent } from '@/components/shared/legal-page-content'
 import { COMPANY, LEGAL_PAGES } from '@/lib/company'
 import { ONDERHOUD_PATH } from '@/lib/constants/nav-items'
 import { scrollToPageSection } from '@/lib/page-scroll'
@@ -166,64 +167,8 @@ function FooterRouteLink({
 }
 
 type LegalKey = keyof typeof LEGAL_PAGES
-type LegalPage = (typeof LEGAL_PAGES)[LegalKey]
-type LegalArticlesList = Extract<LegalPage, { articles: readonly unknown[] }>['articles']
 
 const LEGAL_KEYS = ['privacy', 'terms', 'cookies'] as const satisfies readonly LegalKey[]
-
-function LegalText({ text }: { text: string }) {
-  const email = COMPANY.email
-  if (!text.includes(email)) return text
-
-  const [before, after] = text.split(email)
-  return (
-    <>
-      {before}
-      <a
-        href={`mailto:${email}`}
-        className="font-medium text-[#74b8f8] underline decoration-[#74b8f8]/40 underline-offset-2 hover:text-[#5aa6ef]"
-      >
-        {email}
-      </a>
-      {after}
-    </>
-  )
-}
-
-function LegalArticles({ articles }: { articles: LegalArticlesList }) {
-  return (
-    <div className="mt-5 divide-y divide-mist">
-      {articles.map((article) => {
-        const useBullets = 'bullets' in article && article.bullets
-        const ListTag = useBullets ? 'ul' : 'ol'
-        return (
-          <article key={article.title} className="py-4 first:pt-0 last:pb-1">
-            <h3 className="text-sm font-semibold text-ink">{article.title}</h3>
-            {'lead' in article ? (
-              <p className="mt-2 text-sm leading-relaxed text-ink/75">
-                <LegalText text={article.lead} />
-              </p>
-            ) : null}
-            {'items' in article ? (
-              <ListTag
-                className={cn(
-                  'mt-2 space-y-2 pl-5 text-sm leading-relaxed text-ink/75 marker:text-[#74b8f8]',
-                  useBullets ? 'list-disc' : 'list-decimal marker:font-medium',
-                )}
-              >
-                {article.items.map((item) => (
-                  <li key={item} className="pl-1">
-                    <LegalText text={item} />
-                  </li>
-                ))}
-              </ListTag>
-            ) : null}
-          </article>
-        )
-      })}
-    </div>
-  )
-}
 
 export default function SiteFooter() {
   const { pathname } = useLocation()
@@ -360,25 +305,7 @@ export default function SiteFooter() {
           legalPage && 'articles' in legalPage ? 'sm:max-w-2xl' : 'sm:max-w-lg',
         )}
       >
-        {legalPage ? (
-          <div
-            className={cn(
-              'pr-8',
-              'articles' in legalPage && 'max-h-[min(72vh,42rem)] overflow-y-auto',
-            )}
-          >
-            <p className="text-xs font-medium tracking-[0.2em] text-[#74b8f8] uppercase">
-              Juridisch
-            </p>
-            <h2 className="mt-2 font-display text-2xl text-ink">{legalPage.title}</h2>
-            {'intro' in legalPage ? (
-              <p className="mt-4 text-sm leading-relaxed text-ink/75">{legalPage.intro}</p>
-            ) : null}
-            {'articles' in legalPage ? (
-              <LegalArticles articles={legalPage.articles} />
-            ) : null}
-          </div>
-        ) : null}
+        {legalPage ? <LegalPageContent page={legalPage} /> : null}
       </Modal>
     </section>
   )

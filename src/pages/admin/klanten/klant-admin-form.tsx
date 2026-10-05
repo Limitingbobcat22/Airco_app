@@ -22,7 +22,9 @@ type KlantAdminFormProps = {
 }
 
 function toFormValues(klant?: Klant | null): KlantNawData {
-  if (!klant) return { ...EMPTY_KLANT_NAW, consentContact: true }
+  if (!klant) {
+    return { ...EMPTY_KLANT_NAW, consentContact: true, consentTerms: true }
+  }
   return {
     firstName: klant.firstName,
     lastName: klant.lastName,
@@ -34,6 +36,7 @@ function toFormValues(klant?: Klant | null): KlantNawData {
     city: klant.city,
     note: klant.note ?? '',
     consentContact: Boolean(klant.consentContact),
+    consentTerms: Boolean(klant.consentTerms),
   }
 }
 
@@ -224,6 +227,32 @@ export default function KlantAdminForm({
           />
           <span>Toestemming om contact op te nemen over de offerteaanvraag.</span>
         </label>
+        {shownErrors.consentTerms ? (
+          <p className="mt-3 mb-2 text-sm text-destructive">
+            {shownErrors.consentTerms}
+          </p>
+        ) : null}
+        <label className="mt-3 flex cursor-pointer items-start gap-3 text-sm text-ink/80">
+          <input
+            type="checkbox"
+            name="consentTerms"
+            checked={form.consentTerms}
+            onChange={(event) => {
+              setForm((prev) => ({
+                ...prev,
+                consentTerms: event.target.checked,
+              }))
+              setFieldErrors((prev) => {
+                if (!prev.consentTerms) return prev
+                const next = { ...prev }
+                delete next.consentTerms
+                return next
+              })
+            }}
+            className="mt-0.5 size-4 shrink-0 rounded border-mist accent-teal"
+          />
+          <span>Ik accepteer de algemene voorwaarden.</span>
+        </label>
       </div>
 
       {generalError ? (
@@ -243,7 +272,10 @@ export default function KlantAdminForm({
         </button>
         <button
           type="submit"
-          disabled={submitting || (!initial && !form.consentContact)}
+          disabled={
+            submitting ||
+            (!initial && (!form.consentContact || !form.consentTerms))
+          }
           className="rounded-xl bg-[#74b8f8] px-5 py-3 text-sm font-semibold text-ink transition hover:bg-[#5aa6ef] disabled:opacity-60"
         >
           {submitting ? 'Opslaan…' : 'Opslaan'}
