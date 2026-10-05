@@ -372,9 +372,20 @@ export default function AircoCard({
     }
   }
 
+  const goToVerbruik = () => {
+    markPathUpdatedFromScroll()
+    navigate('/airco/verbruik', { replace: true })
+    scrollToPageSection('verbruik', 'smooth')
+  }
+
   const selectAirco = () => {
     if (previewOpen || Date.now() < ignoreSelectUntilRef.current) return
-    onSelect(selected ? null : airco.id)
+    if (selected) {
+      onSelect(null)
+      return
+    }
+    onSelect(airco.id)
+    goToVerbruik()
   }
 
   const coverImage = [...(airco.images ?? [])].sort(
@@ -405,6 +416,7 @@ export default function AircoCard({
         aria-pressed={selected}
         onClick={selectAirco}
         onKeyDown={(event) => {
+          if (event.target !== event.currentTarget) return
           if (event.key === 'Enter' || event.key === ' ') {
             event.preventDefault()
             selectAirco()
@@ -450,17 +462,25 @@ export default function AircoCard({
               maxWidth="!max-w-[min(96rem,95vw)]"
               maxHeight="max-h-[90dvh]"
               renderButton={(onClick) => (
-                <div
-                  className="relative flex min-h-52 w-full items-center justify-center overflow-hidden rounded-3xl md:min-h-64 2xl:min-h-72"
+                <button
+                  type="button"
+                  onPointerDown={(event) => event.stopPropagation()}
+                  onClick={(event) => {
+                    event.stopPropagation()
+                    event.preventDefault()
+                    onClick()
+                  }}
+                  className="group/photo relative flex min-h-52 w-full cursor-pointer items-center justify-center overflow-hidden rounded-3xl border-0 p-0 text-left focus-visible:ring-2 focus-visible:ring-teal focus-visible:outline-none md:min-h-64 2xl:min-h-72"
                   style={{
                     background: `linear-gradient(160deg, ${airco.accent}14, ${airco.accent}28 55%, #ffffff 100%)`,
                   }}
+                  aria-label={`Bekijk details van ${airco.brand} ${airco.model}`}
                 >
                   {coverImage ? (
                     <img
                       src={aircoImageUrl(coverImage.url)}
                       alt=""
-                      className="absolute inset-0 size-full object-contain p-3"
+                      className="pointer-events-none absolute inset-0 size-full object-contain p-3"
                     />
                   ) : (
                     <AircoIllustration
@@ -468,20 +488,13 @@ export default function AircoCard({
                       gradientId={`unit-face-${airco.id}`}
                     />
                   )}
-                  <button
-                    type="button"
-                    onPointerDown={(event) => event.stopPropagation()}
-                    onClick={(event) => {
-                      event.stopPropagation()
-                      event.preventDefault()
-                      onClick()
-                    }}
-                    className="absolute top-3 right-3 grid size-10 place-items-center rounded-full border border-mist/80 bg-white/90 text-ink shadow-sm transition hover:border-teal/40 hover:bg-white hover:text-teal focus-visible:ring-2 focus-visible:ring-teal focus-visible:outline-none"
-                    aria-label={`Bekijk foto van ${airco.brand} ${airco.model}`}
+                  <span
+                    className="pointer-events-none absolute top-3 right-3 grid size-10 place-items-center rounded-full border border-mist/80 bg-white/90 text-ink shadow-sm transition group-hover/photo:border-teal/40 group-hover/photo:bg-white group-hover/photo:text-teal"
+                    aria-hidden
                   >
-                    <Expand className="size-5" strokeWidth={2.25} aria-hidden />
-                  </button>
-                </div>
+                    <Expand className="size-5" strokeWidth={2.25} />
+                  </span>
+                </button>
               )}
               renderModal={(onClose) => (
                 <AircoPhotoPreview
@@ -490,11 +503,7 @@ export default function AircoCard({
                   onCalculateSavings={() => {
                     onSelect(airco.id)
                     onClose()
-                    window.setTimeout(() => {
-                      markPathUpdatedFromScroll()
-                      navigate('/airco/verbruik', { replace: true })
-                      scrollToPageSection('verbruik', 'smooth')
-                    }, 150)
+                    window.setTimeout(goToVerbruik, 150)
                   }}
                 />
               )}
@@ -568,9 +577,7 @@ export default function AircoCard({
                   onClick={(event) => {
                     event.stopPropagation()
                     event.preventDefault()
-                    markPathUpdatedFromScroll()
-                    navigate('/airco/verbruik', { replace: true })
-                    scrollToPageSection('verbruik', 'smooth')
+                    goToVerbruik()
                   }}
                   className="inline-flex w-full cursor-pointer items-center justify-center rounded-full bg-[#74b8f8] px-5 py-2.5 text-sm font-semibold text-ink transition hover:bg-[#5aa6ef] focus-visible:ring-2 focus-visible:ring-[#74b8f8] focus-visible:outline-none md:text-base"
                 >

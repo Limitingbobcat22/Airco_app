@@ -54,7 +54,7 @@ function Tile({
 }
 
 export default function SavingsDock({ airco, savings, visible }: SavingsDockProps) {
-  const [expanded, setExpanded] = useState(true)
+  const [expanded, setExpanded] = useState(false)
   const hasSavings = airco != null && savings != null
   const showTiles = visible && hasSavings && expanded
 
