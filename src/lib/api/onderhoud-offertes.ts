@@ -1,4 +1,3 @@
-import type { KlantNawData } from '@/pages/klant/types'
 import { API_URL, readApiError } from './base'
 
 export type OnderhoudOfferteTypeRef = {
@@ -15,6 +14,7 @@ export type OnderhoudOffertePhoto = {
   url: string
 }
 
+/** Eén offerte, met klantgegevens uit de klantentabel. Voor bewerken. */
 export type OnderhoudOfferte = {
   id: string
   klantId: string | null
@@ -30,42 +30,43 @@ export type OnderhoudOfferte = {
   consentContact: boolean
   consentTerms: boolean
   types: OnderhoudOfferteTypeRef[]
-  photos: OnderhoudOffertePhoto[]
+  images: OnderhoudOffertePhoto[]
+  createdAt: string
+  updatedAt: string
+}
+
+/** Rij uit onderhoud_offerte_overview. Voor de beheertabel. */
+export type OnderhoudOfferteOverview = {
+  id: string
+  klantId: string | null
+  name: string | null
+  email: string | null
+  phone: string | null
+  city: string | null
+  typeNames: string | null
+  imageCount: number
   createdAt: string
   updatedAt: string
 }
 
 export type SaveOnderhoudOfferteInput = {
-  klant: KlantNawData
-  klantId?: string
+  klantId: string
   typeIds: string[]
-  photos: File[]
-  keepPhotoIds?: string[]
+  images: File[]
+  keepImageIds?: string[]
 }
 
 function appendOfferteFields(
   body: FormData,
   input: SaveOnderhoudOfferteInput,
 ) {
-  const { klant } = input
-  body.append('firstName', klant.firstName.trim())
-  body.append('lastName', klant.lastName.trim())
-  body.append('email', klant.email.trim())
-  body.append('phone', klant.phone.trim())
-  body.append('street', klant.street.trim())
-  body.append('houseNumber', klant.houseNumber.trim())
-  body.append('postalCode', klant.postalCode.trim())
-  body.append('city', klant.city.trim())
-  body.append('note', klant.note.trim())
-  body.append('consentContact', String(klant.consentContact))
-  body.append('consentTerms', String(klant.consentTerms))
-  if (input.klantId) body.append('klantId', input.klantId)
+  body.append('klantId', input.klantId)
   body.append('typeIds', JSON.stringify(input.typeIds))
-  if (input.keepPhotoIds) {
-    body.append('keepPhotoIds', JSON.stringify(input.keepPhotoIds))
+  if (input.keepImageIds) {
+    body.append('keepImageIds', JSON.stringify(input.keepImageIds))
   }
-  for (const photo of input.photos) {
-    body.append('photos', photo)
+  for (const image of input.images) {
+    body.append('images', image)
   }
 }
 
@@ -113,7 +114,7 @@ export async function createOnderhoudOfferteAdmin(
 
 export async function listOnderhoudOffertes(
   token: string,
-): Promise<OnderhoudOfferte[]> {
+): Promise<OnderhoudOfferteOverview[]> {
   const response = await fetch(`${API_URL}/onderhoud-offertes`, {
     headers: { Authorization: `Bearer ${token}` },
   })
@@ -124,7 +125,24 @@ export async function listOnderhoudOffertes(
     )
   }
 
-  return response.json() as Promise<OnderhoudOfferte[]>
+  return response.json() as Promise<OnderhoudOfferteOverview[]>
+}
+
+export async function getOnderhoudOfferte(
+  token: string,
+  id: string,
+): Promise<OnderhoudOfferte> {
+  const response = await fetch(`${API_URL}/onderhoud-offertes/${id}`, {
+    headers: { Authorization: `Bearer ${token}` },
+  })
+
+  if (!response.ok) {
+    throw new Error(
+      await readApiError(response, 'Onderhoudofferte ophalen mislukt'),
+    )
+  }
+
+  return response.json() as Promise<OnderhoudOfferte>
 }
 
 export async function updateOnderhoudOfferte(
@@ -166,13 +184,13 @@ export async function deleteOnderhoudOfferte(
   }
 }
 
-export async function fetchOnderhoudFotoUrl(
+export async function fetchOnderhoudImageUrl(
   token: string,
   offerteId: string,
-  fotoId: string,
+  imageId: string,
 ): Promise<string> {
   const response = await fetch(
-    `${API_URL}/onderhoud-offertes/${offerteId}/fotos/${fotoId}`,
+    `${API_URL}/onderhoud-offertes/${offerteId}/images/${imageId}`,
     { headers: { Authorization: `Bearer ${token}` } },
   )
 

@@ -14,9 +14,10 @@ import { useAuth } from '@/hooks/use-auth'
 import {
   createOnderhoudOfferteAdmin,
   deleteOnderhoudOfferte,
+  getOnderhoudOfferte,
   listOnderhoudOffertes,
   updateOnderhoudOfferte,
-  type OnderhoudOfferte,
+  type OnderhoudOfferteOverview,
 } from '@/lib/api/onderhoud-offertes'
 import { listKlanten } from '@/lib/api/klanten'
 import { listOnderhoudTypes } from '@/lib/api/onderhoud-types'
@@ -62,18 +63,31 @@ export default function AdminOnderhoudOffertesPage() {
     enabled: Boolean(token),
   })
 
-  const [rows, setRows] = useState<OnderhoudOfferte[]>([])
+  const [rows, setRows] = useState<OnderhoudOfferteOverview[]>([])
   const [editorOpen, setEditorOpen] = useState(false)
   const [editorDirty, setEditorDirty] = useState(false)
   const [discardOpen, setDiscardOpen] = useState(false)
-  const [editing, setEditing] = useState<OnderhoudOfferte | null>(null)
-  const [deleting, setDeleting] = useState<OnderhoudOfferte | null>(null)
+  const [editingId, setEditingId] = useState<string | null>(null)
+  const [deleting, setDeleting] = useState<OnderhoudOfferteOverview | null>(null)
+  const {
+    data: editing,
+    isFetching: detailLoading,
+    isError: detailError,
+    error: detailLoadError,
+  } = useQuery({
+    queryKey: ['onderhoud-offerte', editingId],
+    queryFn: () => {
+      if (!token || !editingId) throw new Error('Je bent niet ingelogd als admin.')
+      return getOnderhoudOfferte(token, editingId)
+    },
+    enabled: Boolean(token && editingId),
+  })
 
   const closeEditor = () => {
     setDiscardOpen(false)
     setEditorDirty(false)
     setEditorOpen(false)
-    setEditing(null)
+    setEditingId(null)
   }
 
   const handleEditorDirtyChange = useCallback((dirty: boolean) => {
@@ -84,10 +98,9 @@ export default function AdminOnderhoudOffertesPage() {
     mutationFn: (values: OnderhoudOfferteFormValues) => {
       if (!token) throw new Error('Je bent niet ingelogd als admin.')
       return createOnderhoudOfferteAdmin(token, {
-        klant: values.klant,
         klantId: values.klantId,
         typeIds: values.typeIds,
-        photos: values.newPhotos,
+        images: values.newPhotos,
       })
     },
     onSuccess: () => {
@@ -106,11 +119,10 @@ export default function AdminOnderhoudOffertesPage() {
     }) => {
       if (!token) throw new Error('Je bent niet ingelogd als admin.')
       return updateOnderhoudOfferte(token, id, {
-        klant: values.klant,
         klantId: values.klantId,
         typeIds: values.typeIds,
-        keepPhotoIds: values.keepPhotoIds,
-        photos: values.newPhotos,
+        keepImageIds: values.keepPhotoIds,
+        images: values.newPhotos,
       })
     },
     onSuccess: () => {
@@ -139,7 +151,7 @@ export default function AdminOnderhoudOffertesPage() {
     updateMutation.reset()
     setDiscardOpen(false)
     setEditorDirty(false)
-    setEditing(null)
+    setEditingId(null)
     setEditorOpen(true)
   }
 
@@ -157,25 +169,31 @@ export default function AdminOnderhoudOffertesPage() {
     return () => setDirty(false)
   }, [editorDirty, setDirty])
 
-  const columns = useMemo<ColumnDef<OnderhoudOfferte>[]>(
+  const columns = useMemo<ColumnDef<OnderhoudOfferteOverview>[]>(
     () => [
       {
-        id: 'name',
+        accessorKey: 'name',
         header: 'Naam',
-        accessorFn: (row) => `${row.firstName} ${row.lastName}`,
+        cell: ({ getValue }) => getValue<string | null>() || '–',
       },
-      { accessorKey: 'email', header: 'E-mail' },
-      { accessorKey: 'city', header: 'Woonplaats' },
       {
-        id: 'types',
+        accessorKey: 'email',
+        header: 'E-mail',
+        cell: ({ getValue }) => getValue<string | null>() || '–',
+      },
+      {
+        accessorKey: 'city',
+        header: 'Woonplaats',
+        cell: ({ getValue }) => getValue<string | null>() || '–',
+      },
+      {
+        accessorKey: 'typeNames',
         header: 'Types',
-        accessorFn: (row) => row.types.map((type) => type.name).join(', '),
-        cell: ({ getValue }) => getValue<string>() || '–',
+        cell: ({ getValue }) => getValue<string | null>() || '–',
       },
       {
-        id: 'photos',
+        accessorKey: 'imageCount',
         header: "Foto's",
-        accessorFn: (row) => row.photos.length,
       },
       {
         accessorKey: 'createdAt',
@@ -202,7 +220,7 @@ export default function AdminOnderhoudOffertesPage() {
                 updateMutation.reset()
                 setDiscardOpen(false)
                 setEditorDirty(false)
-                setEditing(row.original)
+                setEditingId(row.original.id)
                 setEditorOpen(true)
               }}
               aria-label="Bewerken"
@@ -237,16 +255,14 @@ export default function AdminOnderhoudOffertesPage() {
 
   const saveError = editing ? updateMutation.error : createMutation.error
   const formError = saveError instanceof Error ? saveError.message : null
-  const fullName = deleting
-    ? `${deleting.firstName} ${deleting.lastName}`.trim()
-    : 'deze offerte'
+  const fullName = deleting?.name?.trim() || 'deze offerte'
 
   return (
     <div className="flex h-full flex-col overflow-hidden">
       <div className="flex flex-col gap-4 border-b px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
         <Heading
           title="Onderhoud-offerte"
-          description="Aanvragen met klantgegevens, gekozen onderhoudtypes en foto's."
+          description="Aanvragen gekoppeld aan een klant, met onderhoudtypes en foto's."
         />
         <Button
           type="button"
@@ -291,18 +307,26 @@ export default function AdminOnderhoudOffertesPage() {
 
       <Modal
         title={
-          editing ? 'Onderhoudofferte bewerken' : 'Onderhoudofferte toevoegen'
+          editingId ? 'Onderhoudofferte bewerken' : 'Onderhoudofferte toevoegen'
         }
         description="Klant, types en foto's"
         isOpen={editorOpen}
         onClose={requestCloseEditor}
         className="max-h-[90vh] overflow-y-auto p-4 sm:max-w-3xl sm:p-6"
       >
-        {token ? (
+        {token && editingId && detailLoading && !editing ? (
+          <p className="py-8 text-center text-sm text-ink/70">Offerte laden…</p>
+        ) : token && editingId && (detailError || !editing) ? (
+          <p className="py-8 text-center text-sm text-destructive">
+            {detailLoadError instanceof Error
+              ? detailLoadError.message
+              : 'Offerte laden mislukt.'}
+          </p>
+        ) : token ? (
           <OnderhoudOfferteForm
             key={editing?.id ?? 'create'}
             token={token}
-            initial={editing}
+            initial={editing ?? null}
             klanten={klanten}
             types={types}
             submitting={

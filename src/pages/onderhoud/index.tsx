@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { Info } from 'lucide-react'
 import PopupModal from '@/components/shared/popup-modal'
@@ -10,6 +10,7 @@ import {
   type OnderhoudType,
 } from '@/lib/api/onderhoud-types'
 import { cn } from '@/lib/utils'
+import { useUnsavedChanges } from '@/providers/unsaved-changes'
 import { CreateKlantForm } from '@/pages/klant'
 import OnderhoudPhotoUpload from '@/pages/onderhoud/photo-upload'
 
@@ -22,6 +23,7 @@ function descriptionLines(description: string | null): string[] {
 }
 
 export default function OnderhoudPage() {
+  const { setDirty } = useUnsavedChanges()
   const [selectedIds, setSelectedIds] = useState<string[]>([])
   const [photos, setPhotos] = useState<File[]>([])
   const [infoType, setInfoType] = useState<OnderhoudType | null>(null)
@@ -44,6 +46,12 @@ export default function OnderhoudPage() {
     .filter((type) => selectedIds.includes(type.id))
     .map((type) => type.name)
   const canRequest = selectedIds.length > 0
+
+  useEffect(() => {
+    const dirty = selectedIds.length > 0 || photos.length > 0
+    setDirty(dirty)
+    return () => setDirty(false)
+  }, [selectedIds, photos, setDirty])
 
   function toggleType(id: string) {
     setSelectedIds((current) =>
@@ -164,11 +172,11 @@ export default function OnderhoudPage() {
                       kind="onderhoud"
                       selectedLabels={selectedLabels}
                       onClose={onClose}
-                      submitRequest={async (data) => {
+                      submitRequest={async (_data, klant) => {
                         await createOnderhoudOfferte({
-                          klant: data,
+                          klantId: klant.id,
                           typeIds: selectedIds,
-                          photos,
+                          images: photos,
                         })
                       }}
                       onSubmit={() => {

@@ -2,7 +2,7 @@ import { Send } from 'lucide-react'
 import { useState, type FormEvent, type MouseEvent } from 'react'
 import { LegalPageContent } from '@/components/shared/legal-page-content'
 import { Modal } from '@/components/ui/modal'
-import { createKlant, toCreateKlantPayload } from '@/lib/api/klanten'
+import { createKlant, toCreateKlantPayload, type Klant } from '@/lib/api/klanten'
 import { LEGAL_PAGES } from '@/lib/company'
 import { cn } from '@/lib/utils'
 import {
@@ -26,19 +26,26 @@ const eur = new Intl.NumberFormat('nl-NL', {
 type CreateKlantFormProps = {
   offerte?: OfferteContext | null
   kind?: 'airco' | 'onderhoud'
+  /** Beheer voegt alleen een klant toe. De publieke aanvraag houdt de huidige tekst. */
+  variant?: 'aanvraag' | 'beheer'
   selectedLabels?: string[]
   onClose: () => void
   onSubmit?: (data: KlantNawData) => void | Promise<void>
-  submitRequest?: (data: KlantNawData) => Promise<void>
+  /** Extra stap na het aanmaken van de klant, bijvoorbeeld een onderhoudofferte. */
+  submitRequest?: (data: KlantNawData, klant: Klant) => Promise<void>
+  /** Beheer: klant is aangemaakt, geen bedankscherm. */
+  onCreated?: (klant: Klant) => void
 }
 
 export default function CreateKlantForm({
   offerte,
   kind = 'airco',
+  variant = 'aanvraag',
   selectedLabels = [],
   onClose,
   onSubmit,
   submitRequest,
+  onCreated,
 }: CreateKlantFormProps) {
   const [form, setForm] = useState<KlantNawData>(EMPTY_KLANT_NAW)
   const [submitting, setSubmitting] = useState(false)
@@ -77,9 +84,14 @@ export default function CreateKlantForm({
     setSubmitting(true)
 
     try {
-      if (submitRequest) await submitRequest(form)
-      else await createKlant(toCreateKlantPayload(form, offerte))
+      const created = await createKlant(toCreateKlantPayload(form, offerte))
+      if (submitRequest) await submitRequest(form, created)
       await onSubmit?.(form)
+      if (onCreated) {
+        onCreated(created)
+        onClose()
+        return
+      }
       setSubmitted(true)
     } catch (err) {
       const message =
@@ -130,15 +142,22 @@ export default function CreateKlantForm({
     >
       <div>
         <h2 className="text-xl font-medium tracking-[0.2em] text-[#74b8f8] uppercase">
-          {kind === 'onderhoud' ? 'Onderhoud' : 'Offerte'}
+          {variant === 'beheer'
+            ? 'Nieuwe klant'
+            : kind === 'onderhoud'
+              ? 'Onderhoud'
+              : 'Offerte'}
         </h2>
         <p className="mt-2 text-sm text-ink/70">
-          Vul uw NAW-gegevens in. Wij gebruiken deze om uw{' '}
-          {kind === 'onderhoud' ? 'onderhoudsaanvraag' : 'offerteaanvraag'} te
-          versturen.
+          {variant === 'beheer'
+            ? 'De klant wordt opgeslagen in Klanten beheer en daarna aan deze offerte gekoppeld.'
+            : `Vul uw NAW-gegevens in. Wij gebruiken deze om uw ${
+                kind === 'onderhoud' ? 'onderhoudsaanvraag' : 'offerteaanvraag'
+              } te versturen.`}
         </p>
       </div>
 
+      {variant === 'aanvraag' ? (
       <div className="rounded-2xl border border-sky-200 bg-sky-100 px-4 py-3 text-sm text-ink/75">
         <p className="font-medium text-ink">Algemene informatie</p>
         <ul className="mt-2 list-disc space-y-1.5 pl-4">
@@ -160,6 +179,7 @@ export default function CreateKlantForm({
           </li>
         </ul>
       </div>
+      ) : null}
 
       {kind === 'onderhoud' && selectedLabels.length > 0 ? (
         <div className="rounded-2xl border border-mist bg-white px-4 py-3 text-sm text-ink/75">
@@ -390,7 +410,11 @@ export default function CreateKlantForm({
           className="inline-flex items-center justify-center gap-2 rounded-xl bg-sky-400 px-5 py-3 text-sm font-semibold text-ink hover:bg-sky-300 disabled:opacity-60"
         >
           <Send className="size-4" aria-hidden />
-          {submitting ? 'Versturen…' : 'Verzend Email'}
+          {submitting
+            ? 'Opslaan…'
+            : variant === 'beheer'
+              ? 'Klant opslaan'
+              : 'Verzend Email'}
         </button>
       </div>
 

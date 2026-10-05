@@ -1,21 +1,17 @@
+import { useQueryClient } from '@tanstack/react-query'
 import { useEffect, useMemo, useRef, useState, type FormEvent } from 'react'
 import { ChevronLeft, ChevronRight, X } from 'lucide-react'
 import { Modal } from '@/components/ui/modal'
 import type { Klant } from '@/lib/api/klanten'
 import type { OnderhoudOfferte } from '@/lib/api/onderhoud-offertes'
-import { fetchOnderhoudFotoUrl } from '@/lib/api/onderhoud-offertes'
+import { fetchOnderhoudImageUrl } from '@/lib/api/onderhoud-offertes'
 import type { OnderhoudType } from '@/lib/api/onderhoud-types'
 import { cn } from '@/lib/utils'
-import { NawTextField } from '@/pages/klant/components/naw-text-field'
-import {
-  validateKlantNaw,
-  type KlantFieldErrors,
-} from '@/pages/klant/schema'
+import CreateKlantForm from '@/pages/klant/components/create'
 import { EMPTY_KLANT_NAW, type KlantNawData } from '@/pages/klant/types'
 
 export type OnderhoudOfferteFormValues = {
-  klant: KlantNawData
-  klantId?: string
+  klantId: string
   typeIds: string[]
   keepPhotoIds: string[]
   newPhotos: File[]
@@ -59,7 +55,7 @@ function formState(offerte: OnderhoudOfferte | null) {
   return {
     klant: toKlant(offerte),
     typeIds: offerte.types.map((type) => type.id),
-    keepPhotoIds: offerte.photos.map((photo) => photo.id),
+    keepPhotoIds: offerte.images.map((image) => image.id),
   }
 }
 
@@ -118,7 +114,7 @@ function useStoredFotoUrls(
     let active = true
     const created: string[] = []
     for (const fotoId of key.split('|')) {
-      void fetchOnderhoudFotoUrl(token, offerteId, fotoId)
+      void fetchOnderhoudImageUrl(token, offerteId, fotoId)
         .then((url) => {
           created.push(url)
           if (!active) {
@@ -338,68 +334,6 @@ function KlantPicker({
   )
 }
 
-function KlantFields({
-  klant,
-  fieldErrors,
-  updateField,
-  setKlant,
-}: {
-  klant: KlantNawData
-  fieldErrors: KlantFieldErrors
-  updateField: (name: keyof KlantNawData, value: string) => void
-  setKlant: (value: KlantNawData | ((prev: KlantNawData) => KlantNawData)) => void
-}) {
-  return (
-    <div className="space-y-5">
-      <div className="grid gap-4 sm:grid-cols-2">
-        <NawTextField label="Voornaam" name="firstName" value={klant.firstName} required error={fieldErrors.firstName} onChange={updateField} />
-        <NawTextField label="Achternaam" name="lastName" value={klant.lastName} required error={fieldErrors.lastName} onChange={updateField} />
-        <NawTextField label="E-mail" name="email" type="email" value={klant.email} required error={fieldErrors.email} onChange={updateField} />
-        <NawTextField label="Telefoon" name="phone" type="tel" value={klant.phone} required error={fieldErrors.phone} onChange={updateField} />
-        <NawTextField label="Straat" name="street" value={klant.street} required error={fieldErrors.street} onChange={updateField} />
-        <NawTextField label="Nr." name="houseNumber" value={klant.houseNumber} required error={fieldErrors.houseNumber} onChange={updateField} />
-        <NawTextField label="Postcode" name="postalCode" value={klant.postalCode} required error={fieldErrors.postalCode} onChange={updateField} />
-        <NawTextField label="Woonplaats" name="city" value={klant.city} required error={fieldErrors.city} onChange={updateField} />
-      </div>
-
-      <label className="block">
-        <span className="mb-2 block text-sm font-medium text-ink/70">Opmerking</span>
-        <textarea
-          rows={3}
-          value={klant.note}
-          onChange={(event) => updateField('note', event.target.value)}
-          className="w-full resize-y rounded-xl border border-mist bg-foam px-3 py-2.5 text-ink outline-none focus:border-teal"
-        />
-      </label>
-
-      <div className="space-y-3">
-        <label className="flex cursor-pointer items-start gap-3 text-sm text-ink/80">
-          <input
-            type="checkbox"
-            checked={klant.consentContact}
-            onChange={(event) =>
-              setKlant((prev) => ({ ...prev, consentContact: event.target.checked }))
-            }
-            className="mt-0.5 size-4 shrink-0 accent-teal"
-          />
-          <span>Toestemming om contact op te nemen.</span>
-        </label>
-        <label className="flex cursor-pointer items-start gap-3 text-sm text-ink/80">
-          <input
-            type="checkbox"
-            checked={klant.consentTerms}
-            onChange={(event) =>
-              setKlant((prev) => ({ ...prev, consentTerms: event.target.checked }))
-            }
-            className="mt-0.5 size-4 shrink-0 accent-teal"
-          />
-          <span>Algemene voorwaarden geaccepteerd.</span>
-        </label>
-      </div>
-    </div>
-  )
-}
-
 export default function OnderhoudOfferteForm({
   token,
   initial,
@@ -422,22 +356,27 @@ export default function OnderhoudOfferteForm({
   )
   const [newPhotos, setNewPhotos] = useState<File[]>([])
   const [selectedKlantId, setSelectedKlantId] = useState('')
-  const [showNewKlant, setShowNewKlant] = useState(false)
-  const [fieldErrors, setFieldErrors] = useState<KlantFieldErrors>({})
+  const [newKlantOpen, setNewKlantOpen] = useState(false)
+  const [createdKlanten, setCreatedKlanten] = useState<Klant[]>([])
+  const queryClient = useQueryClient()
   const [formError, setFormError] = useState<string | null>(null)
   const [fotoIndex, setFotoIndex] = useState(0)
   const [fotoPreviewOpen, setFotoPreviewOpen] = useState(false)
   const isCreate = initial == null
-  const sortedKlanten = useMemo(
-    () =>
-      [...klanten].sort((a, b) =>
-        `${a.lastName} ${a.firstName}`.localeCompare(
-          `${b.lastName} ${b.firstName}`,
-          'nl',
-        ),
+  const sortedKlanten = useMemo(() => {
+    const merged = [
+      ...createdKlanten,
+      ...klanten.filter(
+        (item) => !createdKlanten.some((created) => created.id === item.id),
       ),
-    [klanten],
-  )
+    ]
+    return merged.sort((a, b) =>
+      `${a.lastName} ${a.firstName}`.localeCompare(
+        `${b.lastName} ${b.firstName}`,
+        'nl',
+      ),
+    )
+  }, [klanten, createdKlanten])
   const selectedKlant = sortedKlanten.find((item) => item.id === selectedKlantId)
 
   useEffect(() => {
@@ -446,7 +385,6 @@ export default function OnderhoudOfferteForm({
     setTypeIds(next.typeIds)
     setKeepPhotoIds(next.keepPhotoIds)
     setNewPhotos([])
-    setShowNewKlant(false)
     if (!initial) setSelectedKlantId('')
   }, [initial])
 
@@ -469,7 +407,7 @@ export default function OnderhoudOfferteForm({
   const maxPhotos = Math.min(Math.max(typeIds.length, 0), 3)
   const photoCount = keepPhotoIds.length + newPhotos.length
   const room = Math.max(maxPhotos - photoCount, 0)
-  const keptPhotos = (initial?.photos ?? []).filter((photo) =>
+  const keptPhotos = (initial?.images ?? []).filter((photo) =>
     keepPhotoIds.includes(photo.id),
   )
   const storedUrls = useStoredFotoUrls(
@@ -500,16 +438,6 @@ export default function OnderhoudOfferteForm({
     setFotoPreviewOpen(true)
   }
 
-  const updateField = (name: keyof KlantNawData, value: string) => {
-    setKlant((prev) => ({ ...prev, [name]: value }))
-    setFieldErrors((prev) => {
-      if (!prev[name]) return prev
-      const next = { ...prev }
-      delete next[name]
-      return next
-    })
-  }
-
   const toggleType = (id: string) => {
     setTypeIds((current) =>
       current.includes(id)
@@ -535,19 +463,29 @@ export default function OnderhoudOfferteForm({
 
   const chooseExistingKlant = (id: string) => {
     setSelectedKlantId(id)
-    setShowNewKlant(false)
-    setFieldErrors({})
     setFormError(null)
     const found = sortedKlanten.find((item) => item.id === id)
     setKlant(found ? klantToNaw(found) : { ...EMPTY_KLANT_NAW })
   }
 
-  const openNewKlant = () => {
-    setSelectedKlantId('')
-    setShowNewKlant(true)
-    setFieldErrors({})
+  const rememberCreatedKlant = (created: Klant) => {
+    setCreatedKlanten((current) => [
+      created,
+      ...current.filter((item) => item.id !== created.id),
+    ])
+    queryClient.setQueryData<Klant[]>(['klanten'], (current = []) =>
+      current.some((item) => item.id === created.id)
+        ? current
+        : [created, ...current],
+    )
+    setSelectedKlantId(created.id)
+    setKlant(klantToNaw(created))
     setFormError(null)
-    setKlant({ ...EMPTY_KLANT_NAW })
+  }
+
+  const openNewKlant = () => {
+    setFormError(null)
+    setNewKlantOpen(true)
   }
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
@@ -569,7 +507,6 @@ export default function OnderhoudOfferteForm({
       }
       setFormError(null)
       onSubmit({
-        klant: klantToNaw(selectedKlant),
         klantId: selectedKlant.id,
         typeIds,
         keepPhotoIds,
@@ -577,14 +514,8 @@ export default function OnderhoudOfferteForm({
       })
       return
     }
-    if (!selectedKlantId && !showNewKlant) {
+    if (!selectedKlant) {
       setFormError('Kies een klant of voeg een nieuwe toe.')
-      return
-    }
-    const result = validateKlantNaw(klant, { requireConsent: false })
-    if (!result.ok) {
-      setFieldErrors(result.fieldErrors)
-      if (isCreate) setShowNewKlant(true)
       return
     }
     if (typeIds.length === 0) {
@@ -597,11 +528,9 @@ export default function OnderhoudOfferteForm({
       )
       return
     }
-    setFieldErrors({})
     setFormError(null)
     onSubmit({
-      klant,
-      klantId: showNewKlant ? undefined : selectedKlantId || undefined,
+      klantId: selectedKlant.id,
       typeIds,
       keepPhotoIds,
       newPhotos,
@@ -618,7 +547,7 @@ export default function OnderhoudOfferteForm({
         <p className="mt-2 text-sm text-ink/70">
           {initial
             ? "Kies de klant en pas de onderhoudtypes en foto's aan."
-            : "Kies een bestaande klant of voeg eronder een nieuwe toe."}
+            : 'Kies een bestaande klant of voeg een nieuwe klant toe.'}
         </p>
       </div>
 
@@ -635,18 +564,13 @@ export default function OnderhoudOfferteForm({
             <button
               type="button"
               onClick={openNewKlant}
-              className={cn(
-                'rounded-xl border px-4 py-2.5 text-sm font-semibold',
-                showNewKlant
-                  ? 'border-teal bg-foam text-ink'
-                  : 'border-mist bg-white text-ink hover:bg-foam',
-              )}
+              className="rounded-xl border border-mist bg-white px-4 py-2.5 text-sm font-semibold text-ink hover:bg-foam"
             >
               Voeg nieuwe toe
             </button>
           </div>
 
-          {selectedKlant && !showNewKlant ? (
+          {selectedKlant ? (
             <div className="rounded-xl border border-mist bg-white px-4 py-3 text-sm text-ink/80">
               <p className="font-semibold text-ink">
                 {selectedKlant.firstName} {selectedKlant.lastName}
@@ -697,15 +621,6 @@ export default function OnderhoudOfferteForm({
           </p>
         </div>
       )}
-
-      {showNewKlant ? (
-        <KlantFields
-          klant={klant}
-          fieldErrors={fieldErrors}
-          updateField={updateField}
-          setKlant={setKlant}
-        />
-      ) : null}
 
       <fieldset>
         <legend className="mb-2 text-sm font-medium text-ink/70">
@@ -856,6 +771,21 @@ export default function OnderhoudOfferteForm({
         </button>
       </div>
     </form>
+    <Modal
+      stacked
+      title="Nieuwe klant"
+      description="Klantgegevens"
+      isOpen={newKlantOpen}
+      onClose={() => setNewKlantOpen(false)}
+      className="max-h-[90vh] overflow-y-auto p-4 sm:max-w-3xl sm:p-6"
+    >
+      <CreateKlantForm
+        kind="onderhoud"
+        variant="beheer"
+        onClose={() => setNewKlantOpen(false)}
+        onCreated={rememberCreatedKlant}
+      />
+    </Modal>
     <Modal
       stacked
       title="Foto's"

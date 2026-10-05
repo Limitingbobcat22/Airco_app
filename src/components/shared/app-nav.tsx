@@ -97,11 +97,13 @@ export default function AppNav({
           )
 
           const handleClick = (event: MouseEvent<HTMLAnchorElement>) => {
-            if (!item.leavesTopic) {
+            const onTopicPage = getTopicFromPath(pathname) != null
+            const sectionId = getSectionIdFromHref(href)
+
+            if (pathname === href) {
               setOpen?.(false)
-              const sectionId = getSectionIdFromHref(href)
-              if (sectionId && pathname === href) {
-                event.preventDefault()
+              event.preventDefault()
+              if (!item.leavesTopic && sectionId) {
                 scrollToPageSection(
                   sectionId === 'home' ? null : sectionId,
                   'smooth',
@@ -110,10 +112,15 @@ export default function AppNav({
               return
             }
 
+            // Binnen airco of ketel wisselen de secties zonder de invoer te wissen.
+            if (onTopicPage && !item.leavesTopic) {
+              setOpen?.(false)
+              return
+            }
+
             event.preventDefault()
             const label = item.destinationLabel ?? title
-            const canNavigate = requestNavigation(href, label)
-            if (canNavigate) navigate(href)
+            if (requestNavigation(href, label)) navigate(href)
             setOpen?.(false)
           }
 
