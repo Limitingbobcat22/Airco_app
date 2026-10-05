@@ -5,6 +5,11 @@ import { useActiveSection } from '@/hooks/use-active-section'
 import { useGoToSection } from '@/hooks/use-go-to-section'
 import {
   ADMIN_AIRCOS_PATH,
+  ADMIN_HANDLEIDINGEN_PATH,
+  ADMIN_KLANTEN_PATH,
+  ADMIN_OFFERTES_PATH,
+  ADMIN_ONDERHOUD_OFFERTES_PATH,
+  ADMIN_ONDERHOUD_TYPES_PATH,
   getNavTitleBySectionId,
   HANDLEIDINGEN_PATH,
   ONDERHOUD_PATH,
@@ -23,7 +28,15 @@ export default function Header({ onMenuClick }: HeaderProps) {
   const { pathname } = useLocation()
   const activeSectionId = useActiveSection()
   const goToSection = useGoToSection()
-  const isAdminAircos = pathname === ADMIN_AIRCOS_PATH
+  const adminTitles: Record<string, string> = {
+    [ADMIN_AIRCOS_PATH]: 'Aircos',
+    [ADMIN_KLANTEN_PATH]: 'Klanten',
+    [ADMIN_OFFERTES_PATH]: 'Offertes',
+    [ADMIN_HANDLEIDINGEN_PATH]: 'Handleidingen',
+    [ADMIN_ONDERHOUD_TYPES_PATH]: 'Onderhoud-type',
+    [ADMIN_ONDERHOUD_OFFERTES_PATH]: 'Onderhoud-offerte',
+  }
+  const adminTitle = adminTitles[pathname]
   const infoTitle =
     pathname === ONDERHOUD_PATH
       ? 'Onderhoud'
@@ -31,16 +44,15 @@ export default function Header({ onMenuClick }: HeaderProps) {
         ? 'Handleidingen'
         : null
   const topic = getTopicFromPath(pathname) ?? AIRCO_TOPIC
-  const topicLabel = isAdminAircos
+  const topicLabel = adminTitle
     ? 'Beheer'
     : infoTitle
       ? 'Info'
       : TOPIC_LABELS[topic]
-  const sectionTitle = isAdminAircos
-    ? 'Aircos'
-    : infoTitle
-      ? infoTitle
-      : getNavTitleBySectionId(activeSectionId, topic)
+  const sectionTitle =
+    adminTitle ??
+    infoTitle ??
+    getNavTitleBySectionId(activeSectionId, topic)
 
   return (
     <div className="flex flex-1 items-center gap-2 px-3 md:px-4">
@@ -59,7 +71,7 @@ export default function Header({ onMenuClick }: HeaderProps) {
       <nav aria-label="Huidige locatie" className="min-w-0">
         <ol className="text-ink flex items-center gap-1.5 text-xl font-bold tracking-tight sm:gap-2 sm:text-2xl">
           <li className="min-w-0 truncate">
-            {isAdminAircos || infoTitle ? (
+            {adminTitle || infoTitle ? (
               <span className="truncate">{topicLabel}</span>
             ) : (
               <button

@@ -1,5 +1,5 @@
 import type { LucideIcon } from 'lucide-react'
-import { BookOpen, Flame, FileText, Table2, Users, Wrench } from 'lucide-react'
+import { BookOpen, ClipboardList, Flame, FileText, ListChecks, Table2, Users, Wrench } from 'lucide-react'
 import AircoIcon from '@/components/icons/airco-icon'
 import {
   AIRCO_TOPIC,
@@ -17,6 +17,8 @@ export const ADMIN_AIRCOS_PATH = '/admin/aircos'
 export const ADMIN_KLANTEN_PATH = '/admin/klanten'
 export const ADMIN_OFFERTES_PATH = '/admin/offertes'
 export const ADMIN_HANDLEIDINGEN_PATH = '/admin/handleidingen'
+export const ADMIN_ONDERHOUD_TYPES_PATH = '/admin/onderhoud-types'
+export const ADMIN_ONDERHOUD_OFFERTES_PATH = '/admin/onderhoud-offertes'
 export const HANDLEIDINGEN_PATH = '/handleidingen'
 export const ONDERHOUD_PATH = '/onderhoud'
 
@@ -102,30 +104,48 @@ export function buildTopicNavItems(
 
   if (isAdmin) {
     items.push({ separator: true })
-    items.push({ sectionHeader: 'Beheer' })
+    items.push({ sectionHeader: 'Beheer-airco' })
     items.push({
-      title: 'Aircos beheer',
+      title: 'Aircos',
       href: ADMIN_AIRCOS_PATH,
       icon: Table2,
       leavesTopic: true,
       destinationLabel: 'Aircos beheer',
     })
     items.push({
-      title: 'Klanten beheer',
+      title: 'Offertes',
+      href: ADMIN_OFFERTES_PATH,
+      icon: FileText,
+      leavesTopic: true,
+      destinationLabel: 'Offertes beheer',
+    })
+    items.push({ separator: true })
+    items.push({ sectionHeader: 'Beheer-onderhoud' })
+    items.push({
+      title: 'Types',
+      href: ADMIN_ONDERHOUD_TYPES_PATH,
+      icon: ListChecks,
+      leavesTopic: true,
+      destinationLabel: 'Onderhoud-type',
+    })
+    items.push({
+      title: 'Offertes',
+      href: ADMIN_ONDERHOUD_OFFERTES_PATH,
+      icon: ClipboardList,
+      leavesTopic: true,
+      destinationLabel: 'Onderhoud-offerte',
+    })
+    items.push({ separator: true })
+    items.push({ sectionHeader: 'Beheer-algemeen' })
+    items.push({
+      title: 'Klanten',
       href: ADMIN_KLANTEN_PATH,
       icon: Users,
       leavesTopic: true,
       destinationLabel: 'Klanten beheer',
     })
     items.push({
-      title: 'Offertes beheer',
-      href: ADMIN_OFFERTES_PATH,
-      icon: FileText,
-      leavesTopic: true,
-      destinationLabel: 'Offertes beheer',
-    })
-    items.push({
-      title: 'Handleidingen beheer',
+      title: 'Handleidingen',
       href: ADMIN_HANDLEIDINGEN_PATH,
       icon: BookOpen,
       leavesTopic: true,

@@ -25,14 +25,20 @@ const eur = new Intl.NumberFormat('nl-NL', {
 
 type CreateKlantFormProps = {
   offerte?: OfferteContext | null
+  kind?: 'airco' | 'onderhoud'
+  selectedLabels?: string[]
   onClose: () => void
   onSubmit?: (data: KlantNawData) => void | Promise<void>
+  submitRequest?: (data: KlantNawData) => Promise<void>
 }
 
 export default function CreateKlantForm({
   offerte,
+  kind = 'airco',
+  selectedLabels = [],
   onClose,
   onSubmit,
+  submitRequest,
 }: CreateKlantFormProps) {
   const [form, setForm] = useState<KlantNawData>(EMPTY_KLANT_NAW)
   const [submitting, setSubmitting] = useState(false)
@@ -71,7 +77,8 @@ export default function CreateKlantForm({
     setSubmitting(true)
 
     try {
-      await createKlant(toCreateKlantPayload(form, offerte))
+      if (submitRequest) await submitRequest(form)
+      else await createKlant(toCreateKlantPayload(form, offerte))
       await onSubmit?.(form)
       setSubmitted(true)
     } catch (err) {
@@ -100,7 +107,9 @@ export default function CreateKlantForm({
           Bedankt, {form.firstName}
         </h2>
         <p className="mt-3 text-sm text-ink/70">
-          Wij nemen zo snel mogelijk telefonisch contact met u op over uw offerte.
+          {kind === 'onderhoud'
+            ? 'Wij nemen zo snel mogelijk telefonisch contact met u op over uw onderhoudsaanvraag.'
+            : 'Wij nemen zo snel mogelijk telefonisch contact met u op over uw offerte.'}
         </p>
         <button
           type="button"
@@ -121,10 +130,11 @@ export default function CreateKlantForm({
     >
       <div>
         <h2 className="text-xl font-medium tracking-[0.2em] text-[#74b8f8] uppercase">
-          Offerte
+          {kind === 'onderhoud' ? 'Onderhoud' : 'Offerte'}
         </h2>
         <p className="mt-2 text-sm text-ink/70">
-          Vul uw NAW-gegevens in. Wij gebruiken deze om uw offerteaanvraag te
+          Vul uw NAW-gegevens in. Wij gebruiken deze om uw{' '}
+          {kind === 'onderhoud' ? 'onderhoudsaanvraag' : 'offerteaanvraag'} te
           versturen.
         </p>
       </div>
@@ -137,18 +147,30 @@ export default function CreateKlantForm({
             binnen 1 werkdag.
           </li>
           <li>
-            Wij bespreken uw situatie, het gekozen model en een prijsvoorstel op
-            maat.
+            {kind === 'onderhoud'
+              ? 'Wij bespreken de gekozen onderhoudtypes en plannen een afspraak.'
+              : 'Wij bespreken uw situatie, het gekozen model en een prijsvoorstel op maat.'}
           </li>
           <li>
             Een aanvraag is vrijblijvend — u zit nergens aan vast.
           </li>
           <li>
             Uw gegevens gebruiken wij alleen om contact met u op te nemen over
-            deze offerte.
+            {kind === 'onderhoud' ? ' dit onderhoud.' : ' deze offerte.'}
           </li>
         </ul>
       </div>
+
+      {kind === 'onderhoud' && selectedLabels.length > 0 ? (
+        <div className="rounded-2xl border border-mist bg-white px-4 py-3 text-sm text-ink/75">
+          <p>
+            Gekozen onderhoud:{' '}
+            <span className="font-medium text-ink">
+              {selectedLabels.join(', ')}
+            </span>
+          </p>
+        </div>
+      ) : null}
 
       {offerte ? (
         <div className="rounded-2xl border border-mist bg-white px-4 py-3 text-sm text-ink/75">

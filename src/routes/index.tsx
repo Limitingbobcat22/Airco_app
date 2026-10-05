@@ -2,6 +2,8 @@ import RequireAdmin from '@/auth/require-admin'
 import AppLayout from '@/components/layout/app-layout'
 import AdminAircosPage from '@/pages/admin/aircos'
 import AdminHandleidingenPage from '@/pages/admin/handleidingen'
+import AdminOnderhoudOffertesPage from '@/pages/admin/onderhoud-offertes'
+import AdminOnderhoudTypesPage from '@/pages/admin/onderhoud-types'
 import AdminKlantenPage from '@/pages/admin/klanten'
 import AdminOffertesPage from '@/pages/admin/offertes'
 import AircoPage from '@/pages/airco'
@@ -92,6 +94,22 @@ export default function AppRouter() {
           element: (
             <RequireAdmin>
               <AdminHandleidingenPage />
+            </RequireAdmin>
+          ),
+        },
+        {
+          path: 'admin/onderhoud-types',
+          element: (
+            <RequireAdmin>
+              <AdminOnderhoudTypesPage />
+            </RequireAdmin>
+          ),
+        },
+        {
+          path: 'admin/onderhoud-offertes',
+          element: (
+            <RequireAdmin>
+              <AdminOnderhoudOffertesPage />
             </RequireAdmin>
           ),
         },
