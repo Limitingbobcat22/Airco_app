@@ -12,9 +12,11 @@ export default function RequireAdmin({
 }: {
   children: React.ReactNode
 }) {
-  const { isLoggedIn, user } = useAuth()
+  const { isLoggedIn, isReady, user } = useAuth()
   const location = useLocation()
   const isAdmin = isLoggedIn && Boolean(user?.isAdmin)
+
+  if (!isReady) return null
 
   if (!isAdmin) {
     return (

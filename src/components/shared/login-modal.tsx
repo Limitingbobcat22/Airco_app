@@ -7,7 +7,7 @@ import { useLoginModal } from '@/hooks/use-login-modal'
 import { loginRequest } from '@/lib/api/auth'
 
 export default function LoginModal() {
-  const { isOpen, close } = useLoginModal()
+  const { isOpen, notice, close } = useLoginModal()
   const { login } = useAuth()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -68,6 +68,11 @@ export default function LoginModal() {
           <p className="text-muted-foreground text-sm">
             Login is alleen voor personeel
           </p>
+          {notice ? (
+            <p className="text-sm text-amber-700" role="status">
+              {notice}
+            </p>
+          ) : null}
         </div>
 
         <div className="space-y-2">

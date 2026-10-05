@@ -9,7 +9,8 @@ import {
 
 type LoginModalContextValue = {
   isOpen: boolean
-  open: () => void
+  notice: string | null
+  open: (notice?: string) => void
   close: () => void
 }
 
@@ -17,13 +18,20 @@ const LoginModalContext = createContext<LoginModalContextValue | null>(null)
 
 export function LoginModalProvider({ children }: { children: ReactNode }) {
   const [isOpen, setIsOpen] = useState(false)
+  const [notice, setNotice] = useState<string | null>(null)
 
-  const open = useCallback(() => setIsOpen(true), [])
-  const close = useCallback(() => setIsOpen(false), [])
+  const open = useCallback((nextNotice?: string) => {
+    setNotice(nextNotice ?? null)
+    setIsOpen(true)
+  }, [])
+  const close = useCallback(() => {
+    setIsOpen(false)
+    setNotice(null)
+  }, [])
 
   const value = useMemo(
-    () => ({ isOpen, open, close }),
-    [isOpen, open, close],
+    () => ({ isOpen, notice, open, close }),
+    [isOpen, notice, open, close],
   )
 
   return (
