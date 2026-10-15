@@ -581,6 +581,12 @@ export default function OnderhoudOfferteForm({
                 {selectedKlant.street} {selectedKlant.houseNumber},{' '}
                 {selectedKlant.postalCode} {selectedKlant.city}
               </p>
+              <p className="mt-2 whitespace-pre-wrap">
+                <span className="font-medium text-ink">Opmerking</span>
+                <span className="mt-0.5 block">
+                  {selectedKlant.note?.trim() || '–'}
+                </span>
+              </p>
             </div>
           ) : null}
         </div>
@@ -613,6 +619,12 @@ export default function OnderhoudOfferteForm({
               <p className="mt-1">
                 {selectedKlant.street} {selectedKlant.houseNumber},{' '}
                 {selectedKlant.postalCode} {selectedKlant.city}
+              </p>
+              <p className="mt-2 whitespace-pre-wrap">
+                <span className="font-medium text-ink">Opmerking</span>
+                <span className="mt-0.5 block">
+                  {selectedKlant.note?.trim() || '–'}
+                </span>
               </p>
             </div>
           ) : null}

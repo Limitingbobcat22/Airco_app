@@ -228,6 +228,21 @@ export default function AdminOnderhoudOffertesPage() {
         cell: ({ getValue }) => getValue<string | null>() || '–',
       },
       {
+        id: 'note',
+        header: 'Opmerking',
+        cell: ({ row }) => {
+          const value = klanten
+            .find((klant) => klant.id === row.original.klantId)
+            ?.note?.trim()
+          if (!value) return '–'
+          return (
+            <span className="line-clamp-2 max-w-xs whitespace-pre-wrap" title={value}>
+              {value}
+            </span>
+          )
+        },
+      },
+      {
         accessorKey: 'typeNames',
         header: 'Types',
         cell: ({ getValue }) => getValue<string | null>() || '–',
@@ -287,7 +302,7 @@ export default function AdminOnderhoudOffertesPage() {
         ),
       },
     ],
-    [createMutation, deleteMutation, markReadMutation, updateMutation],
+    [createMutation, deleteMutation, klanten, markReadMutation, updateMutation],
   )
 
   const table = useReactTable({
