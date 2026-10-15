@@ -13,6 +13,7 @@ import { EMPTY_KLANT_NAW, type KlantNawData } from '@/pages/klant/types'
 export type OnderhoudOfferteFormValues = {
   klantId: string
   typeIds: string[]
+  taskNote: string
   keepPhotoIds: string[]
   newPhotos: File[]
 }
@@ -47,6 +48,7 @@ function formState(offerte: OnderhoudOfferte | null) {
   if (!offerte) {
     return {
       klant: { ...EMPTY_KLANT_NAW },
+      taskNote: '',
       typeIds: [] as string[],
       keepPhotoIds: [] as string[],
     }
@@ -54,6 +56,7 @@ function formState(offerte: OnderhoudOfferte | null) {
 
   return {
     klant: toKlant(offerte),
+    taskNote: offerte.taskNote ?? '',
     typeIds: offerte.types.map((type) => type.id),
     keepPhotoIds: offerte.images.map((image) => image.id),
   }
@@ -348,6 +351,9 @@ export default function OnderhoudOfferteForm({
   const [klant, setKlant] = useState<KlantNawData>(
     () => formState(initial).klant,
   )
+  const [taskNote, setTaskNote] = useState(
+    () => formState(initial).taskNote,
+  )
   const [typeIds, setTypeIds] = useState<string[]>(
     () => formState(initial).typeIds,
   )
@@ -382,6 +388,7 @@ export default function OnderhoudOfferteForm({
   useEffect(() => {
     const next = formState(initial)
     setKlant(next.klant)
+    setTaskNote(next.taskNote)
     setTypeIds(next.typeIds)
     setKeepPhotoIds(next.keepPhotoIds)
     setNewPhotos([])
@@ -397,12 +404,13 @@ export default function OnderhoudOfferteForm({
     const baseline = formState(initial)
     const dirty =
       JSON.stringify(klant) !== JSON.stringify(baseline.klant) ||
+      taskNote !== baseline.taskNote ||
       typeIds.join() !== baseline.typeIds.join() ||
       keepPhotoIds.join() !== baseline.keepPhotoIds.join() ||
       newPhotos.length > 0
     onDirtyChange?.(dirty)
     return () => onDirtyChange?.(false)
-  }, [klant, typeIds, keepPhotoIds, newPhotos, initial, onDirtyChange])
+  }, [klant, taskNote, typeIds, keepPhotoIds, newPhotos, initial, onDirtyChange])
 
   const maxPhotos = Math.min(Math.max(typeIds.length, 0), 3)
   const photoCount = keepPhotoIds.length + newPhotos.length
@@ -499,6 +507,10 @@ export default function OnderhoudOfferteForm({
         setFormError('Kies minimaal één onderhoudtype.')
         return
       }
+      if (taskNote.trim().length > 2000) {
+        setFormError('Toelichting is te lang.')
+        return
+      }
       if (photoCount > maxPhotos) {
         setFormError(
           `Maximaal ${maxPhotos} ${maxPhotos === 1 ? 'foto' : "foto's"} bij ${typeIds.length} ${typeIds.length === 1 ? 'type' : 'types'}.`,
@@ -509,6 +521,7 @@ export default function OnderhoudOfferteForm({
       onSubmit({
         klantId: selectedKlant.id,
         typeIds,
+        taskNote,
         keepPhotoIds,
         newPhotos,
       })
@@ -522,6 +535,10 @@ export default function OnderhoudOfferteForm({
       setFormError('Kies minimaal één onderhoudtype.')
       return
     }
+    if (taskNote.trim().length > 2000) {
+      setFormError('Toelichting is te lang.')
+      return
+    }
     if (photoCount > maxPhotos) {
       setFormError(
         `Maximaal ${maxPhotos} ${maxPhotos === 1 ? 'foto' : "foto's"} bij ${typeIds.length} ${typeIds.length === 1 ? 'type' : 'types'}.`,
@@ -532,6 +549,7 @@ export default function OnderhoudOfferteForm({
     onSubmit({
       klantId: selectedKlant.id,
       typeIds,
+      taskNote,
       keepPhotoIds,
       newPhotos,
     })
@@ -662,6 +680,20 @@ export default function OnderhoudOfferteForm({
           })}
         </ul>
       </fieldset>
+
+      <label className="block">
+        <span className="mb-2 block text-sm font-medium text-ink/70">
+          Toelichting
+        </span>
+        <textarea
+          rows={4}
+          maxLength={2000}
+          value={taskNote}
+          onChange={(event) => setTaskNote(event.target.value)}
+          placeholder="Extra informatie over de onderhoudstaken"
+          className="w-full resize-y rounded-xl border border-mist bg-foam px-3 py-2.5 text-ink outline-none focus:border-teal"
+        />
+      </label>
 
       <div>
         <div className="mb-2 flex items-center justify-between gap-3">

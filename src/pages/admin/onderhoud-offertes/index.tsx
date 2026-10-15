@@ -102,6 +102,7 @@ export default function AdminOnderhoudOffertesPage() {
       return createOnderhoudOfferteAdmin(token, {
         klantId: values.klantId,
         typeIds: values.typeIds,
+        taskNote: values.taskNote,
         images: values.newPhotos,
       })
     },
@@ -123,6 +124,7 @@ export default function AdminOnderhoudOffertesPage() {
       return updateOnderhoudOfferte(token, id, {
         klantId: values.klantId,
         typeIds: values.typeIds,
+        taskNote: values.taskNote,
         keepImageIds: values.keepPhotoIds,
         images: values.newPhotos,
       })
@@ -234,6 +236,19 @@ export default function AdminOnderhoudOffertesPage() {
           const value = klanten
             .find((klant) => klant.id === row.original.klantId)
             ?.note?.trim()
+          if (!value) return '–'
+          return (
+            <span className="line-clamp-2 max-w-xs whitespace-pre-wrap" title={value}>
+              {value}
+            </span>
+          )
+        },
+      },
+      {
+        accessorKey: 'taskNote',
+        header: 'Toelichting',
+        cell: ({ getValue }) => {
+          const value = getValue<string | null>()?.trim()
           if (!value) return '–'
           return (
             <span className="line-clamp-2 max-w-xs whitespace-pre-wrap" title={value}>

@@ -27,6 +27,7 @@ export type OnderhoudOfferte = {
   postalCode: string
   city: string
   note: string | null
+  taskNote: string | null
   consentContact: boolean
   consentTerms: boolean
   types: OnderhoudOfferteTypeRef[]
@@ -43,6 +44,7 @@ export type OnderhoudOfferteOverview = {
   email: string | null
   phone: string | null
   city: string | null
+  taskNote: string | null
   typeNames: string | null
   imageCount: number
   read: boolean
@@ -53,6 +55,7 @@ export type OnderhoudOfferteOverview = {
 export type SaveOnderhoudOfferteInput = {
   klantId: string
   typeIds: string[]
+  taskNote?: string
   images: File[]
   keepImageIds?: string[]
 }
@@ -63,6 +66,7 @@ function appendOfferteFields(
 ) {
   body.append('klantId', input.klantId)
   body.append('typeIds', JSON.stringify(input.typeIds))
+  body.append('taskNote', input.taskNote ?? '')
   if (input.keepImageIds) {
     body.append('keepImageIds', JSON.stringify(input.keepImageIds))
   }

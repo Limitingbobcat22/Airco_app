@@ -25,6 +25,7 @@ function descriptionLines(description: string | null): string[] {
 export default function OnderhoudPage() {
   const { setDirty } = useUnsavedChanges()
   const [selectedIds, setSelectedIds] = useState<string[]>([])
+  const [taskNote, setTaskNote] = useState('')
   const [photos, setPhotos] = useState<File[]>([])
   const [infoType, setInfoType] = useState<OnderhoudType | null>(null)
   const handlePhotosChange = useCallback((next: File[]) => {
@@ -48,10 +49,11 @@ export default function OnderhoudPage() {
   const canRequest = selectedIds.length > 0
 
   useEffect(() => {
-    const dirty = selectedIds.length > 0 || photos.length > 0
+    const dirty =
+      selectedIds.length > 0 || photos.length > 0 || taskNote.trim().length > 0
     setDirty(dirty)
     return () => setDirty(false)
-  }, [selectedIds, photos, setDirty])
+  }, [selectedIds, photos, taskNote, setDirty])
 
   function toggleType(id: string) {
     setSelectedIds((current) =>
@@ -153,6 +155,22 @@ export default function OnderhoudPage() {
                 onPhotosChange={handlePhotosChange}
               />
 
+              <section className="page-block mt-4 rounded-2xl border border-white/70 bg-white/90 p-5 sm:p-6">
+                <h2 className="font-display text-2xl text-ink">Toelichting</h2>
+                <p className="mt-2 text-sm leading-relaxed text-ink/70 sm:text-base">
+                  Optioneel. Schrijf hier extra informatie over de
+                  onderhoudstaken.
+                </p>
+                <textarea
+                  rows={4}
+                  maxLength={2000}
+                  value={taskNote}
+                  onChange={(event) => setTaskNote(event.target.value)}
+                  placeholder="Bijvoorbeeld welk toestel het betreft of wat er aan de hand is."
+                  className="mt-4 w-full resize-y rounded-xl border border-mist bg-white px-3 py-2.5 text-ink outline-none focus:border-teal"
+                />
+              </section>
+
               <div className="mt-4">
                 <PopupModal
                   maxWidth="md:max-w-[720px]"
@@ -176,11 +194,13 @@ export default function OnderhoudPage() {
                         await createOnderhoudOfferte({
                           klantId: klant.id,
                           typeIds: selectedIds,
+                          taskNote,
                           images: photos,
                         })
                       }}
                       onSubmit={() => {
                         setSelectedIds([])
+                        setTaskNote('')
                         setPhotos([])
                       }}
                     />
