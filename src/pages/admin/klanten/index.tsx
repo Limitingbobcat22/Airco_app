@@ -53,6 +53,7 @@ export default function AdminKlantenPage() {
   const [editorDirty, setEditorDirty] = useState(false)
   const [discardOpen, setDiscardOpen] = useState(false)
   const [editing, setEditing] = useState<Klant | null>(null)
+  const [selectedRowId, setSelectedRowId] = useState<string | null>(null)
   const [deleting, setDeleting] = useState<Klant | null>(null)
 
   const closeEditor = () => {
@@ -60,6 +61,7 @@ export default function AdminKlantenPage() {
     setEditorDirty(false)
     setEditorOpen(false)
     setEditing(null)
+    setSelectedRowId(null)
   }
 
   const handleEditorDirtyChange = useCallback((dirty: boolean) => {
@@ -111,6 +113,7 @@ export default function AdminKlantenPage() {
     deleteMutation.reset()
     setDiscardOpen(false)
     setEditorDirty(false)
+    setSelectedRowId(null)
     setEditing(null)
     setEditorOpen(true)
   }
@@ -121,6 +124,7 @@ export default function AdminKlantenPage() {
     deleteMutation.reset()
     setDiscardOpen(false)
     setEditorDirty(false)
+    setSelectedRowId(klant.id)
     setEditing(klant)
     setEditorOpen(true)
   }
@@ -266,6 +270,8 @@ export default function AdminKlantenPage() {
             table={table}
             emptyMessage="Nog geen klanten."
             titleColumnIds={['name']}
+            selectedRowId={selectedRowId}
+            onRowClick={(row) => openEdit(row.original)}
           />
         )}
       </div>

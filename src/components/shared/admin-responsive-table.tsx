@@ -1,3 +1,4 @@
+import type { MouseEvent } from 'react'
 import { flexRender, type Cell, type Row, type Table as ReactTable } from '@tanstack/react-table'
 import {
   Table,
@@ -15,6 +16,15 @@ type AdminResponsiveTableProps<TData> = {
   /** Kolommen die samen de kaarttitel vormen. Ontbreekt er een, dan valt de titel terug op de eerste zichtbare kolom. */
   titleColumnIds?: string[]
   getRowClassName?: (row: Row<TData>) => string | undefined
+  onRowClick?: (row: Row<TData>) => void
+  selectedRowId?: string | null
+}
+
+function isRowClickIgnored(target: EventTarget | null) {
+  return (
+    target instanceof Element &&
+    Boolean(target.closest('a, button, input, select, textarea, label'))
+  )
 }
 
 function columnHeaderLabel(column: { id: string; columnDef: { header?: unknown } }) {
@@ -50,9 +60,19 @@ export function AdminResponsiveTable<TData>({
   emptyMessage,
   titleColumnIds,
   getRowClassName,
+  onRowClick,
+  selectedRowId,
 }: AdminResponsiveTableProps<TData>) {
   const rows = table.getRowModel().rows
   const visibleColumnCount = table.getVisibleLeafColumns().length
+
+  const isSelected = (row: Row<TData>) =>
+    selectedRowId != null && row.id === selectedRowId
+
+  const handleRowClick = (row: Row<TData>) => (event: MouseEvent) => {
+    if (!onRowClick || isRowClickIgnored(event.target)) return
+    onRowClick(row)
+  }
 
   return (
     <div className="flex min-h-0 flex-1 flex-col">
@@ -65,9 +85,14 @@ export function AdminResponsiveTable<TData>({
             return (
               <article
                 key={row.id}
+                data-state={isSelected(row) ? 'selected' : undefined}
+                onClick={onRowClick ? handleRowClick(row) : undefined}
                 className={cn(
                   'rounded-xl border bg-white p-4 shadow-sm',
+                  onRowClick && 'cursor-pointer hover:bg-muted/40',
                   getRowClassName?.(row),
+                  isSelected(row) &&
+                    'bg-sky-100 hover:bg-sky-100 data-[state=selected]:bg-sky-100',
                 )}
               >
                 {titleCells.length || statusCell ? (
@@ -125,7 +150,10 @@ export function AdminResponsiveTable<TData>({
                 ) : null}
 
                 {actionCells.length ? (
-                  <div className="mt-1 flex items-center justify-end border-t border-border pt-2">
+                  <div
+                    className="mt-1 flex items-center justify-end border-t border-border pt-2"
+                    onClick={(event) => event.stopPropagation()}
+                  >
                     {actionCells.map((cell) => (
                       <div key={cell.id}>
                         {flexRender(
@@ -170,9 +198,27 @@ export function AdminResponsiveTable<TData>({
           <TableBody>
             {rows.length ? (
               rows.map((row) => (
-                <TableRow key={row.id} className={getRowClassName?.(row)}>
+                <TableRow
+                  key={row.id}
+                  data-state={isSelected(row) ? 'selected' : undefined}
+                  onClick={onRowClick ? handleRowClick(row) : undefined}
+                  className={cn(
+                    onRowClick && 'cursor-pointer',
+                    getRowClassName?.(row),
+                    isSelected(row) &&
+                      'bg-sky-100 hover:bg-sky-100 data-[state=selected]:bg-sky-100',
+                  )}
+                >
                   {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id} className="whitespace-nowrap">
+                    <TableCell
+                      key={cell.id}
+                      className="whitespace-nowrap"
+                      onClick={
+                        cell.column.id === 'actions'
+                          ? (event) => event.stopPropagation()
+                          : undefined
+                      }
+                    >
                       {flexRender(
                         cell.column.columnDef.cell,
                         cell.getContext(),

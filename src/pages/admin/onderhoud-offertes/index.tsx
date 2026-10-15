@@ -4,6 +4,7 @@ import {
   getCoreRowModel,
   useReactTable,
   type ColumnDef,
+  type VisibilityState,
 } from '@tanstack/react-table'
 import { Pencil, Plus, Trash2 } from 'lucide-react'
 import { AdminResponsiveTable } from '@/components/shared/admin-responsive-table'
@@ -11,6 +12,7 @@ import Heading from '@/components/shared/heading'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Modal } from '@/components/ui/modal'
+import { MultiSelect } from '@/components/ui/multi-select'
 import { useAuth } from '@/hooks/use-auth'
 import {
   createOnderhoudOfferteAdmin,
@@ -21,7 +23,7 @@ import {
   updateOnderhoudOfferteRead,
   type OnderhoudOfferteOverview,
 } from '@/lib/api/onderhoud-offertes'
-import { listKlanten } from '@/lib/api/klanten'
+import { listKlanten, type Klant } from '@/lib/api/klanten'
 import { listOnderhoudTypes } from '@/lib/api/onderhoud-types'
 import { useUnsavedChanges } from '@/providers/unsaved-changes'
 import OnderhoudOfferteForm, {
@@ -32,6 +34,90 @@ const dateTime = new Intl.DateTimeFormat('nl-NL', {
   dateStyle: 'short',
   timeStyle: 'short',
 })
+
+const COLUMN_PREFS_KEY = 'columnPreferences_admin_onderhoud_offertes_v2'
+
+const DEFAULT_VISIBLE_COLUMN_IDS = [
+  'read',
+  'name',
+  'city',
+  'taskNote',
+  'typeNames',
+  'imageCount',
+  'createdAt',
+] as const
+
+const EXTRA_COLUMN_IDS = [
+  'email',
+  'note',
+  'phone',
+  'street',
+  'houseNumber',
+  'postalCode',
+  'consentContact',
+  'consentTerms',
+  'updatedAt',
+] as const
+
+const ALL_TOGGLEABLE_COLUMN_IDS = [
+  ...DEFAULT_VISIBLE_COLUMN_IDS,
+  ...EXTRA_COLUMN_IDS,
+] as const
+
+function buildDefaultVisibility(columnIds: string[]): VisibilityState {
+  const visibility: VisibilityState = {}
+  for (const id of columnIds) {
+    if (id === 'actions') {
+      visibility[id] = true
+      continue
+    }
+    visibility[id] = (DEFAULT_VISIBLE_COLUMN_IDS as readonly string[]).includes(
+      id,
+    )
+  }
+  return visibility
+}
+
+function loadColumnVisibility(columnIds: string[]): VisibilityState {
+  const defaults = buildDefaultVisibility(columnIds)
+  try {
+    localStorage.removeItem('columnPreferences_admin_onderhoud_offertes')
+    const raw = localStorage.getItem(COLUMN_PREFS_KEY)
+    if (!raw) return defaults
+    const saved = JSON.parse(raw) as VisibilityState
+    const merged: VisibilityState = { ...defaults }
+    for (const id of columnIds) {
+      if (id === 'actions') {
+        merged[id] = true
+        continue
+      }
+      if (id in saved) merged[id] = Boolean(saved[id])
+    }
+    return merged
+  } catch {
+    return defaults
+  }
+}
+
+function formatDateTime(value: string | null | undefined) {
+  const date = value ? new Date(value) : null
+  return date && !Number.isNaN(date.getTime()) ? dateTime.format(date) : '–'
+}
+
+function textOrDash(value: string | null | undefined) {
+  const trimmed = value?.trim()
+  return trimmed ? trimmed : '–'
+}
+
+function klantOf(klanten: Klant[], klantId: string | null) {
+  if (!klantId) return undefined
+  return klanten.find((klant) => klant.id === klantId)
+}
+
+function yesNo(value: boolean | null | undefined) {
+  if (value == null) return '–'
+  return value ? 'Ja' : 'Nee'
+}
 
 export default function AdminOnderhoudOffertesPage() {
   const { token } = useAuth()
@@ -70,7 +156,12 @@ export default function AdminOnderhoudOffertesPage() {
   const [editorDirty, setEditorDirty] = useState(false)
   const [discardOpen, setDiscardOpen] = useState(false)
   const [editingId, setEditingId] = useState<string | null>(null)
+  const [selectedRowId, setSelectedRowId] = useState<string | null>(null)
   const [deleting, setDeleting] = useState<OnderhoudOfferteOverview | null>(null)
+  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>(
+    () => loadColumnVisibility([...ALL_TOGGLEABLE_COLUMN_IDS, 'actions']),
+  )
+  const [columnPrefsReady, setColumnPrefsReady] = useState(false)
   const {
     data: editing,
     isFetching: detailLoading,
@@ -90,6 +181,7 @@ export default function AdminOnderhoudOffertesPage() {
     setEditorDirty(false)
     setEditorOpen(false)
     setEditingId(null)
+    setSelectedRowId(null)
   }
 
   const handleEditorDirtyChange = useCallback((dirty: boolean) => {
@@ -177,14 +269,35 @@ export default function AdminOnderhoudOffertesPage() {
     if (remoteRows) setRows(remoteRows)
   }, [remoteRows])
 
+  useEffect(() => {
+    setColumnPrefsReady(true)
+  }, [])
+
   const openCreate = () => {
     createMutation.reset()
     updateMutation.reset()
     setDiscardOpen(false)
     setEditorDirty(false)
+    setSelectedRowId(null)
     setEditingId(null)
     setEditorOpen(true)
   }
+
+  const openEdit = useCallback(
+    (item: OnderhoudOfferteOverview) => {
+      createMutation.reset()
+      updateMutation.reset()
+      setDiscardOpen(false)
+      setEditorDirty(false)
+      setSelectedRowId(item.id)
+      setEditingId(item.id)
+      setEditorOpen(true)
+      if (!item.read) {
+        markReadMutation.mutate(item.id)
+      }
+    },
+    [createMutation, markReadMutation, updateMutation],
+  )
 
   const requestCloseEditor = () => {
     if (createMutation.isPending || updateMutation.isPending) return
@@ -222,20 +335,41 @@ export default function AdminOnderhoudOffertesPage() {
       {
         accessorKey: 'email',
         header: 'E-mail',
-        cell: ({ getValue }) => getValue<string | null>() || '–',
+        cell: ({ getValue }) => textOrDash(getValue<string | null>()),
+      },
+      {
+        accessorKey: 'phone',
+        header: 'Telefoon',
+        cell: ({ getValue }) => textOrDash(getValue<string | null>()),
+      },
+      {
+        id: 'street',
+        header: 'Straat',
+        accessorFn: (row) => klantOf(klanten, row.klantId)?.street,
+        cell: ({ getValue }) => textOrDash(getValue<string | null>()),
+      },
+      {
+        id: 'houseNumber',
+        header: 'Huisnummer',
+        accessorFn: (row) => klantOf(klanten, row.klantId)?.houseNumber,
+        cell: ({ getValue }) => textOrDash(getValue<string | null>()),
       },
       {
         accessorKey: 'city',
         header: 'Woonplaats',
-        cell: ({ getValue }) => getValue<string | null>() || '–',
+        cell: ({ getValue }) => textOrDash(getValue<string | null>()),
+      },
+      {
+        id: 'postalCode',
+        header: 'Postcode',
+        accessorFn: (row) => klantOf(klanten, row.klantId)?.postalCode,
+        cell: ({ getValue }) => textOrDash(getValue<string | null>()),
       },
       {
         id: 'note',
         header: 'Opmerking',
         cell: ({ row }) => {
-          const value = klanten
-            .find((klant) => klant.id === row.original.klantId)
-            ?.note?.trim()
+          const value = klantOf(klanten, row.original.klantId)?.note?.trim()
           if (!value) return '–'
           return (
             <span className="line-clamp-2 max-w-xs whitespace-pre-wrap" title={value}>
@@ -243,6 +377,18 @@ export default function AdminOnderhoudOffertesPage() {
             </span>
           )
         },
+      },
+      {
+        id: 'consentContact',
+        header: 'Contact',
+        accessorFn: (row) => klantOf(klanten, row.klantId)?.consentContact ?? null,
+        cell: ({ getValue }) => yesNo(getValue<boolean | null>()),
+      },
+      {
+        id: 'consentTerms',
+        header: 'Voorwaarden',
+        accessorFn: (row) => klantOf(klanten, row.klantId)?.consentTerms ?? null,
+        cell: ({ getValue }) => yesNo(getValue<boolean | null>()),
       },
       {
         accessorKey: 'taskNote',
@@ -269,34 +415,24 @@ export default function AdminOnderhoudOffertesPage() {
       {
         accessorKey: 'createdAt',
         header: 'Aangemaakt',
-        cell: ({ getValue }) => {
-          const value = getValue<string>()
-          const date = value ? new Date(value) : null
-          return date && !Number.isNaN(date.getTime())
-            ? dateTime.format(date)
-            : '–'
-        },
+        cell: ({ getValue }) => formatDateTime(getValue<string>()),
+      },
+      {
+        accessorKey: 'updatedAt',
+        header: 'Gewijzigd',
+        cell: ({ getValue }) => formatDateTime(getValue<string>()),
       },
       {
         id: 'actions',
         header: 'Acties',
+        enableHiding: false,
         cell: ({ row }) => (
           <div className="flex items-center gap-1">
             <Button
               type="button"
               variant="ghost"
               size="icon"
-              onClick={() => {
-                createMutation.reset()
-                updateMutation.reset()
-                setDiscardOpen(false)
-                setEditorDirty(false)
-                setEditingId(row.original.id)
-                setEditorOpen(true)
-                if (!row.original.read) {
-                  markReadMutation.mutate(row.original.id)
-                }
-              }}
+              onClick={() => openEdit(row.original)}
               aria-label="Bewerken"
             >
               <Pencil className="size-4" />
@@ -317,12 +453,73 @@ export default function AdminOnderhoudOffertesPage() {
         ),
       },
     ],
-    [createMutation, deleteMutation, klanten, markReadMutation, updateMutation],
+    [deleteMutation, klanten, openEdit],
+  )
+
+  const selectableColumnIds = useMemo(
+    () =>
+      columns
+        .map((column) => {
+          if (column.id === 'actions') return null
+          if (column.id) return column.id
+          if (
+            'accessorKey' in column &&
+            typeof column.accessorKey === 'string'
+          ) {
+            return column.accessorKey
+          }
+          return null
+        })
+        .filter((id): id is string => Boolean(id)),
+    [columns],
+  )
+
+  const columnOptions = useMemo(
+    () =>
+      selectableColumnIds.map((id) => {
+        const column = columns.find((item) => {
+          if (item.id === id) return true
+          return (
+            'accessorKey' in item &&
+            typeof item.accessorKey === 'string' &&
+            item.accessorKey === id
+          )
+        })
+        const header = typeof column?.header === 'string' ? column.header : id
+        return { value: id, label: header }
+      }),
+    [columns, selectableColumnIds],
+  )
+
+  useEffect(() => {
+    if (!columnPrefsReady) return
+    localStorage.setItem(COLUMN_PREFS_KEY, JSON.stringify(columnVisibility))
+  }, [columnVisibility, columnPrefsReady])
+
+  const resetColumnVisibility = () => {
+    localStorage.removeItem(COLUMN_PREFS_KEY)
+    setColumnVisibility(
+      buildDefaultVisibility([...selectableColumnIds, 'actions']),
+    )
+  }
+
+  const handleColumnVisibilityChange = (selectedColumns: string[]) => {
+    const next: VisibilityState = { actions: true }
+    for (const id of selectableColumnIds) {
+      next[id] = selectedColumns.includes(id)
+    }
+    setColumnVisibility(next)
+  }
+
+  const visibleColumns = Object.keys(columnVisibility).filter(
+    (key) => columnVisibility[key] && key !== 'actions',
   )
 
   const table = useReactTable({
     data: rows,
     columns,
+    state: { columnVisibility },
+    onColumnVisibilityChange: setColumnVisibility,
     getCoreRowModel: getCoreRowModel(),
     getRowId: (row) => row.id,
   })
@@ -334,7 +531,7 @@ export default function AdminOnderhoudOffertesPage() {
 
   return (
     <div className="flex h-full flex-col overflow-hidden">
-      <div className="flex flex-col gap-4 border-b px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
+      <div className="flex flex-col gap-4 border-b px-4 py-4 xl:px-6">
         <Heading
           title="Onderhoud-offerte"
           description={
@@ -343,14 +540,26 @@ export default function AdminOnderhoudOffertesPage() {
               : "Aanvragen gekoppeld aan een klant, met onderhoudtypes en foto's."
           }
         />
-        <Button
-          type="button"
-          onClick={openCreate}
-          className="gap-2 bg-sky-400 text-white shadow hover:bg-sky-500"
-        >
-          <Plus className="size-4" />
-          Toevoegen
-        </Button>
+        <div className="flex w-full flex-col items-stretch gap-3 xl:flex-row xl:items-center">
+          <span className="shrink-0 text-sm font-medium">Kolommen:</span>
+          <MultiSelect
+            value={visibleColumns}
+            options={columnOptions}
+            onValueChange={handleColumnVisibilityChange}
+            onClear={resetColumnVisibility}
+            placeholder="Selecteer kolommen"
+            variant="inverted"
+            className="w-full xl:min-w-0 xl:flex-1"
+          />
+          <Button
+            type="button"
+            onClick={openCreate}
+            className="w-full gap-2 bg-sky-400 text-white shadow hover:bg-sky-500 xl:w-auto"
+          >
+            <Plus className="size-4" />
+            Toevoegen
+          </Button>
+        </div>
       </div>
 
       <div className="flex min-h-0 flex-1 flex-col overflow-hidden p-4 sm:p-6">
@@ -380,6 +589,8 @@ export default function AdminOnderhoudOffertesPage() {
             table={table}
             emptyMessage="Nog geen onderhoudoffertes."
             titleColumnIds={['name']}
+            selectedRowId={selectedRowId}
+            onRowClick={(row) => openEdit(row.original)}
             getRowClassName={(row) =>
               row.original.read ? undefined : 'bg-teal/5 font-medium'
             }

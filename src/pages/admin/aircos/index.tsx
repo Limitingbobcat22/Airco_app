@@ -121,6 +121,7 @@ export default function AdminAircosPage() {
   const [editorDirty, setEditorDirty] = useState(false)
   const [discardOpen, setDiscardOpen] = useState(false)
   const [editing, setEditing] = useState<Airco | null>(null)
+  const [selectedRowId, setSelectedRowId] = useState<string | null>(null)
   const [deleting, setDeleting] = useState<Airco | null>(null)
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>(
     () =>
@@ -133,6 +134,7 @@ export default function AdminAircosPage() {
     setEditorDirty(false)
     setEditorOpen(false)
     setEditing(null)
+    setSelectedRowId(null)
   }
 
   const handleEditorDirtyChange = useCallback((dirty: boolean) => {
@@ -247,6 +249,7 @@ export default function AdminAircosPage() {
     deleteMutation.reset()
     setDiscardOpen(false)
     setEditorDirty(false)
+    setSelectedRowId(null)
     setEditing(null)
     setEditorOpen(true)
   }
@@ -257,6 +260,7 @@ export default function AdminAircosPage() {
     deleteMutation.reset()
     setDiscardOpen(false)
     setEditorDirty(false)
+    setSelectedRowId(airco.id)
     setEditing(airco)
     setEditorOpen(true)
   }
@@ -520,6 +524,8 @@ export default function AdminAircosPage() {
             table={table}
             emptyMessage="Geen aircos gevonden."
             titleColumnIds={['brand', 'model']}
+            selectedRowId={selectedRowId}
+            onRowClick={(row) => openEdit(row.original)}
           />
         )}
       </div>

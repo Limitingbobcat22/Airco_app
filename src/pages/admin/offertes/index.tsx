@@ -148,6 +148,7 @@ export default function AdminOffertesPage() {
   const [editorDirty, setEditorDirty] = useState(false)
   const [discardOpen, setDiscardOpen] = useState(false)
   const [editing, setEditing] = useState<Offerte | null>(null)
+  const [selectedRowId, setSelectedRowId] = useState<string | null>(null)
   const [deleting, setDeleting] = useState<Offerte | null>(null)
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>(
     () => loadColumnVisibility([...ALL_TOGGLEABLE_COLUMN_IDS, 'actions']),
@@ -159,6 +160,7 @@ export default function AdminOffertesPage() {
     setEditorDirty(false)
     setEditorOpen(false)
     setEditing(null)
+    setSelectedRowId(null)
   }
 
   const handleEditorDirtyChange = useCallback((dirty: boolean) => {
@@ -247,6 +249,7 @@ export default function AdminOffertesPage() {
     deleteMutation.reset()
     setDiscardOpen(false)
     setEditorDirty(false)
+    setSelectedRowId(null)
     setEditing(null)
     setEditorOpen(true)
   }
@@ -257,6 +260,7 @@ export default function AdminOffertesPage() {
     deleteMutation.reset()
     setDiscardOpen(false)
     setEditorDirty(false)
+    setSelectedRowId(offerte.id)
     setEditing(offerte)
     setEditorOpen(true)
     if (!offerte.read) {
@@ -562,6 +566,8 @@ export default function AdminOffertesPage() {
             table={table}
             emptyMessage="Nog geen offertes."
             titleColumnIds={['name']}
+            selectedRowId={selectedRowId}
+            onRowClick={(row) => openEdit(row.original)}
             getRowClassName={(row) =>
               row.original.read ? undefined : 'bg-teal/5 font-medium'
             }

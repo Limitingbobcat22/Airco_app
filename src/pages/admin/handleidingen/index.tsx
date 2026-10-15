@@ -51,6 +51,7 @@ export default function AdminHandleidingenPage() {
   const [editorDirty, setEditorDirty] = useState(false)
   const [discardOpen, setDiscardOpen] = useState(false)
   const [editing, setEditing] = useState<Handleiding | null>(null)
+  const [selectedRowId, setSelectedRowId] = useState<string | null>(null)
   const [deleting, setDeleting] = useState<Handleiding | null>(null)
   const [preview, setPreview] = useState<Handleiding | null>(null)
 
@@ -59,6 +60,7 @@ export default function AdminHandleidingenPage() {
     setEditorDirty(false)
     setEditorOpen(false)
     setEditing(null)
+    setSelectedRowId(null)
   }
 
   const handleEditorDirtyChange = useCallback((dirty: boolean) => {
@@ -127,6 +129,7 @@ export default function AdminHandleidingenPage() {
     deleteMutation.reset()
     setDiscardOpen(false)
     setEditorDirty(false)
+    setSelectedRowId(null)
     setEditing(null)
     setEditorOpen(true)
   }
@@ -137,6 +140,7 @@ export default function AdminHandleidingenPage() {
     deleteMutation.reset()
     setDiscardOpen(false)
     setEditorDirty(false)
+    setSelectedRowId(handleiding.id)
     setEditing(handleiding)
     setEditorOpen(true)
   }
@@ -283,6 +287,8 @@ export default function AdminHandleidingenPage() {
             table={table}
             emptyMessage="Nog geen handleidingen."
             titleColumnIds={['title']}
+            selectedRowId={selectedRowId}
+            onRowClick={(row) => openEdit(row.original)}
           />
         )}
       </div>

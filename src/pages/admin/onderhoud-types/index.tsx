@@ -44,6 +44,7 @@ export default function AdminOnderhoudTypesPage() {
   const [editorDirty, setEditorDirty] = useState(false)
   const [discardOpen, setDiscardOpen] = useState(false)
   const [editing, setEditing] = useState<OnderhoudType | null>(null)
+  const [selectedRowId, setSelectedRowId] = useState<string | null>(null)
   const [deleting, setDeleting] = useState<OnderhoudType | null>(null)
 
   const closeEditor = () => {
@@ -51,6 +52,7 @@ export default function AdminOnderhoudTypesPage() {
     setEditorDirty(false)
     setEditorOpen(false)
     setEditing(null)
+    setSelectedRowId(null)
   }
 
   const handleEditorDirtyChange = useCallback((dirty: boolean) => {
@@ -105,6 +107,7 @@ export default function AdminOnderhoudTypesPage() {
     updateMutation.reset()
     setDiscardOpen(false)
     setEditorDirty(false)
+    setSelectedRowId(null)
     setEditing(null)
     setEditorOpen(true)
   }
@@ -114,6 +117,7 @@ export default function AdminOnderhoudTypesPage() {
     updateMutation.reset()
     setDiscardOpen(false)
     setEditorDirty(false)
+    setSelectedRowId(type.id)
     setEditing(type)
     setEditorOpen(true)
   }
@@ -236,6 +240,8 @@ export default function AdminOnderhoudTypesPage() {
             table={table}
             emptyMessage="Nog geen onderhoudtypes."
             titleColumnIds={['name']}
+            selectedRowId={selectedRowId}
+            onRowClick={(row) => openEdit(row.original)}
           />
         )}
       </div>
