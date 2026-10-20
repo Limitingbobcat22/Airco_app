@@ -7,6 +7,11 @@ import {
   type VisibilityState,
 } from '@tanstack/react-table'
 import { Pencil, Plus, Trash2 } from 'lucide-react'
+import {
+  AdminExportButton,
+  AdminExportError,
+  useAdminExcelExport,
+} from '@/components/shared/admin-export-button'
 import { AdminResponsiveTable } from '@/components/shared/admin-responsive-table'
 import {
   AdminTableSearch,
@@ -17,6 +22,7 @@ import { Button } from '@/components/ui/button'
 import { Modal } from '@/components/ui/modal'
 import { MultiSelect } from '@/components/ui/multi-select'
 import { useAuth } from '@/hooks/use-auth'
+import { downloadAdminExport } from '@/lib/api/base'
 import { useDebouncedValue } from '@/hooks/use-debounced-value'
 import { createAirco, deleteAirco, deleteAircoImage, listAircos, updateAirco, uploadAircoImage } from '@/lib/api/aircos'
 import type { Airco } from '@/pages/airco/data/aircos'
@@ -107,6 +113,7 @@ function loadColumnVisibility(columnIds: string[]): VisibilityState {
 
 export default function AdminAircosPage() {
   const { token } = useAuth()
+  const excel = useAdminExcelExport()
   const { setDirty } = useUnsavedChanges()
   const queryClient = useQueryClient()
   const [search, setSearch] = useState('')
@@ -478,17 +485,48 @@ export default function AdminAircosPage() {
 
   return (
     <div className="flex h-full flex-col overflow-hidden">
-      <div className="flex flex-col gap-4 border-b px-4 py-4 xl:px-6">
-        <Heading
-          title="Aircos beheer"
-          description="Airco-modellen uit de API. Standaard 6 kolommen; voeg er meer toe via Kolommen."
-        />
+      <div className="flex flex-col gap-4 border-b px-4 py-4 sm:px-6">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <Heading
+            className="sm:min-w-0 sm:flex-1"
+            title="Aircos beheer"
+            description="Airco-modellen uit de API. Standaard 6 kolommen; voeg er meer toe via Kolommen."
+          />
+          <div className="flex shrink-0 flex-col items-stretch gap-2 sm:items-end">
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+              <AdminExportButton
+                onClick={() =>
+                  void excel.exportExcel((authToken) =>
+                    downloadAdminExport(
+                      authToken,
+                      '/aircos/export',
+                      'aircos',
+                      debouncedSearch,
+                      visibleColumns,
+                    ),
+                  )
+                }
+                loading={excel.isExporting}
+                disabled={!excel.canExport}
+              />
+              <Button
+                type="button"
+                onClick={openCreate}
+                className="gap-2 bg-sky-400 text-white shadow hover:bg-sky-500"
+              >
+                <Plus className="size-4" />
+                Toevoegen
+              </Button>
+            </div>
+            <AdminExportError message={excel.exportError} />
+          </div>
+        </div>
         <AdminTableSearch
           value={search}
           onChange={setSearch}
           placeholder="Zoek op merk, model, type of vermogen"
         />
-        <div className="flex w-full flex-col items-stretch gap-3 xl:flex-row xl:items-center">
+        <div className="flex w-full flex-col items-stretch gap-3 sm:flex-row sm:items-center">
           <span className="shrink-0 text-sm font-medium">Kolommen:</span>
           <MultiSelect
             value={visibleColumns}
@@ -497,16 +535,8 @@ export default function AdminAircosPage() {
             onClear={resetColumnVisibility}
             placeholder="Selecteer kolommen"
             variant="inverted"
-            className="w-full xl:min-w-0 xl:flex-1"
+            className="w-full sm:min-w-0 sm:flex-1"
           />
-          <Button
-            type="button"
-            onClick={openCreate}
-            className="w-full gap-2 bg-sky-400 text-white shadow hover:bg-sky-500 xl:w-auto"
-          >
-            <Plus className="size-4" />
-            Toevoegen
-          </Button>
         </div>
       </div>
 

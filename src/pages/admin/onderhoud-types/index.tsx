@@ -6,6 +6,11 @@ import {
   type ColumnDef,
 } from '@tanstack/react-table'
 import { Pencil, Plus, Trash2 } from 'lucide-react'
+import {
+  AdminExportButton,
+  AdminExportError,
+  useAdminExcelExport,
+} from '@/components/shared/admin-export-button'
 import { AdminResponsiveTable } from '@/components/shared/admin-responsive-table'
 import {
   AdminTableSearch,
@@ -15,6 +20,7 @@ import Heading from '@/components/shared/heading'
 import { Button } from '@/components/ui/button'
 import { Modal } from '@/components/ui/modal'
 import { useAuth } from '@/hooks/use-auth'
+import { downloadAdminExport } from '@/lib/api/base'
 import { useDebouncedValue } from '@/hooks/use-debounced-value'
 import {
   createOnderhoudType,
@@ -30,6 +36,7 @@ import OnderhoudTypeForm, {
 
 export default function AdminOnderhoudTypesPage() {
   const { token } = useAuth()
+  const excel = useAdminExcelExport()
   const { setDirty } = useUnsavedChanges()
   const queryClient = useQueryClient()
   const [search, setSearch] = useState('')
@@ -214,14 +221,33 @@ export default function AdminOnderhoudTypesPage() {
             title="Onderhoud-type"
             description="Types en handelingen die klanten op de onderhoudspagina zien."
           />
-          <Button
-            type="button"
-            onClick={openCreate}
-            className="gap-2 bg-sky-400 text-white shadow hover:bg-sky-500"
-          >
-            <Plus className="size-4" />
-            Toevoegen
-          </Button>
+          <div className="flex flex-col items-stretch gap-2 sm:items-end">
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+              <AdminExportButton
+                onClick={() =>
+                  void excel.exportExcel((authToken) =>
+                    downloadAdminExport(
+                      authToken,
+                      '/onderhoud-types/export',
+                      'onderhoud-types',
+                      debouncedSearch,
+                    ),
+                  )
+                }
+                loading={excel.isExporting}
+                disabled={!excel.canExport}
+              />
+              <Button
+                type="button"
+                onClick={openCreate}
+                className="gap-2 bg-sky-400 text-white shadow hover:bg-sky-500"
+              >
+                <Plus className="size-4" />
+                Toevoegen
+              </Button>
+            </div>
+            <AdminExportError message={excel.exportError} />
+          </div>
         </div>
         <AdminTableSearch
           value={search}
