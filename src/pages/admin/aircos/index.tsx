@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import {
   getCoreRowModel,
   useReactTable,
@@ -8,11 +8,16 @@ import {
 } from '@tanstack/react-table'
 import { Pencil, Plus, Trash2 } from 'lucide-react'
 import { AdminResponsiveTable } from '@/components/shared/admin-responsive-table'
+import {
+  AdminTableSearch,
+  searchEmptyMessage,
+} from '@/components/shared/admin-table-search'
 import Heading from '@/components/shared/heading'
 import { Button } from '@/components/ui/button'
 import { Modal } from '@/components/ui/modal'
 import { MultiSelect } from '@/components/ui/multi-select'
 import { useAuth } from '@/hooks/use-auth'
+import { useDebouncedValue } from '@/hooks/use-debounced-value'
 import { createAirco, deleteAirco, deleteAircoImage, listAircos, updateAirco, uploadAircoImage } from '@/lib/api/aircos'
 import type { Airco } from '@/pages/airco/data/aircos'
 import type { PendingAircoImage } from '@/pages/airco/data/airco-photos'
@@ -104,6 +109,8 @@ export default function AdminAircosPage() {
   const { token } = useAuth()
   const { setDirty } = useUnsavedChanges()
   const queryClient = useQueryClient()
+  const [search, setSearch] = useState('')
+  const debouncedSearch = useDebouncedValue(search)
   const {
     data: remoteRows,
     isLoading,
@@ -112,8 +119,9 @@ export default function AdminAircosPage() {
     refetch,
     isFetching,
   } = useQuery({
-    queryKey: ['aircos'],
-    queryFn: listAircos,
+    queryKey: debouncedSearch ? ['aircos', debouncedSearch] : ['aircos'],
+    queryFn: () => listAircos(debouncedSearch),
+    placeholderData: keepPreviousData,
   })
 
   const [rows, setRows] = useState<Airco[]>([])
@@ -475,6 +483,11 @@ export default function AdminAircosPage() {
           title="Aircos beheer"
           description="Airco-modellen uit de API. Standaard 6 kolommen; voeg er meer toe via Kolommen."
         />
+        <AdminTableSearch
+          value={search}
+          onChange={setSearch}
+          placeholder="Zoek op merk, model, type of vermogen"
+        />
         <div className="flex w-full flex-col items-stretch gap-3 xl:flex-row xl:items-center">
           <span className="shrink-0 text-sm font-medium">Kolommen:</span>
           <MultiSelect
@@ -522,7 +535,10 @@ export default function AdminAircosPage() {
         ) : (
           <AdminResponsiveTable
             table={table}
-            emptyMessage="Geen aircos gevonden."
+            emptyMessage={searchEmptyMessage(
+              debouncedSearch,
+              'Geen aircos gevonden.',
+            )}
             titleColumnIds={['brand', 'model']}
             selectedRowId={selectedRowId}
             onRowClick={(row) => openEdit(row.original)}

@@ -1,4 +1,4 @@
-import { API_URL, readApiError } from './base'
+import { API_URL, readApiError, withSearch } from './base'
 import type { KlantNawData, OfferteContext } from '@/pages/klant/types'
 
 export type Klant = {
@@ -104,8 +104,11 @@ export async function createKlant(payload: CreateKlantInput): Promise<Klant> {
   return response.json() as Promise<Klant>
 }
 
-export async function listKlanten(token: string): Promise<Klant[]> {
-  const response = await fetch(`${API_URL}/klanten`, {
+export async function listKlanten(
+  token: string,
+  search?: string,
+): Promise<Klant[]> {
+  const response = await fetch(withSearch(`${API_URL}/klanten`, search), {
     headers: { Authorization: `Bearer ${token}` },
   })
 

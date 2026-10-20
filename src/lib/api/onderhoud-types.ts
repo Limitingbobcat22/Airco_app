@@ -1,4 +1,4 @@
-import { API_URL, readApiError } from './base'
+import { API_URL, readApiError, withSearch } from './base'
 
 export type OnderhoudType = {
   id: string
@@ -13,8 +13,10 @@ export type OnderhoudTypeInput = {
   sortOrder: number
 }
 
-export async function listOnderhoudTypes(): Promise<OnderhoudType[]> {
-  const response = await fetch(`${API_URL}/onderhoud-types`)
+export async function listOnderhoudTypes(
+  search?: string,
+): Promise<OnderhoudType[]> {
+  const response = await fetch(withSearch(`${API_URL}/onderhoud-types`, search))
 
   if (!response.ok) {
     throw new Error(

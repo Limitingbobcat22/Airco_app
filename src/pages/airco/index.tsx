@@ -47,7 +47,7 @@ export default function AircoPage() {
     error: aircosFetchError,
   } = useQuery({
     queryKey: ['aircos'],
-    queryFn: listAircos,
+    queryFn: () => listAircos(),
   })
 
   useEffect(() => {

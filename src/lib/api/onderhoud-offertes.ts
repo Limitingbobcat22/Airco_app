@@ -1,4 +1,4 @@
-import { API_URL, readApiError } from './base'
+import { API_URL, readApiError, withSearch } from './base'
 
 export type OnderhoudOfferteTypeRef = {
   id: string
@@ -119,10 +119,14 @@ export async function createOnderhoudOfferteAdmin(
 
 export async function listOnderhoudOffertes(
   token: string,
+  search?: string,
 ): Promise<OnderhoudOfferteOverview[]> {
-  const response = await fetch(`${API_URL}/onderhoud-offertes`, {
-    headers: { Authorization: `Bearer ${token}` },
-  })
+  const response = await fetch(
+    withSearch(`${API_URL}/onderhoud-offertes`, search),
+    {
+      headers: { Authorization: `Bearer ${token}` },
+    },
+  )
 
   if (!response.ok) {
     throw new Error(

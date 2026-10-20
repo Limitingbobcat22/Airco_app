@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import {
   getCoreRowModel,
   useReactTable,
@@ -7,10 +7,15 @@ import {
 } from '@tanstack/react-table'
 import { Pencil, Plus, Trash2 } from 'lucide-react'
 import { AdminResponsiveTable } from '@/components/shared/admin-responsive-table'
+import {
+  AdminTableSearch,
+  searchEmptyMessage,
+} from '@/components/shared/admin-table-search'
 import Heading from '@/components/shared/heading'
 import { Button } from '@/components/ui/button'
 import { Modal } from '@/components/ui/modal'
 import { useAuth } from '@/hooks/use-auth'
+import { useDebouncedValue } from '@/hooks/use-debounced-value'
 import {
   createOnderhoudType,
   deleteOnderhoudType,
@@ -27,6 +32,8 @@ export default function AdminOnderhoudTypesPage() {
   const { token } = useAuth()
   const { setDirty } = useUnsavedChanges()
   const queryClient = useQueryClient()
+  const [search, setSearch] = useState('')
+  const debouncedSearch = useDebouncedValue(search)
   const {
     data: remoteRows,
     isLoading,
@@ -35,8 +42,11 @@ export default function AdminOnderhoudTypesPage() {
     refetch,
     isFetching,
   } = useQuery({
-    queryKey: ['onderhoud-types'],
-    queryFn: listOnderhoudTypes,
+    queryKey: debouncedSearch
+      ? ['onderhoud-types', debouncedSearch]
+      : ['onderhoud-types'],
+    queryFn: () => listOnderhoudTypes(debouncedSearch),
+    placeholderData: keepPreviousData,
   })
 
   const [rows, setRows] = useState<OnderhoudType[]>([])
@@ -198,19 +208,26 @@ export default function AdminOnderhoudTypesPage() {
 
   return (
     <div className="flex h-full flex-col overflow-hidden">
-      <div className="flex flex-col gap-4 border-b px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
-        <Heading
-          title="Onderhoud-type"
-          description="Types en handelingen die klanten op de onderhoudspagina zien."
+      <div className="flex flex-col gap-4 border-b px-4 py-4 sm:px-6">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <Heading
+            title="Onderhoud-type"
+            description="Types en handelingen die klanten op de onderhoudspagina zien."
+          />
+          <Button
+            type="button"
+            onClick={openCreate}
+            className="gap-2 bg-sky-400 text-white shadow hover:bg-sky-500"
+          >
+            <Plus className="size-4" />
+            Toevoegen
+          </Button>
+        </div>
+        <AdminTableSearch
+          value={search}
+          onChange={setSearch}
+          placeholder="Zoek op type of handelingen"
         />
-        <Button
-          type="button"
-          onClick={openCreate}
-          className="gap-2 bg-sky-400 text-white shadow hover:bg-sky-500"
-        >
-          <Plus className="size-4" />
-          Toevoegen
-        </Button>
       </div>
 
       <div className="flex min-h-0 flex-1 flex-col overflow-hidden p-4 sm:p-6">
@@ -238,7 +255,10 @@ export default function AdminOnderhoudTypesPage() {
         ) : (
           <AdminResponsiveTable
             table={table}
-            emptyMessage="Nog geen onderhoudtypes."
+            emptyMessage={searchEmptyMessage(
+              debouncedSearch,
+              'Nog geen onderhoudtypes.',
+            )}
             titleColumnIds={['name']}
             selectedRowId={selectedRowId}
             onRowClick={(row) => openEdit(row.original)}

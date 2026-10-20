@@ -19,7 +19,7 @@ export default function HandleidingenPage() {
     error,
   } = useQuery({
     queryKey: ['handleidingen'],
-    queryFn: listHandleidingen,
+    queryFn: () => listHandleidingen(),
   })
 
   return (

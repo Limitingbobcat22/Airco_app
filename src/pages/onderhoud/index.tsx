@@ -39,7 +39,7 @@ export default function OnderhoudPage() {
     error,
   } = useQuery({
     queryKey: ['onderhoud-types'],
-    queryFn: listOnderhoudTypes,
+    queryFn: () => listOnderhoudTypes(),
   })
 
   const maxPhotos = Math.min(selectedIds.length, 3)

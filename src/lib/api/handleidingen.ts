@@ -1,4 +1,4 @@
-import { API_URL, readApiError } from './base'
+import { API_URL, readApiError, withSearch } from './base'
 
 export type Handleiding = {
   id: string
@@ -23,8 +23,10 @@ export type UpdateHandleidingInput = {
   file?: File
 }
 
-export async function listHandleidingen(): Promise<Handleiding[]> {
-  const response = await fetch(`${API_URL}/handleidingen`)
+export async function listHandleidingen(
+  search?: string,
+): Promise<Handleiding[]> {
+  const response = await fetch(withSearch(`${API_URL}/handleidingen`, search))
 
   if (!response.ok) {
     throw new Error(

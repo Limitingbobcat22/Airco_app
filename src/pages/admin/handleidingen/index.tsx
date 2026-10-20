@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import {
   getCoreRowModel,
   useReactTable,
@@ -7,11 +7,16 @@ import {
 } from '@tanstack/react-table'
 import { Eye, Pencil, Plus, Trash2 } from 'lucide-react'
 import { AdminResponsiveTable } from '@/components/shared/admin-responsive-table'
+import {
+  AdminTableSearch,
+  searchEmptyMessage,
+} from '@/components/shared/admin-table-search'
 import Heading from '@/components/shared/heading'
 import { PdfDocumentPreview } from '@/components/shared/pdf-document-preview'
 import { Button } from '@/components/ui/button'
 import { Modal } from '@/components/ui/modal'
 import { useAuth } from '@/hooks/use-auth'
+import { useDebouncedValue } from '@/hooks/use-debounced-value'
 import {
   createHandleiding,
   deleteHandleiding,
@@ -34,6 +39,8 @@ export default function AdminHandleidingenPage() {
   const { token } = useAuth()
   const { setDirty } = useUnsavedChanges()
   const queryClient = useQueryClient()
+  const [search, setSearch] = useState('')
+  const debouncedSearch = useDebouncedValue(search)
   const {
     data: remoteRows,
     isLoading,
@@ -42,8 +49,11 @@ export default function AdminHandleidingenPage() {
     refetch,
     isFetching,
   } = useQuery({
-    queryKey: ['handleidingen'],
-    queryFn: listHandleidingen,
+    queryKey: debouncedSearch
+      ? ['handleidingen', debouncedSearch]
+      : ['handleidingen'],
+    queryFn: () => listHandleidingen(debouncedSearch),
+    placeholderData: keepPreviousData,
   })
 
   const [rows, setRows] = useState<Handleiding[]>([])
@@ -245,19 +255,26 @@ export default function AdminHandleidingenPage() {
 
   return (
     <div className="flex h-full flex-col overflow-hidden">
-      <div className="flex flex-col gap-4 border-b px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
-        <Heading
-          title="Handleidingen beheer"
-          description="Upload, bewerk en verwijder PDF-handleidingen die klanten kunnen bekijken."
+      <div className="flex flex-col gap-4 border-b px-4 py-4 sm:px-6">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <Heading
+            title="Handleidingen beheer"
+            description="Upload, bewerk en verwijder PDF-handleidingen die klanten kunnen bekijken."
+          />
+          <Button
+            type="button"
+            onClick={openCreate}
+            className="gap-2 bg-sky-400 text-white shadow hover:bg-sky-500"
+          >
+            <Plus className="size-4" />
+            Toevoegen
+          </Button>
+        </div>
+        <AdminTableSearch
+          value={search}
+          onChange={setSearch}
+          placeholder="Zoek op titel, beschrijving of bestandsnaam"
         />
-        <Button
-          type="button"
-          onClick={openCreate}
-          className="gap-2 bg-sky-400 text-white shadow hover:bg-sky-500"
-        >
-          <Plus className="size-4" />
-          Toevoegen
-        </Button>
       </div>
 
       <div className="flex min-h-0 flex-1 flex-col overflow-hidden p-4 sm:p-6">
@@ -285,7 +302,10 @@ export default function AdminHandleidingenPage() {
         ) : (
           <AdminResponsiveTable
             table={table}
-            emptyMessage="Nog geen handleidingen."
+            emptyMessage={searchEmptyMessage(
+              debouncedSearch,
+              'Nog geen handleidingen.',
+            )}
             titleColumnIds={['title']}
             selectedRowId={selectedRowId}
             onRowClick={(row) => openEdit(row.original)}

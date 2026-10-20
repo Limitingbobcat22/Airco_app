@@ -1,4 +1,4 @@
-import { API_URL, readApiError } from './base'
+import { API_URL, readApiError, withSearch } from './base'
 import type { Klant } from './klanten'
 
 export type OfferteAirco = {
@@ -71,8 +71,11 @@ export function offerteAircoLabel(offerte: Offerte): string {
   return `${offerte.airco.brand} ${offerte.airco.model}`.trim()
 }
 
-export async function listOffertes(token: string): Promise<Offerte[]> {
-  const response = await fetch(`${API_URL}/offertes`, {
+export async function listOffertes(
+  token: string,
+  search?: string,
+): Promise<Offerte[]> {
+  const response = await fetch(withSearch(`${API_URL}/offertes`, search), {
     headers: { Authorization: `Bearer ${token}` },
   })
 

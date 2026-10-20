@@ -1,4 +1,4 @@
-import { API_URL, readApiError } from './base'
+import { API_URL, readApiError, withSearch } from './base'
 import type { Airco } from '@/pages/airco/data/aircos'
 
 export type CreateAircoInput = {
@@ -27,8 +27,8 @@ export type CreateAircoInput = {
   accent?: string
 }
 
-export async function listAircos(): Promise<Airco[]> {
-  const response = await fetch(`${API_URL}/aircos`)
+export async function listAircos(search?: string): Promise<Airco[]> {
+  const response = await fetch(withSearch(`${API_URL}/aircos`, search))
 
   if (!response.ok) {
     throw new Error(await readApiError(response, 'Aircos ophalen mislukt'))

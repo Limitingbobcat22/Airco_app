@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import {
   getCoreRowModel,
   useReactTable,
@@ -8,12 +8,17 @@ import {
 } from '@tanstack/react-table'
 import { Pencil, Plus, Trash2 } from 'lucide-react'
 import { AdminResponsiveTable } from '@/components/shared/admin-responsive-table'
+import {
+  AdminTableSearch,
+  searchEmptyMessage,
+} from '@/components/shared/admin-table-search'
 import Heading from '@/components/shared/heading'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Modal } from '@/components/ui/modal'
 import { MultiSelect } from '@/components/ui/multi-select'
 import { useAuth } from '@/hooks/use-auth'
+import { useDebouncedValue } from '@/hooks/use-debounced-value'
 import { listAircos } from '@/lib/api/aircos'
 import { listKlanten } from '@/lib/api/klanten'
 import {
@@ -113,6 +118,8 @@ export default function AdminOffertesPage() {
   const { token } = useAuth()
   const { setDirty } = useUnsavedChanges()
   const queryClient = useQueryClient()
+  const [search, setSearch] = useState('')
+  const debouncedSearch = useDebouncedValue(search)
   const {
     data: remoteRows,
     isLoading,
@@ -121,12 +128,13 @@ export default function AdminOffertesPage() {
     refetch,
     isFetching,
   } = useQuery({
-    queryKey: ['offertes'],
+    queryKey: debouncedSearch ? ['offertes', debouncedSearch] : ['offertes'],
     queryFn: () => {
       if (!token) throw new Error('Je bent niet ingelogd als admin.')
-      return listOffertes(token)
+      return listOffertes(token, debouncedSearch)
     },
     enabled: Boolean(token),
+    placeholderData: keepPreviousData,
   })
 
   const { data: klanten = [] } = useQuery({
@@ -140,7 +148,7 @@ export default function AdminOffertesPage() {
 
   const { data: aircos = [] } = useQuery({
     queryKey: ['aircos'],
-    queryFn: listAircos,
+    queryFn: () => listAircos(),
   })
 
   const [rows, setRows] = useState<Offerte[]>([])
@@ -500,7 +508,9 @@ export default function AdminOffertesPage() {
     getRowId: (row) => row.id,
   })
 
-  const unreadCount = rows.filter((row) => !row.read).length
+  const unreadCount = debouncedSearch
+    ? 0
+    : rows.filter((row) => !row.read).length
   const saveError = editing ? updateMutation.error : createMutation.error
   const formError = saveError instanceof Error ? saveError.message : null
   const label = (offerte: Offerte | null) =>
@@ -516,6 +526,11 @@ export default function AdminOffertesPage() {
               ? `${unreadCount} ongelezen aanvraag${unreadCount === 1 ? '' : 'en'}. Aanvragen gekoppeld aan klant en airco.`
               : 'Aanvragen gekoppeld aan klant en airco. Het jaarvoordeel wordt bewaard zoals berekend bij de aanvraag.'
           }
+        />
+        <AdminTableSearch
+          value={search}
+          onChange={setSearch}
+          placeholder="Zoek op klant, e-mail, plaats of airco"
         />
         <div className="flex w-full flex-col items-stretch gap-3 xl:flex-row xl:items-center">
           <span className="shrink-0 text-sm font-medium">Kolommen:</span>
@@ -564,7 +579,7 @@ export default function AdminOffertesPage() {
         ) : (
           <AdminResponsiveTable
             table={table}
-            emptyMessage="Nog geen offertes."
+            emptyMessage={searchEmptyMessage(debouncedSearch, 'Nog geen offertes.')}
             titleColumnIds={['name']}
             selectedRowId={selectedRowId}
             onRowClick={(row) => openEdit(row.original)}

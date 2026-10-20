@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import {
   getCoreRowModel,
   useReactTable,
@@ -7,10 +7,15 @@ import {
 } from '@tanstack/react-table'
 import { Pencil, Plus, Trash2 } from 'lucide-react'
 import { AdminResponsiveTable } from '@/components/shared/admin-responsive-table'
+import {
+  AdminTableSearch,
+  searchEmptyMessage,
+} from '@/components/shared/admin-table-search'
 import Heading from '@/components/shared/heading'
 import { Button } from '@/components/ui/button'
 import { Modal } from '@/components/ui/modal'
 import { useAuth } from '@/hooks/use-auth'
+import { useDebouncedValue } from '@/hooks/use-debounced-value'
 import {
   createKlant,
   deleteKlant,
@@ -32,6 +37,8 @@ export default function AdminKlantenPage() {
   const { token } = useAuth()
   const { setDirty } = useUnsavedChanges()
   const queryClient = useQueryClient()
+  const [search, setSearch] = useState('')
+  const debouncedSearch = useDebouncedValue(search)
   const {
     data: remoteRows,
     isLoading,
@@ -40,12 +47,13 @@ export default function AdminKlantenPage() {
     refetch,
     isFetching,
   } = useQuery({
-    queryKey: ['klanten'],
+    queryKey: debouncedSearch ? ['klanten', debouncedSearch] : ['klanten'],
     queryFn: () => {
       if (!token) throw new Error('Je bent niet ingelogd als admin.')
-      return listKlanten(token)
+      return listKlanten(token, debouncedSearch)
     },
     enabled: Boolean(token),
+    placeholderData: keepPreviousData,
   })
 
   const [rows, setRows] = useState<Klant[]>([])
@@ -228,19 +236,26 @@ export default function AdminKlantenPage() {
 
   return (
     <div className="flex h-full flex-col overflow-hidden">
-      <div className="flex flex-col gap-4 border-b px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
-        <Heading
-          title="Klanten beheer"
-          description="NAW-gegevens van klanten. Aanmaken kan via de offerte-popup; bekijken, wijzigen en verwijderen is alleen voor admins."
+      <div className="flex flex-col gap-4 border-b px-4 py-4 sm:px-6">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <Heading
+            title="Klanten beheer"
+            description="NAW-gegevens van klanten. Aanmaken kan via de offerte-popup; bekijken, wijzigen en verwijderen is alleen voor admins."
+          />
+          <Button
+            type="button"
+            onClick={openCreate}
+            className="gap-2 bg-sky-400 text-white shadow hover:bg-sky-500"
+          >
+            <Plus className="size-4" />
+            Toevoegen
+          </Button>
+        </div>
+        <AdminTableSearch
+          value={search}
+          onChange={setSearch}
+          placeholder="Zoek op naam, e-mail, telefoon of plaats"
         />
-        <Button
-          type="button"
-          onClick={openCreate}
-          className="gap-2 bg-sky-400 text-white shadow hover:bg-sky-500"
-        >
-          <Plus className="size-4" />
-          Toevoegen
-        </Button>
       </div>
 
       <div className="flex min-h-0 flex-1 flex-col overflow-hidden p-4 sm:p-6">
@@ -268,7 +283,7 @@ export default function AdminKlantenPage() {
         ) : (
           <AdminResponsiveTable
             table={table}
-            emptyMessage="Nog geen klanten."
+            emptyMessage={searchEmptyMessage(debouncedSearch, 'Nog geen klanten.')}
             titleColumnIds={['name']}
             selectedRowId={selectedRowId}
             onRowClick={(row) => openEdit(row.original)}
