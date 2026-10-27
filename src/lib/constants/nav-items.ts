@@ -53,7 +53,16 @@ export function buildTopicNavItems(
 ): NavItem[] {
   const { isAdmin = false } = options
   const links = TOPIC_NAV_LINKS[topic]
-  const items: NavItem[] = []
+  const items: NavItem[] = [
+    {
+      title: 'Onderhoud',
+      href: ONDERHOUD_PATH,
+      icon: Wrench,
+      leavesTopic: true,
+      destinationLabel: 'Onderhoud',
+    },
+    { separator: true },
+  ]
   let lastGroup: string | null = null
 
   for (const link of links) {
@@ -80,13 +89,6 @@ export function buildTopicNavItems(
     icon: BookOpen,
     leavesTopic: true,
     destinationLabel: 'Handleidingen',
-  })
-  items.push({
-    title: 'Onderhoud',
-    href: ONDERHOUD_PATH,
-    icon: Wrench,
-    leavesTopic: true,
-    destinationLabel: 'Onderhoud',
   })
 
   if (canSwitchToTarget) {

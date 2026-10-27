@@ -9,7 +9,7 @@ export const COMPANY = {
   phoneHref: 'tel:+31644454681',
   addressLines: ['Nederland'],
   kvk: '42174382',
-  vat: 'NL001234567B01',
+  vat: 'NL42174382B01',
   socials: [
     {
       id: 'instagram',
