@@ -77,13 +77,14 @@ export default function OnderhoudPage() {
               </h1>
               <div className="mt-6 space-y-4 text-base leading-relaxed text-ink/75 sm:text-lg">
                 <p>
-                  Regelmatig onderhoud houdt uw airco of ketel zuinig, stil en
-                  betrouwbaar. Hier leest u straks wat een onderhoudsbeurt
-                  inhoudt en wanneer die nodig is.
+                  Zuinig, stil en betrouwbaar: het belang van regelmatig
+                  onderhoud
                 </p>
                 <p>
-                  Deze tekst is een tijdelijke placeholder. De definitieve
-                  uitleg over onderhoud, afspraken en service komt hier later.
+                  Met periodiek onderhoud blijft uw airco of ketel in
+                  topconditie. U voorkomt onverwachte storingen, verlengt de
+                  levensduur van uw installatie én bespaart direct op uw
+                  energiekosten.
                 </p>
               </div>
 
