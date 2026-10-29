@@ -349,7 +349,7 @@ export default function CreateKlantForm({
             className="mt-0.5 size-4 shrink-0 rounded border-mist accent-teal"
           />
           <span>
-            Ik geef hierbij toestemming aan AiroEnWarmte om contact met mij op te nemen over
+            Ik geef hierbij toestemming aan AircoEnWarmte om contact met mij op te nemen over
             deze offerteaanvraag.
           </span>
         </label>

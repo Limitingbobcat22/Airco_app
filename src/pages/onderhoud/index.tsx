@@ -78,7 +78,7 @@ export default function OnderhoudPage() {
               <div className="mt-6 space-y-4 text-base leading-relaxed text-ink/75 sm:text-lg">
                 <p>
                   Zuinig, stil en betrouwbaar: het belang van regelmatig
-                  onderhoud
+                  onderhoud.
                 </p>
                 <p>
                   Met periodiek onderhoud blijft uw airco of ketel in
